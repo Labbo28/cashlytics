@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CashLytics</title>
+  <link rel="stylesheet" th:href="@{/homepage.css}">
+</head>
+<body>
+  <div class="container">
+    <div class="brand-logo">
+      <h1>CashLytics</h1>
+      <p>Prendi il controllo delle tue finanze</p>
+    </div>
+
+    <!-- Messaggi flash (es. dopo logout) -->
+    <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <div class="form-group">
+      <button
+        th:onclick="|window.location.href='@{/register}'|"
+        class="btn btn-primary">
+        Registrati
+      </button>
+    </div>
+  </div>
+</body>
+</html>

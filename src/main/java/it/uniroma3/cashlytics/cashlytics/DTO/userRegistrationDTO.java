@@ -8,13 +8,49 @@ import lombok.Data;
 @Data
 public class userRegistrationDTO {
     
-    @NotBlank(message = "Username cannot be blank")
-    @Size(min = 3, max = 20)
+    // User credentials
+    @NotBlank(message = "{NotBlank.userRegistrationDTO.username}")
+    @Size(min = 3, max = 20, message = "{Size.userRegistrationDTO.username}")
     private String username;
-    @NotBlank(message = "Password cannot be blank")
-    @Pattern( regexp = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,}$",
-    message = "Password must contain at least one letter, one number and be at least 8 characters long")
-    @Size(min = 8,message = "Password must be at least 8 characters long")
+
+    @NotBlank(message = "{NotBlank.userRegistrationDTO.password}")
+    @Pattern(
+        regexp = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,}$",
+        message = "{Pattern.userRegistrationDTO.password}"
+    )
+    @Size(min = 8, message = "{Size.userRegistrationDTO.password}")
     private String password;
+
+    @NotBlank(message = "{NotBlank.userRegistrationDTO.confirmPassword}")
+    @Pattern(
+        regexp = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,}$",
+        message = "{Pattern.userRegistrationDTO.confirmPassword}"
+    )
+    @Size(min = 8, message = "{Size.userRegistrationDTO.confirmPassword}")
+    private String confirmPassword;
+
+
+    // User data
+    @NotBlank(message = "{NotBlank.userRegistrationDTO.email}")
+    @Pattern(
+        regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+        message = "{Pattern.userRegistrationDTO.email}"
+    )
+    private String email;
+
+    @NotBlank(message = "{NotBlank.userRegistrationDTO.firstName}")
+    @Size(min = 2, max = 20, message = "{Size.userRegistrationDTO.firstName}")
+    private String firstName;
+
+    @NotBlank(message = "{NotBlank.userRegistrationDTO.lastName}")
+    @Size(min = 2, max = 20, message = "{Size.userRegistrationDTO.lastName}")
+    private String lastName;
+
+    @NotBlank(message = "{NotBlank.userRegistrationDTO.phoneNumber}")
+    @Pattern(
+        regexp = "^\\+?[0-9]{10,15}$",
+        message = "{Pattern.userRegistrationDTO.phoneNumber}"
+    )
+    private String phoneNumber;
 
 }

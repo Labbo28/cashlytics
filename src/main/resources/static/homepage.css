@@ -1,0 +1,57 @@
+@import url('styles.css'); /* importa lo stile base */
+
+.home-container {
+  max-width: 600px;
+  margin: 5rem auto;
+  background-color: var(--white);
+  border-radius: 12px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 20px rgba(10, 36, 99, 0.15);
+  text-align: center;
+}
+
+.home-container h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.home-container p {
+  font-size: 1.1rem;
+  color: var(--neutral-mid);
+  margin-bottom: 2rem;
+}
+
+.home-logo {
+  font-size: 2rem;
+  font-weight: var(--heading-weight);
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+}
+
+.home-button {
+  display: inline-block;
+  background-color: var(--primary);
+  color: var(--white);
+  padding: 0.9rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.home-button:hover {
+  background-color: #083682;
+  transform: translateY(-1px);
+}
+
+.home-button:active {
+  transform: translateY(0);
+}
+
+footer {
+  margin-top: 3rem;
+  font-size: 0.85rem;
+  color: var(--neutral-mid);
+  text-align: center;
+}
