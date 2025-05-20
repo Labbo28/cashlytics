@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class userRegistrationDTO {
+public class UserRegistrationDTO {
     
     // User credentials
     @NotBlank(message = "{NotBlank.userRegistrationDTO.username}")

@@ -5,13 +5,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import it.uniroma3.cashlytics.cashlytics.DTO.userRegistrationDTO;
+
+import it.uniroma3.cashlytics.cashlytics.DTO.UserLoginDTO;
+import it.uniroma3.cashlytics.cashlytics.DTO.UserRegistrationDTO;
 import it.uniroma3.cashlytics.cashlytics.Exceptions.EmailAlreadyExistsException;
 import it.uniroma3.cashlytics.cashlytics.Exceptions.UserAlreadyExistsException;
+import it.uniroma3.cashlytics.cashlytics.Exceptions.UserDoesNotExistsException;
+import it.uniroma3.cashlytics.cashlytics.Exceptions.WrongPasswordException;
 import it.uniroma3.cashlytics.cashlytics.service.AutenticationService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
@@ -34,7 +38,7 @@ public class AutententicationController {
     @GetMapping("/register")
     public String getRegisterPage(Model model) {
         if(!model.containsAttribute("userRegistrationDTO")) {
-            model.addAttribute("userRegistrationDTO", new userRegistrationDTO());
+            model.addAttribute("userRegistrationDTO", new UserRegistrationDTO());
         }
         return "register";
     }
@@ -50,7 +54,7 @@ public class AutententicationController {
      * @return The view name to render (either back to register page or redirect to login)
      */
     @PostMapping("/register")
-    public String registerUser(@Valid  userRegistrationDTO userRegistrationDTO,
+    public String registerUser(@Valid  UserRegistrationDTO userRegistrationDTO,
                               BindingResult bindingResult, 
                               RedirectAttributes redirectAttributes,
                               Model model) {
@@ -85,6 +89,49 @@ public class AutententicationController {
             return "register";
         }
     }
+
+    @GetMapping("/login")
+   public String GetLoginPage(Model model) {
+    if(!model.containsAttribute("userLoginDTO")) {
+        model.addAttribute("userLoginDTO", new UserLoginDTO());
+        }
+    return "login";
+   }
+
+
+   @PostMapping("/login")
+   public String LoginUser(@Valid UserLoginDTO userLoginDTO, 
+                                BindingResult bindingResult,
+                           RedirectAttributes redirectAttributes,
+                           Model model
+                           ){
+        if(bindingResult.hasErrors()) {
+
+            return "login";
+        }
+        try{
+            autenticationService.loginUser(userLoginDTO);
+            redirectAttributes.addFlashAttribute("successMessage", 
+            "Login successful! Welcome back " + userLoginDTO.getUsername() + "!");
+        } catch (UserDoesNotExistsException e) {
+            bindingResult.rejectValue("username", "error.usernameLogin", e.getMessage());
+            model.addAttribute("userLoginDTO", userLoginDTO);
+            return "login";
+        }
+        catch (WrongPasswordException e) {
+            bindingResult.rejectValue("password", "error.password", e.getMessage());
+            model.addAttribute("userLoginDTO", userLoginDTO);
+            return "login";
+        }
+        catch (Exception e) {
+            // Handle any other unexpected errors
+            model.addAttribute("userRegistrationDTO", userLoginDTO);
+            model.addAttribute("errorMessage", "An unexpected error occurred. Please try again.");
+            return "login";
+        }
+       
+       return "redirect:/";
+   }
     
    
 }
