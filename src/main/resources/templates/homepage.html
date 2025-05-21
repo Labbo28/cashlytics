@@ -1,36 +1,88 @@
 <!DOCTYPE html>
 <html lang="it" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CashLytics</title>
-  <link rel="stylesheet" th:href="@{/homepage.css}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CashLytics - Gestione Finanziaria</title>
+    <!-- Main stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <!-- Font import from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
-  <div class="container">
-    <div class="brand-logo">
-      <h1>CashLytics</h1>
-      <p>Prendi il controllo delle tue finanze</p>
-    </div>
+<body class="homepage-body">
+    <header class="homepage-header">
+        <div class="container">
+            <nav class="main-nav">
+                <div class="logo">CashLytics</div>
+                <ul class="nav-links">
+                    <li><a th:href="@{/login}" class="nav-btn">Accedi</a></li>
+                    <li><a th:href="@{/register}" class="nav-btn nav-btn-primary">Registrati</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-    <!-- Messaggi flash (es. dopo logout) -->
-    <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
-    <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Gestisci le tue finanze con semplicità</h1>
+                    <p>CashLytics ti offre gli strumenti per tenere traccia delle tue spese, raggiungere i tuoi obiettivi finanziari e prendere decisioni più consapevoli.</p>
+                    
+                    <!-- Messaggi flash (es. dopo logout) -->
+                    <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+                    <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+                    
+                    <div class="cta-buttons">
+                        <a th:href="@{/register}" class="btn btn-primary">Inizia Gratis <i class="fas fa-arrow-right"></i></a>
+                        <a th:href="@{/login}" class="btn btn-secondary">Accedi</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img th:src="@{/images/finance-illustration.png}" alt="Finance Management" 
+                         onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'><rect width=\'400\' height=\'300\' fill=\'%23f0f5ff\'/><path d=\'M40,220 L100,150 L160,190 L240,110 L360,180\' stroke=\'%233abbf7\' stroke-width=\'4\' fill=\'none\'/><circle cx=\'100\' cy=\'150\' r=\'6\' fill=\'%233abbf7\'/><circle cx=\'160\' cy=\'190\' r=\'6\' fill=\'%233abbf7\'/><circle cx=\'240\' cy=\'110\' r=\'6\' fill=\'%233abbf7\'/><circle cx=\'360\' cy=\'180\' r=\'6\' fill=\'%233abbf7\'/><rect x=\'160\' y=\'50\' width=\'80\' height=\'40\' rx=\'5\' fill=\'%2344AF69\'/><text x=\'200\' y=\'75\' font-family=\'Arial\' font-size=\'16\' fill=\'white\' text-anchor=\'middle\'>+23%</text></svg>'">
+                </div>
+            </div>
+        </section>
 
-    <div class="form-group">
-      <button
-        th:onclick="|window.location.href='@{/register}'|"
-        class="btn btn-primary">
-        Registrati
-      </button>
-      <div class="form-group" style="margin-top: 20;"></div>
-        <button
-          th:onclick="|window.location.href='@{/login}'|"
-          class="btn btn-primary">
-          Accedi
-        </button>
-      </div>
-    </div>
-  </div>
+        <!-- Features Section -->
+        <section class="features">
+            <div class="container">
+                <h2 class="section-title">Funzionalità principali</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Traccia le tue spese</h3>
+                        <p>Monitora facilmente entrate e uscite per vedere dove vanno i tuoi soldi.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <h3>Imposta obiettivi</h3>
+                        <p>Crea obiettivi di risparmio e monitora i tuoi progressi nel tempo.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <h3>Ottieni insights</h3>
+                        <p>Analisi dettagliate e suggerimenti personalizzati per migliorare le tue finanze.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>&copy; 2025 CashLytics - Progetto universitario</p>
+        </div>
+    </footer>
 </body>
 </html>
