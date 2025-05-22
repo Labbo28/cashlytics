@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard - CashLytics</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+</head>
+<body class="homepage-body">
+    <!-- Header -->
+    <header class="homepage-header">
+        <div class="container">
+            <nav class="main-nav">
+                <div class="logo">CashLytics</div>
+                <ul class="nav-links">
+                    <li><span th:text="'Welcome, ' + ${user.firstName}">Welcome, User</span></li>
+                    <li><a href="/logout" class="nav-btn">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container" style="padding: 2rem 1.5rem;">
+        <!-- Alert Messages -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+        <!-- Dashboard Overview -->
+        <section style="margin-bottom: 3rem;">
+            <h1>Financial Dashboard</h1>
+            <p style="color: var(--neutral-mid); font-size: 1.1rem;">
+                Manage your financial accounts and track your wealth
+            </p>
+        </section>
+
+        <!-- Summary Cards -->
+        <section class="features-grid" style="margin-bottom: 3rem;">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <h3>Total Balance</h3>
+                <p style="font-size: 1.5rem; font-weight: 600; color: var(--accent);">
+                    €<span th:text="${#numbers.formatDecimal(totalBalance, 1, 2)}">0.00</span>
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <h3>Active Accounts</h3>
+                <p style="font-size: 1.5rem; font-weight: 600; color: var(--primary);">
+                    <span th:text="${#lists.size(financialAccounts)}">0</span>
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>This Month</h3>
+                <p style="font-size: 1.5rem; font-weight: 600; color: var(--neutral-mid);">
+                    Coming Soon
+                </p>
+            </div>
+        </section>
+
+        <!-- Financial Accounts Section -->
+        <section style="margin-bottom: 3rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2>Your Financial Accounts</h2>
+                <button onclick="toggleAccountForm()" class="btn btn-primary" style="width: auto; padding: 0.75rem 1.5rem;">
+                    <i class="fas fa-plus"></i> Add New Account
+                </button>
+            </div>
+
+            <!-- Add Account Form (Hidden by default) -->
+            <div id="addAccountForm" style="display: none; margin-bottom: 2rem;">
+                <div class="auth-container" style="margin: 0; max-width: 100%;">
+                    <h3 style="text-align: center; margin-bottom: 1.5rem;">Add New Financial Account</h3>
+
+                    <form th:action="@{'/' + ${username} + '/dashboard/add-account'}" 
+                          th:object="${financialAccountDTO}" 
+                          method="post">
+
+                        <div class="form-group">
+                            <label for="accountType">Account Type</label>
+                            <select th:field="*{accountType}" id="accountType" 
+                                    style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;">
+                                <option value="">Select Account Type</option>
+                                <option th:each="type : ${accountTypes}" 
+                                        th:value="${type}" 
+                                        th:text="${type}">Account Type</option>
+                            </select>
+                            <span class="error" th:if="${#fields.hasErrors('accountType')}" th:errors="*{accountType}"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="balance">Initial Balance (€)</label>
+                            <input type="number" th:field="*{balance}" id="balance" 
+                                   step="0.01" min="0" placeholder="0.00" />
+                            <span class="error" th:if="${#fields.hasErrors('balance')}" th:errors="*{balance}"></span>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="submit" class="btn btn-primary">Create Account</button>
+                            <button type="button" onclick="toggleAccountForm()" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Accounts List -->
+            <div th:if="${#lists.isEmpty(financialAccounts)}" class="feature-card" style="text-align: center;">
+                <div class="feature-icon">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+                <h3>No Accounts Yet</h3>
+                <p>Start by adding your first financial account to track your finances.</p>
+                <button onclick="toggleAccountForm()" class="btn btn-accent" style="width: auto; padding: 0.75rem 1.5rem; margin-top: 1rem;">
+                    Add Your First Account
+                </button>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(financialAccounts)}" class="features-grid">
+                <div th:each="account : ${financialAccounts}" class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas"
+                           th:classappend="
+                               ${account.accountType.name() == 'CHECKING'} ? ' fa-university' :
+                               (${account.accountType.name() == 'SAVINGS'} ? ' fa-piggy-bank' :
+                               (${account.accountType.name() == 'CREDIT'} ? ' fa-credit-card' :
+                               (${account.accountType.name() == 'INVESTMENT'} ? ' fa-chart-line' : ' fa-wallet')))">
+                        </i>
+                    </div>
+                    <h3 th:text="${account.accountType}">Account Type</h3>
+                    <p style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem;"
+                       th:style="${account.balance >= 0} ? 'color: var(--accent);' : 'color: var(--warning);'">
+                        €<span th:text="${#numbers.formatDecimal(account.balance, 1, 2)}">0.00</span>
+                    </p>
+                    <p style="font-size: 0.85rem; color: var(--neutral-mid);">
+                        Account ID: <span th:text="${account.id}">123</span>
+                    </p>
+                    <div style="margin-top: 1rem;">
+                        <a th:href="@{'/' + ${username} + '/account/' + ${account.id}}" 
+                           class="btn btn-secondary" 
+                           style="width: auto; padding: 0.5rem 1rem; font-size: 0.9rem;">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section>
+            <h2>Quick Actions</h2>
+            <div class="features-grid">
+                <div class="feature-card" style="cursor: pointer;" onclick="alert('Feature coming soon!')">
+                    <div class="feature-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <h3>Transfer Money</h3>
+                    <p>Transfer funds between your accounts</p>
+                </div>
+
+                <div class="feature-card" style="cursor: pointer;" onclick="alert('Feature coming soon!')">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>View Reports</h3>
+                    <p>Analyze your financial patterns</p>
+                </div>
+
+                <div class="feature-card" style="cursor: pointer;" onclick="alert('Feature coming soon!')">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Notifications</h3>
+                    <p>Manage your alerts and reminders</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <p>&copy; 2024 CashLytics. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleAccountForm() {
+            const form = document.getElementById('addAccountForm');
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'block';
+                form.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                form.style.display = 'none';
+            }
+        }
+
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.transition = 'opacity 0.5s ease';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>

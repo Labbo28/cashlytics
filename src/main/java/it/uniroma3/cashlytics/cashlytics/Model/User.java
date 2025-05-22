@@ -10,6 +10,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -34,7 +35,7 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.createdAt = LocalDateTime.now();
     }
-
+    @EqualsAndHashCode.Exclude
     @OneToOne(cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.EAGER)
     private Credentials credentials;
 

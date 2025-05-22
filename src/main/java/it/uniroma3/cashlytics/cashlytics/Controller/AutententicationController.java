@@ -15,7 +15,7 @@ import it.uniroma3.cashlytics.cashlytics.Exceptions.WrongPasswordException;
 import it.uniroma3.cashlytics.cashlytics.service.AutenticationService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
@@ -91,47 +91,18 @@ public class AutententicationController {
     }
 
     @GetMapping("/login")
-   public String GetLoginPage(Model model) {
+   public String GetLoginPage(Model model,
+   @RequestParam(value = "error", required = false) String error) {
     if(!model.containsAttribute("userLoginDTO")) {
         model.addAttribute("userLoginDTO", new UserLoginDTO());
         }
+    if (error != null) {
+        model.addAttribute("errorMessage", "Invalid username or password.");
+    }
     return "login";
    }
 
 
-   @PostMapping("/login")
-   public String LoginUser(@Valid UserLoginDTO userLoginDTO, 
-                                BindingResult bindingResult,
-                           RedirectAttributes redirectAttributes,
-                           Model model
-                           ){
-        if(bindingResult.hasErrors()) {
-
-            return "login";
-        }
-        try{
-            autenticationService.loginUser(userLoginDTO);
-            redirectAttributes.addFlashAttribute("successMessage", 
-            "Login successful! Welcome back " + userLoginDTO.getUsername() + "!");
-        } catch (UserDoesNotExistsException e) {
-            bindingResult.rejectValue("username", "error.usernameLogin", e.getMessage());
-            model.addAttribute("userLoginDTO", userLoginDTO);
-            return "login";
-        }
-        catch (WrongPasswordException e) {
-            bindingResult.rejectValue("password", "error.password", e.getMessage());
-            model.addAttribute("userLoginDTO", userLoginDTO);
-            return "login";
-        }
-        catch (Exception e) {
-            // Handle any other unexpected errors
-            model.addAttribute("userRegistrationDTO", userLoginDTO);
-            model.addAttribute("errorMessage", "An unexpected error occurred. Please try again.");
-            return "login";
-        }
-       
-       return "redirect:/";
-   }
-    
+   
    
 }
