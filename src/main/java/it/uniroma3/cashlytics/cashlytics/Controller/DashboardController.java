@@ -14,26 +14,25 @@ import org.springframework.transaction.annotation.Transactional;
 import it.uniroma3.cashlytics.cashlytics.Model.User;
 import it.uniroma3.cashlytics.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.cashlytics.Model.Enums.AccountType;
-import it.uniroma3.cashlytics.cashlytics.Repository.UserRepository;
-import it.uniroma3.cashlytics.cashlytics.Repository.FinancialAccountRepository;
+import it.uniroma3.cashlytics.cashlytics.service.FinancialAccountService;
+import it.uniroma3.cashlytics.cashlytics.service.UserService;
 import it.uniroma3.cashlytics.cashlytics.DTO.FinancialAccountDTO;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.ArrayList;
+
 
 @Controller
 public class DashboardController {
-    
+
     @Autowired
-    private UserRepository userRepository;
-    
+    private UserService userService;
+
     @Autowired
-    private FinancialAccountRepository financialAccountRepository;
+    private FinancialAccountService financialAccountService;
     
-    /**
-     * Displays the user's personal dashboard with financial accounts.
-     */
+   
+    
     @GetMapping("/{username}/dashboard")
     @Transactional(readOnly = true)
     public String getUserDashboard(@PathVariable String username, Model model) {
@@ -59,8 +58,8 @@ public class DashboardController {
             }
             
             // Recupera l'utente dal database
-            User user = userRepository.findByCredentials_Username(username)
-                .orElse(null);
+            User user = userService.getUserByUsername(username);
+                
             
             if (user == null) {
                 System.err.println("User not found in database: " + username);
@@ -69,8 +68,7 @@ public class DashboardController {
             
             // SOLUZIONE MIGLIORATA: Recupera gli account finanziari direttamente dal repository
             // Questo evita problemi di lazy loading e assicura dati freschi
-            List<FinancialAccount> financialAccountsList = 
-                financialAccountRepository.findByUser_Credentials_Username(username);
+            List<FinancialAccount> financialAccountsList = financialAccountService.getAllFinancialAccountByUsername(username);
             
             System.out.println("Loaded " + financialAccountsList.size() + " financial accounts for user: " + username);
             
@@ -119,11 +117,6 @@ public class DashboardController {
             // Ottieni l'autenticazione corrente
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             
-            // Debug logging
-            System.out.println("Add account - Current authentication: " + (authentication != null ? authentication.getName() : "null"));
-            System.out.println("Add account - Requested username: " + username);
-            System.out.println("Add account - Is authenticated: " + (authentication != null && authentication.isAuthenticated()));
-            
             // Verifica autenticazione
             if (authentication == null || !authentication.isAuthenticated()) {
                 System.err.println("User not authenticated during account creation");
@@ -147,37 +140,10 @@ public class DashboardController {
                 return "redirect:/" + username + "/dashboard";
             }
             
-            // Recupera l'utente
-            User user = userRepository.findByCredentials_Username(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+            // RecupeFa l'utente
+            User user = userService.getUserByUsername(username);
+            FinancialAccount newAccount = financialAccountService.createFinancialAccount(financialAccountDTO, user);  
             
-            // Debug: stampa i dati ricevuti
-            System.out.println("Creating account with data:");
-            System.out.println("- Account Type: " + financialAccountDTO.getAccountType());
-            System.out.println("- Balance: " + financialAccountDTO.getBalance());
-            System.out.println("- User ID: " + user.getId());
-            
-            // Crea nuovo account finanziario
-            FinancialAccount newAccount = new FinancialAccount();
-            newAccount.setAccountType(financialAccountDTO.getAccountType());
-            newAccount.setBalance(financialAccountDTO.getBalance() != null ? 
-                financialAccountDTO.getBalance() : BigDecimal.ZERO);
-            newAccount.setUser(user);
-            
-            // Salva l'account e forza il flush per assicurarsi che venga scritto nel DB
-            FinancialAccount savedAccount = financialAccountRepository.save(newAccount);
-            financialAccountRepository.flush(); // Forza la scrittura immediata nel database
-            
-            System.out.println("Account created successfully with ID: " + savedAccount.getId());
-            System.out.println("Account balance: " + savedAccount.getBalance());
-            System.out.println("Account type: " + savedAccount.getAccountType());
-            
-            // Verifica che l'account sia stato salvato correttamente
-            List<FinancialAccount> userAccounts = financialAccountRepository.findByUser_Credentials_Username(username);
-            System.out.println("Total accounts for user after creation: " + userAccounts.size());
-            
-            redirectAttributes.addFlashAttribute("successMessage", 
-                "Account " + financialAccountDTO.getAccountType() + " created successfully!");
             
         } catch (Exception e) {
             System.err.println("Error creating financial account: " + e.getMessage());
@@ -188,4 +154,36 @@ public class DashboardController {
         
         return "redirect:/" + username + "/dashboard";
     }
+
+    @GetMapping("/{username}/dashboard/account/{accountId}")
+    public String getAccountDetails(@PathVariable String username,
+                                    @PathVariable Long accountId, 
+                                    Model model, 
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            // Ottieni l'autenticazione corrente
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            
+            // Verifica autenticazione
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return "redirect:/login";
+            }
+
+            // TODO: Implement account details retrieval logic here
+
+            return "accountDetails"; // Replace with your actual view name
+        } catch (Exception e) {
+            System.err.println("Error retrieving account details: " + e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                "Error retrieving account details. Please try again.");
+            return "redirect:/" + username + "/dashboard";
+        }
+
+   
+    
+    }
 }
+
+
+                                    
