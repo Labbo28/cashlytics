@@ -11,16 +11,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.transaction.annotation.Transactional;
+
 import it.uniroma3.cashlytics.cashlytics.Model.User;
 import it.uniroma3.cashlytics.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.cashlytics.Model.Enums.AccountType;
 import it.uniroma3.cashlytics.cashlytics.service.FinancialAccountService;
 import it.uniroma3.cashlytics.cashlytics.service.UserService;
 import it.uniroma3.cashlytics.cashlytics.DTO.FinancialAccountDTO;
+import it.uniroma3.cashlytics.cashlytics.DTO.TransactionDTO;
+
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
-
 
 @Controller
 public class DashboardController {
@@ -30,8 +32,6 @@ public class DashboardController {
 
     @Autowired
     private FinancialAccountService financialAccountService;
-    
-   
     
     @GetMapping("/{username}/dashboard")
     @Transactional(readOnly = true)
@@ -59,16 +59,13 @@ public class DashboardController {
             
             // Recupera l'utente dal database
             User user = userService.getUserByUsername(username);
-                
-            
             if (user == null) {
                 System.err.println("User not found in database: " + username);
                 return "redirect:/login";
             }
             
-            // SOLUZIONE MIGLIORATA: Recupera gli account finanziari direttamente dal repository
-            // Questo evita problemi di lazy loading e assicura dati freschi
-            List<FinancialAccount> financialAccountsList = financialAccountService.getAllFinancialAccountByUsername(username);
+            List<FinancialAccount> financialAccountsList =
+                financialAccountService.getAllFinancialAccountByUsername(username);
             
             System.out.println("Loaded " + financialAccountsList.size() + " financial accounts for user: " + username);
             
@@ -95,24 +92,19 @@ public class DashboardController {
             System.out.println("Number of accounts: " + financialAccountsList.size());
             
             return "dashboard";
-            
         } catch (Exception e) {
             System.err.println("Error retrieving user dashboard: " + e.getMessage());
             e.printStackTrace();
             return "redirect:/login?error=dashboard_error";
         }
-    }
-    
-    /**
-     * Handles the creation of a new financial account.
-     */
+    } // ← qui finisce getUserDashboard
+
     @PostMapping("/{username}/dashboard/add-account")
     @Transactional
     public String addFinancialAccount(@PathVariable String username,
-                                    @Valid FinancialAccountDTO financialAccountDTO,
-                                    BindingResult bindingResult,
-                                    RedirectAttributes redirectAttributes) {
-        
+                                      @Valid FinancialAccountDTO financialAccountDTO,
+                                      BindingResult bindingResult,
+                                      RedirectAttributes redirectAttributes) {
         try {
             // Ottieni l'autenticazione corrente
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -140,11 +132,10 @@ public class DashboardController {
                 return "redirect:/" + username + "/dashboard";
             }
             
-            // RecupeFa l'utente
+            // Recupera l'utente
             User user = userService.getUserByUsername(username);
-            FinancialAccount newAccount = financialAccountService.createFinancialAccount(financialAccountDTO, user);  
-            
-            
+            FinancialAccount newAccount = financialAccountService.createFinancialAccount(financialAccountDTO, user);
+            // (eventuali altre logiche dopo la creazione)
         } catch (Exception e) {
             System.err.println("Error creating financial account: " + e.getMessage());
             e.printStackTrace();
@@ -155,7 +146,7 @@ public class DashboardController {
         return "redirect:/" + username + "/dashboard";
     }
 
-    @GetMapping("/{username}/dashboard/account/{accountId}")
+    @GetMapping("/{username}/account/{accountId}")
     public String getAccountDetails(@PathVariable String username,
                                     @PathVariable Long accountId, 
                                     Model model, 
@@ -168,10 +159,12 @@ public class DashboardController {
             if (authentication == null || !authentication.isAuthenticated()) {
                 return "redirect:/login";
             }
-
-            // TODO: Implement account details retrieval logic here
-
-            return "accountDetails"; // Replace with your actual view name
+            
+            // Carica le transazioni (supponendo che il metodo sia già implementato)
+            model.addAttribute("transactions", 
+                financialAccountService.getAllTransactionsByAccountId(accountId));
+            
+            return "accountDetails"; // Nome della view per i dettagli dell’account
         } catch (Exception e) {
             System.err.println("Error retrieving account details: " + e.getMessage());
             e.printStackTrace();
@@ -179,11 +172,45 @@ public class DashboardController {
                 "Error retrieving account details. Please try again.");
             return "redirect:/" + username + "/dashboard";
         }
+    } // ← qui mancava la parentesi di chiusura di getAccountDetails
 
-   
-    
+    @PostMapping("/{username}/account/{accountId}/add-transaction")
+    public String addTransaction(@PathVariable String username,
+                                 @PathVariable Long accountId,
+                                 @Valid TransactionDTO transactionDTO,
+                                 BindingResult bindingResult,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            // Ottieni l'autenticazione corrente
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            
+            // Verifica autenticazione
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return "redirect:/login";
+            }
+            
+            if (!authentication.getName().equals(username)) {
+                return "redirect:/login";
+            }
+            
+            // Verifica errori di validazione
+            if (bindingResult.hasErrors()) {
+                redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.transactionDTO", bindingResult);
+                redirectAttributes.addFlashAttribute("transactionDTO", transactionDTO);
+                redirectAttributes.addFlashAttribute("errorMessage", "Please correct the errors in the form.");
+                return "redirect:/" + username + "/account/" + accountId;
+            }
+
+            // TODO: Implement transaction creation logic qui
+
+            return "redirect:/" + username + "/account/" + accountId;
+        } catch (Exception e) {
+            System.err.println("Error adding transaction: " + e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                "Error adding transaction. Please try again.");
+            return "redirect:/" + username + "/account/" + accountId;
+        }
     }
-}
 
-
-                                    
+} 

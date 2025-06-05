@@ -9,6 +9,9 @@ import it.uniroma3.cashlytics.cashlytics.Repository.FinancialAccountRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
+
+import it.uniroma3.cashlytics.cashlytics.Model.Transaction;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,8 +38,10 @@ public class FinancialAccountService {
             return savedAccount;
     }
 
-    public Object getAllTransactionsByAccountId(Long accountId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllTransactionsByAccountId'");
+    public  Set<Transaction> getAllTransactionsByAccountId(Long accountId) {
+        FinancialAccount account = financialAccountRepository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Financial account not found with id: " + accountId));
+        return account.getTransactions();
+       
     }
 }
