@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
@@ -26,13 +27,15 @@ public class Transaction {
     private boolean isRecurring;
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
-
+    @EqualsAndHashCode.Exclude  
     @ManyToOne
     @JoinColumn(name = "financial_account_id")
     private FinancialAccount financialAccount;
+    @EqualsAndHashCode.Exclude  
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+    @EqualsAndHashCode.Exclude  
     @ManyToOne
     @JoinColumn(name = "merchant_id")
     private Merchant merchant;

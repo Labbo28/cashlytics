@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -18,10 +19,10 @@ public class Credentials {
     private String username;
     
     private String password;
-
+    @ToString.Exclude
     @OneToOne(cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.EAGER)
     private User user;
-
+    
     public Credentials(String username, String password) {
         this.username = username;
         this.password = password;

@@ -5,10 +5,10 @@ import java.util.Set;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 
 @Entity
@@ -20,14 +20,12 @@ public class Category {
     private String name;
     private String icon;
     private String color;
-
+    
+    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "category")
     private Set<Transaction> transactions;
+    @EqualsAndHashCode.Exclude
+    @ManyToOne 
+    private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "parent_category_id")
-    private Category parentCategory;
-    
-    @OneToMany(mappedBy = "parentCategory")
-    private Set<Category> subcategories;
 }

@@ -7,6 +7,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.CascadeType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,7 +24,7 @@ public class FinancialAccount {
     
     @ManyToOne
     private User user;
-    
+    @EqualsAndHashCode.Exclude  
     @OneToMany(mappedBy = "financialAccount", cascade = CascadeType.ALL)
     private Set<Transaction> transactions = new HashSet<>();
 }

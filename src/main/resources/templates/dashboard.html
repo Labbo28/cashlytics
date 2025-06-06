@@ -42,10 +42,15 @@
                     <i class="fas fa-wallet"></i>
                 </div>
                 <h3>Total Balance</h3>
-                <p style="font-size: 1.5rem; font-weight: 600; color: var(--accent);">
+                <p 
+                    th:style="
+                        |font-size: 1.5rem; 
+                         font-weight: 600; 
+                         color: ${totalBalance < 0} ? 'var(--warning)' : 'var(--accent)';|
+                    ">
                     €<span th:text="${#numbers.formatDecimal(totalBalance, 1, 2)}">0.00</span>
                 </p>
-            </div>
+                
 
             <div class="feature-card">
                 <div class="feature-icon">
@@ -57,15 +62,7 @@
                 </p>
             </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h3>This Month</h3>
-                <p style="font-size: 1.5rem; font-weight: 600; color: var(--neutral-mid);">
-                    Coming Soon
-                </p>
-            </div>
+            
         </section>
 
         <!-- Financial Accounts Section -->
@@ -155,41 +152,12 @@
             </div>
         </section>
 
-        <!-- Quick Actions -->
-        <section>
-            <h2>Quick Actions</h2>
-            <div class="features-grid">
-                <div class="feature-card" style="cursor: pointer;" onclick="alert('Feature coming soon!')">
-                    <div class="feature-icon">
-                        <i class="fas fa-exchange-alt"></i>
-                    </div>
-                    <h3>Transfer Money</h3>
-                    <p>Transfer funds between your accounts</p>
-                </div>
-
-                <div class="feature-card" style="cursor: pointer;" onclick="alert('Feature coming soon!')">
-                    <div class="feature-icon">
-                        <i class="fas fa-chart-bar"></i>
-                    </div>
-                    <h3>View Reports</h3>
-                    <p>Analyze your financial patterns</p>
-                </div>
-
-                <div class="feature-card" style="cursor: pointer;" onclick="alert('Feature coming soon!')">
-                    <div class="feature-icon">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                    <h3>Notifications</h3>
-                    <p>Manage your alerts and reminders</p>
-                </div>
-            </div>
-        </section>
     </main>
 
     <!-- Footer -->
     <footer class="main-footer">
         <div class="container">
-            <p>&copy; 2024 CashLytics. All rights reserved.</p>
+            <p>&copy; 202 CashLytics. All rights reserved.</p>
         </div>
     </footer>
 

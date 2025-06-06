@@ -1,5 +1,6 @@
 package it.uniroma3.cashlytics.cashlytics.Controller;
 
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,14 +15,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import it.uniroma3.cashlytics.cashlytics.Model.User;
 import it.uniroma3.cashlytics.cashlytics.Model.FinancialAccount;
+import it.uniroma3.cashlytics.cashlytics.Model.Transaction;
 import it.uniroma3.cashlytics.cashlytics.Model.Enums.AccountType;
 import it.uniroma3.cashlytics.cashlytics.service.FinancialAccountService;
+import it.uniroma3.cashlytics.cashlytics.service.TransactionService;
 import it.uniroma3.cashlytics.cashlytics.service.UserService;
 import it.uniroma3.cashlytics.cashlytics.DTO.FinancialAccountDTO;
 import it.uniroma3.cashlytics.cashlytics.DTO.TransactionDTO;
 
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -32,6 +36,9 @@ public class DashboardController {
 
     @Autowired
     private FinancialAccountService financialAccountService;
+
+    @Autowired
+    private TransactionService transactionService; // Assicurati di avere un TransactionService
     
     @GetMapping("/{username}/dashboard")
     @Transactional(readOnly = true)
@@ -146,71 +153,6 @@ public class DashboardController {
         return "redirect:/" + username + "/dashboard";
     }
 
-    @GetMapping("/{username}/account/{accountId}")
-    public String getAccountDetails(@PathVariable String username,
-                                    @PathVariable Long accountId, 
-                                    Model model, 
-                                    RedirectAttributes redirectAttributes) {
-        try {
-            // Ottieni l'autenticazione corrente
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            
-            // Verifica autenticazione
-            if (authentication == null || !authentication.isAuthenticated()) {
-                return "redirect:/login";
-            }
-            
-            // Carica le transazioni (supponendo che il metodo sia già implementato)
-            model.addAttribute("transactions", 
-                financialAccountService.getAllTransactionsByAccountId(accountId));
-            
-            return "accountDetails"; // Nome della view per i dettagli dell’account
-        } catch (Exception e) {
-            System.err.println("Error retrieving account details: " + e.getMessage());
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("errorMessage", 
-                "Error retrieving account details. Please try again.");
-            return "redirect:/" + username + "/dashboard";
-        }
-    } // ← qui mancava la parentesi di chiusura di getAccountDetails
-
-    @PostMapping("/{username}/account/{accountId}/add-transaction")
-    public String addTransaction(@PathVariable String username,
-                                 @PathVariable Long accountId,
-                                 @Valid TransactionDTO transactionDTO,
-                                 BindingResult bindingResult,
-                                 RedirectAttributes redirectAttributes) {
-        try {
-            // Ottieni l'autenticazione corrente
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            
-            // Verifica autenticazione
-            if (authentication == null || !authentication.isAuthenticated()) {
-                return "redirect:/login";
-            }
-            
-            if (!authentication.getName().equals(username)) {
-                return "redirect:/login";
-            }
-            
-            // Verifica errori di validazione
-            if (bindingResult.hasErrors()) {
-                redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.transactionDTO", bindingResult);
-                redirectAttributes.addFlashAttribute("transactionDTO", transactionDTO);
-                redirectAttributes.addFlashAttribute("errorMessage", "Please correct the errors in the form.");
-                return "redirect:/" + username + "/account/" + accountId;
-            }
-
-            // TODO: Implement transaction creation logic qui
-
-            return "redirect:/" + username + "/account/" + accountId;
-        } catch (Exception e) {
-            System.err.println("Error adding transaction: " + e.getMessage());
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("errorMessage", 
-                "Error adding transaction. Please try again.");
-            return "redirect:/" + username + "/account/" + accountId;
-        }
-    }
+    
 
 } 

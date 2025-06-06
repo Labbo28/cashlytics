@@ -44,4 +44,10 @@ public class FinancialAccountService {
         return account.getTransactions();
        
     }
+
+    public FinancialAccount getFinancialAccountById(Long accountId) {
+        
+        return financialAccountRepository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Financial account not found with id: " + accountId));
+    }
 }

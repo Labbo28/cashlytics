@@ -38,8 +38,17 @@ public class User {
     @EqualsAndHashCode.Exclude
     @OneToOne(cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.EAGER)
     private Credentials credentials;
-
+    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "user")
     private Set<FinancialAccount> financialAccounts;
+    @EqualsAndHashCode.Exclude
+    @OneToMany(mappedBy = "user")
+    private Set<Merchant> merchants;
+
+    @EqualsAndHashCode.Exclude
+    @OneToMany(mappedBy = "user")
+    private Set<Category> categories;
+
+    
 
 }

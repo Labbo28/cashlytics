@@ -1,11 +1,9 @@
 package it.uniroma3.cashlytics.cashlytics.Model;
 
-import java.util.Set;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 @Entity
@@ -16,6 +14,8 @@ public class Merchant {
     private Long id;
     private String name;
     private String logo;
-    @OneToMany(mappedBy = "merchant")
-    private Set<Transaction> transactions;
+
+    @ManyToOne
+    private User user;
+    
 }
