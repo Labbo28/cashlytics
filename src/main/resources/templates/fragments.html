@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" th:href="@{/css/main.css}">
+	<!-- Font import from Google Fonts -->
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,700&display=swap" rel="stylesheet">
+	<!-- Font Awesome for icons -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+	<div th:fragment="siteHeader">
+		<header class="homepage-header">
+			<div class="container">
+				<nav class="main-nav">
+					<div class="logo">CashLytics</div>
+					<ul class="nav-links">
+						<li><a th:href="@{/login}" class="nav-btn">Accedi</a></li>
+						<li><a th:href="@{/register}" class="nav-btn nav-btn-primary">Registrati</a></li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+	</div>
+
+	<div th:fragment="siteFooter">
+		<footer class="main-footer">
+			<div class="container">
+				<p>2025 CashLytics - Progetto universitario</p>
+			</div>
+		</footer>
+	</div>
+</body>
+
+</html>

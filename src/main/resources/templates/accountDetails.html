@@ -1,371 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Financial Account - CashLytics</title>
-    <link rel="stylesheet" th:href="@{/css/main.css}" />
-    <link 
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" 
-      rel="stylesheet" 
-    />
-    <style>
-        /* Additional styles for improved form and transaction display */
-        .form-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            backdrop-filter: blur(4px);
-        }
-
-        .form-modal {
-            background-color: var(--white);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-xl);
-            width: 90%;
-            max-width: 500px;
-            box-shadow: var(--shadow-lg);
-            position: relative;
-            animation: modalSlideIn 0.3s ease-out;
-        }
-
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .form-modal h3 {
-            margin-bottom: var(--spacing-lg);
-            text-align: center;
-            color: var(--primary-dark);
-            font-size: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: var(--spacing-sm);
-            color: var(--neutral-dark);
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: var(--spacing-md);
-            border: 2px solid var(--neutral-light);
-            border-radius: var(--radius-md);
-            font-size: 1rem;
-            transition: var(--transition-fast);
-            font-family: inherit;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
-            outline: none;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .form-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: var(--spacing-sm);
-            margin-top: var(--spacing-lg);
-        }
-
-        .btn {
-            padding: var(--spacing-md) var(--spacing-lg);
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: var(--spacing-xs);
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: var(--white);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .btn-secondary {
-            background-color: var(--white);
-            color: var(--neutral-dark);
-            border: 2px solid var(--neutral-light);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--neutral-light);
-            border-color: var(--neutral-mid);
-        }
-
-        .btn-sm {
-            padding: var(--spacing-sm) var(--spacing-md);
-            font-size: 0.9rem;
-        }
-
-        /* Enhanced transaction styling */
-        .transaction-item {
-            background-color: var(--white);
-            border-radius: var(--radius-md);
-            padding: var(--spacing-lg);
-            margin-bottom: var(--spacing-md);
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: var(--transition-normal);
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
-            border-left: 4px solid transparent;
-        }
-
-        .transaction-item:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .transaction-item.transaction-positive {
-            border-left-color: var(--accent);
-        }
-
-        .transaction-item.transaction-negative {
-            border-left-color: var(--warning);
-        }
-
-        .transaction-details {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-md);
-            flex: 1;
-        }
-
-        .transaction-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: var(--white);
-        }
-
-        .transaction-icon.positive {
-            background-color: var(--accent);
-        }
-
-        .transaction-icon.negative {
-            background-color: var(--warning);
-        }
-
-        .transaction-info {
-            flex: 1;
-        }
-
-        .transaction-type {
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: var(--neutral-dark);
-            margin-bottom: var(--spacing-xs);
-        }
-
-        .transaction-date {
-            font-size: 0.9rem;
-            color: var(--neutral-mid);
-        }
-
-        .transaction-amount {
-            font-size: 1.3rem;
-            font-weight: 700;
-            text-align: right;
-        }
-
-        .transaction-amount.positive {
-            color: var(--accent);
-        }
-
-        .transaction-amount.negative {
-            color: var(--warning);
-        }
-
-        /* Account header improvements */
-        .account-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: var(--white);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-xl);
-            box-shadow: var(--shadow-md);
-            margin-bottom: var(--spacing-xl);
-        }
-
-        .account-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .account-info h2 {
-            color: var(--white);
-            margin-bottom: 0;
-            font-size: 1.8rem;
-        }
-
-        .account-info .balance {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: var(--white);
-        }
-
-        /* Navigation improvements */
-        .back-nav {
-            background: var(--white);
-            padding: var(--spacing-md);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .back-nav a {
-            color: var(--primary);
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: var(--spacing-xs);
-            transition: var(--transition-fast);
-        }
-
-        .back-nav a:hover {
-            color: var(--primary-dark);
-        }
-
-        /* Transactions container */
-        .transactions-container {
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-xl);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .transactions-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--spacing-lg);
-            padding-bottom: var(--spacing-md);
-            border-bottom: 2px solid var(--neutral-light);
-        }
-
-        .transactions-header h3 {
-            color: var(--primary-dark);
-            margin-bottom: 0;
-            font-size: 1.4rem;
-        }
-
-        .no-transactions {
-            text-align: center;
-            padding: var(--spacing-xxl);
-            color: var(--neutral-mid);
-        }
-
-        .no-transactions i {
-            font-size: 3rem;
-            margin-bottom: var(--spacing-md);
-            color: var(--neutral-light);
-        }
-
-        .no-transactions h4 {
-            color: var(--neutral-dark);
-            margin-bottom: var(--spacing-sm);
-        }
-
-        /* Alert improvements */
-        .alert {
-            padding: var(--spacing-md);
-            margin: var(--spacing-lg) 0;
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            font-weight: 500;
-        }
-
-        .alert-success {
-            background-color: rgba(76, 175, 80, 0.1);
-            color: var(--accent);
-            border: 2px solid rgba(76, 175, 80, 0.2);
-        }
-
-        .alert-danger {
-            background-color: rgba(244, 67, 54, 0.1);
-            color: var(--warning);
-            border: 2px solid rgba(244, 67, 54, 0.2);
-        }
-
-        /* Responsive improvements */
-        @media (max-width: 768px) {
-            .account-info {
-                flex-direction: column;
-                text-align: center;
-                gap: var(--spacing-md);
-            }
-
-            .transaction-details {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: var(--spacing-sm);
-            }
-
-            .transaction-amount {
-                text-align: left;
-            }
-
-            .form-modal {
-                margin: var(--spacing-md);
-                width: calc(100% - 2rem);
-            }
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <!-- Font import from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>tba</title>
 </head>
+
 <body>
     <!-- HEADER / NAVIGATION -->
     <nav class="container mt-lg back-nav">
@@ -381,8 +28,7 @@
                 <div>
                     <h2 th:text="${account.accountType}">Account Type</h2>
                 </div>
-                <div class="balance" 
-                     th:text="'€' + ${#numbers.formatDecimal(account.balance, 1, 2)}">
+                <div class="balance" th:text="'€' + ${#numbers.formatDecimal(account.balance, 1, 2)}">
                     €0.00
                 </div>
             </div>
@@ -404,38 +50,39 @@
                 <i class="fas fa-receipt"></i>
                 <h4>No transactions yet</h4>
                 <p>Start by adding your first transaction to track your account activity.</p>
-                <button onclick="toggleTransactionForm()" class="btn btn-accent btn-sm" style="margin-top: var(--spacing-md);">
+                <button onclick="toggleTransactionForm()" class="btn btn-accent btn-sm"
+                    style="margin-top: var(--spacing-md);">
                     <i class="fas fa-plus"></i> Add Your First Transaction
                 </button>
             </div>
 
             <!-- TRANSACTIONS LIST -->
             <div th:if="${!#lists.isEmpty(transactions)}">
-                <a th:each="transaction : ${transactions}" 
-                   th:href="@{/{u}/transaction/{id}(u=${username},id=${transaction.id})}"
-                   class="transaction-item"
-                   th:classappend="${transaction.transactionType.toString() == 'INCOME'} ? ' transaction-positive' : ' transaction-negative'">
-                    
+                <a th:each="transaction : ${transactions}"
+                    th:href="@{/{u}/transaction/{id}(u=${username},id=${transaction.id})}" class="transaction-item"
+                    th:classappend="${transaction.transactionType.toString() == 'INCOME'} ? ' transaction-positive' : ' transaction-negative'">
+
                     <div class="transaction-details">
                         <div class="transaction-icon"
-                             th:classappend="${transaction.transactionType.toString() == 'INCOME'} ? ' positive' : ' negative'">
-                            <i th:class="${transaction.transactionType.toString() == 'INCOME'} ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+                            th:classappend="${transaction.transactionType.toString() == 'INCOME'} ? ' positive' : ' negative'">
+                            <i
+                                th:class="${transaction.transactionType.toString() == 'INCOME'} ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
                         </div>
-                        
+
                         <div class="transaction-info">
                             <div class="transaction-type" th:text="${transaction.transactionType}">
                                 Transaction Type
                             </div>
-                            <div class="transaction-date" 
-                                 th:text="${#temporals.format(transaction.date, 'dd/MM/yyyy HH:mm')}">
+                            <div class="transaction-date"
+                                th:text="${#temporals.format(transaction.date, 'dd/MM/yyyy HH:mm')}">
                                 01/01/2024 12:00
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="transaction-amount"
-                         th:classappend="${transaction.transactionType.toString() == 'INCOME'} ? ' positive' : ' negative'"
-                         th:text="${transaction.transactionType.toString() == 'INCOME' 
+                        th:classappend="${transaction.transactionType.toString() == 'INCOME'} ? ' positive' : ' negative'"
+                        th:text="${transaction.transactionType.toString() == 'INCOME' 
                                      ? '+€' + #numbers.formatDecimal(transaction.amount, 1, 2) 
                                      : '-€' + #numbers.formatDecimal(transaction.amount, 1, 2)}">
                         €0.00
@@ -459,100 +106,61 @@
     <div id="addTransactionForm" class="form-overlay" style="display: none;">
         <div class="form-modal">
             <h3>Add New Transaction</h3>
-            <form 
-                th:action="@{/{u}/account/{id}/add-transaction(u=${username},id=${account.id})}"
-                th:object="${transactionDTO}" 
-                method="post"
-            >
+            <form th:action="@{/{u}/account/{id}/add-transaction(u=${username},id=${account.id})}"
+                th:object="${transactionDTO}" method="post">
                 <div class="form-group">
                     <label for="transactionType">Transaction Type</label>
                     <select th:field="*{transactionType}" id="transactionType" required>
                         <option value="">Select Transaction Type</option>
-                        <option 
-                          th:each="type : ${transactionTypes}" 
-                          th:value="${type}" 
-                          th:text="${type}">
-                          Transaction Type
+                        <option th:each="type : ${transactionTypes}" th:value="${type}" th:text="${type}">
+                            Transaction Type
                         </option>
                     </select>
-                    <span class="error" 
-                          th:if="${#fields.hasErrors('transactionType')}" 
-                          th:errors="*{transactionType}">
+                    <span class="error" th:if="${#fields.hasErrors('transactionType')}" th:errors="*{transactionType}">
                     </span>
                 </div>
 
                 <div class="form-group">
                     <label for="amount">Amount (€)</label>
-                    <input type="number" 
-                           th:field="*{amount}" 
-                           id="amount" 
-                           step="0.01" 
-                           placeholder="0.00" 
-                           required 
-                    />
-                    <span class="error" 
-                          th:if="${#fields.hasErrors('amount')}" 
-                          th:errors="*{amount}">
+                    <input type="number" th:field="*{amount}" id="amount" step="0.01" placeholder="0.00" required />
+                    <span class="error" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}">
                     </span>
                 </div>
 
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <textarea 
-                      th:field="*{description}" 
-                      id="description" 
-                      placeholder="Enter transaction description..." 
-                      required
-                    ></textarea>
-                    <span class="error" 
-                          th:if="${#fields.hasErrors('description')}" 
-                          th:errors="*{description}">
+                    <textarea th:field="*{description}" id="description" placeholder="Enter transaction description..."
+                        required></textarea>
+                    <span class="error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">
                     </span>
                 </div>
 
                 <div class="form-group">
                     <label for="categoryInput">Category</label>
-                    <input type="text" 
-                           id="categoryInput" 
-                           th:field="*{categoryName}" 
-                           list="categoriesList" 
-                           placeholder="Type or select a category…" 
-                           required />
+                    <input type="text" id="categoryInput" th:field="*{categoryName}" list="categoriesList"
+                        placeholder="Type or select a category…" required />
                     <datalist id="categoriesList">
-                        <option th:each="cat : ${categories}" 
-                                th:value="${cat.name}" />
+                        <option th:each="cat : ${categories}" th:value="${cat.name}" />
                     </datalist>
                     <input type="hidden" th:field="*{categoryId}" />
-                    <span class="error" 
-                          th:if="${#fields.hasErrors('categoryName')}" 
-                          th:errors="*{categoryName}">
+                    <span class="error" th:if="${#fields.hasErrors('categoryName')}" th:errors="*{categoryName}">
                     </span>
                 </div>
 
                 <div class="form-group">
                     <label for="merchantInput">Merchant</label>
-                    <input type="text" 
-                           id="merchantInput" 
-                           th:field="*{merchantName}" 
-                           list="merchantsList" 
-                           placeholder="Type or select a merchant…" 
-                           required />
+                    <input type="text" id="merchantInput" th:field="*{merchantName}" list="merchantsList"
+                        placeholder="Type or select a merchant…" required />
                     <datalist id="merchantsList">
-                        <option th:each="m : ${merchants}" 
-                                th:value="${m.name}" />
+                        <option th:each="m : ${merchants}" th:value="${m.name}" />
                     </datalist>
                     <input type="hidden" th:field="*{merchantId}" />
-                    <span class="error" 
-                          th:if="${#fields.hasErrors('merchantName')}" 
-                          th:errors="*{merchantName}">
+                    <span class="error" th:if="${#fields.hasErrors('merchantName')}" th:errors="*{merchantName}">
                     </span>
                 </div>
 
                 <div class="form-buttons">
-                    <button 
-                      type="button" 
-                      onclick="toggleTransactionForm()" 
-                      class="btn btn-secondary btn-sm">
+                    <button type="button" onclick="toggleTransactionForm()" class="btn btn-secondary btn-sm">
                         Cancel
                     </button>
                     <button type="submit" class="btn btn-primary btn-sm">
@@ -568,7 +176,7 @@
         function toggleTransactionForm() {
             const overlay = document.getElementById('addTransactionForm');
             const form = overlay.querySelector('form');
-            
+
             if (overlay.style.display === 'flex') {
                 overlay.style.display = 'none';
                 form.reset();
@@ -585,14 +193,14 @@
         }
 
         // Close modal when clicking outside
-        document.getElementById('addTransactionForm').addEventListener('click', function(e) {
+        document.getElementById('addTransactionForm').addEventListener('click', function (e) {
             if (e.target === this) {
                 toggleTransactionForm();
             }
         });
 
         // Close modal with Escape key
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 const overlay = document.getElementById('addTransactionForm');
                 if (overlay.style.display === 'flex') {
@@ -603,7 +211,7 @@
 
         // Enhanced form validation feedback
         document.querySelectorAll('input, select, textarea').forEach(input => {
-            input.addEventListener('blur', function() {
+            input.addEventListener('blur', function () {
                 if (this.hasAttribute('required') && !this.value.trim()) {
                     this.style.borderColor = 'var(--warning)';
                 } else {
@@ -611,7 +219,7 @@
                 }
             });
 
-            input.addEventListener('input', function() {
+            input.addEventListener('input', function () {
                 if (this.style.borderColor === 'var(--warning)' && this.value.trim()) {
                     this.style.borderColor = 'var(--primary)';
                 }
@@ -619,4 +227,5 @@
         });
     </script>
 </body>
+
 </html>

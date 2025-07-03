@@ -1,30 +1,29 @@
 <!DOCTYPE html>
 <html lang="it" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - CashLytics</title>
-    <!-- Main stylesheet -->
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <!-- Font import from Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,700&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Login - CashLytics</title>
 </head>
+
 <body>
     <div class="auth-container">
-        <!-- App logo/branding -->
-        <div class="brand-logo">
-            <h1>CashLytics</h1>
-            <p>Prendi il controllo delle tue finanze</p>
-        </div>
-        
+        <div class="logo" style="text-align: center;">CashLytics</div>
+        <br>
         <!-- Alerts for success/error messages -->
         <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
         <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
-        
+
         <!-- Login form -->
         <form th:action="@{/login}" th:object="${userLoginDTO}" method="post">
+
             <div class="form-group">
                 <label for="username">Username</label>
                 <div class="input-with-icon">
@@ -33,27 +32,28 @@
                 </div>
                 <span class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
             </div>
-            
+
             <div class="form-group">
                 <label for="password">Password</label>
                 <div class="input-with-icon">
                     <i class="fas fa-lock icon"></i>
-                    <input type="password" id="password" th:field="*{password}" placeholder="Inserisci la tua password" />
+                    <input type="password" id="password" th:field="*{password}"
+                        placeholder="Inserisci la tua password" />
                 </div>
                 <span class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
             </div>
-            
+
             <button type="submit" class="btn btn-primary">Accedi</button>
         </form>
-        
+
         <!-- Registration link -->
         <div class="form-divider">
             <span>oppure</span>
         </div>
-        
+
         <p style="text-align: center; margin-bottom: var(--spacing-md);">Non hai ancora un account?</p>
         <a th:href="@{/register}" class="btn btn-secondary">Registrati ora</a>
-        
+
         <!-- Back to homepage link -->
         <nav>
             <ul>
@@ -62,4 +62,5 @@
         </nav>
     </div>
 </body>
+
 </html>
