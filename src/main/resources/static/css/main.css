@@ -149,6 +149,16 @@ a:hover {
   margin-bottom: var(--spacing-lg);
 }
 
+.inline-form {
+  background: none;
+  padding: 0;
+  margin: 0;
+  border: none;
+  font-family: var(--font-family);
+  display: inline;
+  vertical-align: middle;
+}
+
 label {
   display: block;
   margin-bottom: var(--spacing-sm);
@@ -364,6 +374,16 @@ nav a:hover {
   border-radius: var(--radius-md);
   font-weight: 500;
   transition: var(--transition-fast);
+  text-decoration: none;
+  color: var(--primary);
+  display: inline-block;
+  border: none;
+  background: none;
+  font-family: var(--font-family);
+  font-size: 1rem;
+  cursor: pointer;
+  line-height: 1.5;
+  vertical-align: middle;
 }
 
 .nav-btn:hover {

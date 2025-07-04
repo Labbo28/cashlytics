@@ -10,17 +10,38 @@
 	<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,700&display=swap" rel="stylesheet">
 	<!-- Font Awesome for icons -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 
 <body>
 	<div th:fragment="siteHeader">
 		<header class="homepage-header">
+
+			<!-- Sezione sinistra: logo/navigazione -->
 			<div class="container">
 				<nav class="main-nav">
-					<div class="logo">CashLytics</div>
+					<a th:href="@{/}" class="logo">CashLytics</a>
 					<ul class="nav-links">
-						<li><a th:href="@{/login}" class="nav-btn">Accedi</a></li>
-						<li><a th:href="@{/register}" class="nav-btn nav-btn-primary">Registrati</a></li>
+
+						<!-- Sezione destra: se l'utente ha effettuato il login -->
+						<li th:if="${userDetails}">
+							<span class="nav-btn" th:text="${userDetails.username}">utente</span>
+						</li>
+						<li th:if="${userDetails}">
+							<form class="inline-form" th:action="@{/logout}" method="post">
+								<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+								<button class="nav-btn nav-btn-primary" type="submit">Logout</button>
+							</form>
+						</li>
+
+						<!-- Se l'utente NON ha effettuato il login -->
+						<li th:unless="${userDetails}">
+							<a th:href="@{/login}" class="nav-btn">Accedi</a>
+						</li>
+						<li th:unless="${userDetails}">
+							<a th:href="@{/register}" class="nav-btn nav-btn-primary">Registrati</a>
+						</li>
 					</ul>
 				</nav>
 			</div>

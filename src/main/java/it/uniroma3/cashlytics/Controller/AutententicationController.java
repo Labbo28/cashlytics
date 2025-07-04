@@ -94,7 +94,7 @@ public class AutententicationController {
 
     @GetMapping("/login")
     public String GetLoginPage(Model model,
-            @RequestParam(value = "error", required = false) String error) {
+            @RequestParam(required = false) String error) {
         if (!model.containsAttribute("userLoginDTO")) {
             model.addAttribute("userLoginDTO", new UserLoginDTO());
         }

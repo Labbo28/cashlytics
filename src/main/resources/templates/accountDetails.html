@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,700&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <title>tba</title>
 </head>
 
@@ -152,7 +154,7 @@
                     <input type="text" id="merchantInput" th:field="*{merchantName}" list="merchantsList"
                         placeholder="Type or select a merchant…" required />
                     <datalist id="merchantsList">
-                        <option th:each="m : ${merchants}" th:value="${m.name}" />
+                        <option th:each="m : ${merchants}" th:value="${m.name}">
                     </datalist>
                     <input type="hidden" th:field="*{merchantId}" />
                     <span class="error" th:if="${#fields.hasErrors('merchantName')}" th:errors="*{merchantName}">
@@ -170,8 +172,7 @@
             </form>
         </div>
     </div>
-
-    <!-- ENHANCED SCRIPT -->
+    <div th:replace="~{fragments.html :: siteFooter}"></div>
     <script>
         function toggleTransactionForm() {
             const overlay = document.getElementById('addTransactionForm');

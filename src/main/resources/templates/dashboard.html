@@ -10,24 +10,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,700&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <title>tba</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <title>CashLytics - Account Finanziario</title>
 </head>
 
 <body class="homepage-body">
     <div th:replace="~{fragments.html :: siteHeader}"></div>
+
     <!-- Main Content -->
     <main class="container" style="padding: 2rem;">
-        <!-- Alert Messages -->
         <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
         <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-
-        <!-- Dashboard Overview -->
-        <section style="margin-bottom: 3rem;">
-            <h1>Financial Dashboard</h1>
-            <p style="color: var(--neutral-mid); font-size: 1.1rem;">
-                Manage your financial accounts and track your wealth
-            </p>
-        </section>
+        <h1 style="margin-bottom: 3rem;" th:text="'Resoconto di ' + ${userDetails.username}">Resoconto di username</h1>
 
         <!-- Summary Cards -->
         <section class="features-grid" style="margin-bottom: 3rem;">
@@ -35,11 +30,10 @@
                 <div class="feature-icon">
                     <i class="fas fa-wallet"></i>
                 </div>
-                <h3>Total Balance</h3>
-                <p th:style="
-                        |font-size: 1.5rem; 
-                         font-weight: 600; 
-                         color: ${totalBalance < 0} ? 'var(--warning)' : 'var(--accent)';|">
+                <h3>Bilancio Totale</h3>
+                <p
+                    th:style="|font-size: 1.5rem; font-weight: 600; color: ${
+                    (totalBalance != null and totalBalance.compareTo(T(java.math.BigDecimal).ZERO) < 0) ? 'var(--warning)' : 'var(--accent)'}|">
                     €<span th:text="${#numbers.formatDecimal(totalBalance, 1, 2)}">0.00</span>
                 </p>
 
@@ -47,7 +41,7 @@
                     <div class="feature-icon">
                         <i class="fas fa-credit-card"></i>
                     </div>
-                    <h3>Active Accounts</h3>
+                    <h3>Account Attivi</h3>
                     <p style="font-size: 1.5rem; font-weight: 600; color: var(--primary);">
                         <span th:text="${#lists.size(financialAccounts)}">0</span>
                     </p>
@@ -57,7 +51,7 @@
         <!-- Financial Accounts Section -->
         <section style="margin-bottom: 3rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2>Your Financial Accounts</h2>
+                <h2>I Tuoi Account Finanziari</h2>
                 <button onclick="toggleAccountForm()" class="btn btn-primary"
                     style="width: auto; padding: 0.75rem 1.5rem;">
                     <i class="fas fa-plus"></i> Add New Account
