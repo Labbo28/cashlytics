@@ -1,8 +1,6 @@
 package it.uniroma3.cashlytics.Controller;
 
-import java.math.BigDecimal;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import it.uniroma3.cashlytics.DTO.FinancialAccountDTO;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.User;
@@ -69,17 +66,11 @@ public class DashboardController {
                     .getAllFinancialAccountByUsername(username);
             System.out.println("Loaded " + financialAccountsList.size() + " financial accounts for user: " + username);
 
-            // Calcola il bilancio totale
-            BigDecimal totalBalance = financialAccountsList.stream()
-                    .map(FinancialAccount::getBalance)
-                    .filter(balance -> balance != null)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-
             // Aggiungi dati al modello
             model.addAttribute("user", user);
             model.addAttribute("username", username);
             model.addAttribute("financialAccounts", financialAccountsList);
-            model.addAttribute("totalBalance", totalBalance);
+            model.addAttribute("totalBalance", user.getTotalBalance());
             model.addAttribute("accountTypes", AccountType.values());
 
             // Aggiungi un DTO vuoto per il form di creazione nuovo account
@@ -88,7 +79,7 @@ public class DashboardController {
             }
 
             System.out.println("Dashboard loaded successfully for user: " + username);
-            System.out.println("Total balance calculated: " + totalBalance);
+            System.out.println("Total balance calculated: " + user.getTotalBalance());
             System.out.println("Number of accounts: " + financialAccountsList.size());
             return "dashboard";
         } catch (Exception e) {
@@ -113,7 +104,6 @@ public class DashboardController {
                 System.err.println("User not authenticated during account creation");
                 return "redirect:/login";
             }
-
             if (!authentication.getName().equals(username)) {
                 System.err.println(
                         "Username mismatch during account creation: " + authentication.getName() + " vs " + username);

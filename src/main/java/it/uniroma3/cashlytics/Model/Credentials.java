@@ -15,9 +15,7 @@ public class Credentials {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
-
     private String username;
-
     private String password;
     @ToString.Exclude
     @OneToOne(cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.EAGER)

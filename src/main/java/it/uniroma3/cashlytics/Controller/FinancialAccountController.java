@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import it.uniroma3.cashlytics.DTO.TransactionDTO;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.Transaction;
@@ -33,23 +31,17 @@ public class FinancialAccountController {
 
     @Autowired
     private FinancialAccountService financialAccountService;
-
     @Autowired
     private TransactionService transactionService;
-
     @Autowired
     private UserService userService;
-
     @Autowired
     private CategoryService categoryService;
-
     @Autowired
     private MerchantService merchantService;
 
     /*
-     * =====================
      * GET: Account Details
-     * =====================
      */
     @GetMapping("/{username}/account/{accountId}")
     @Transactional(readOnly = true)
@@ -154,9 +146,7 @@ public class FinancialAccountController {
     }
 
     /*
-     * =====================
      * METODI AUSILIARI
-     * =====================
      */
 
     /**
@@ -209,4 +199,5 @@ public class FinancialAccountController {
         }
         return Arrays.asList("INCOME", "EXPENSE", "TRANSFER");
     }
+
 }

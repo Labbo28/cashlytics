@@ -8,10 +8,10 @@ import it.uniroma3.cashlytics.Model.User;
 
 public interface CategoryRepository extends CrudRepository<Category, Long> {
 
-    Set<Category> findAllByUser(User currentUser);
+	Set<Category> findAllByUser(User currentUser);
 
-    Optional<Category> findByIdAndUser(Long catId, User user);
+	Optional<Category> findByIdAndUser(Long catId, User user);
 
-    Optional<Category> findByNameIgnoreCaseAndUser(String catName, User user);
+	Optional<Category> findByNameIgnoreCaseAndUser(String catName, User user);
 
 }

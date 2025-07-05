@@ -23,9 +23,10 @@ public class FinancialAccountService {
 
     public FinancialAccount createFinancialAccount(FinancialAccountDTO financialAccountDTO, User user) {
         FinancialAccount newAccount = new FinancialAccount();
-        newAccount.setAccountType(financialAccountDTO.getAccountType());
         newAccount.setBalance(
                 financialAccountDTO.getBalance() != null ? financialAccountDTO.getBalance() : BigDecimal.ZERO);
+        newAccount.setType(financialAccountDTO.getAccountType());
+        newAccount.setName(financialAccountDTO.getName());
         newAccount.setUser(user);
 
         // Salva l'account e forza il flush per assicurarsi che venga scritto nel DB
@@ -38,12 +39,11 @@ public class FinancialAccountService {
         FinancialAccount account = financialAccountRepository.findById(accountId)
                 .orElseThrow(() -> new RuntimeException("Financial account not found with id: " + accountId));
         return account.getTransactions();
-
     }
 
     public FinancialAccount getFinancialAccountById(Long accountId) {
-
         return financialAccountRepository.findById(accountId)
                 .orElseThrow(() -> new RuntimeException("Financial account not found with id: " + accountId));
     }
+
 }

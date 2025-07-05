@@ -13,7 +13,7 @@ public class Merchant {
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String logo;
+    private String logo; // as Url
 
     @ManyToOne
     private User user;

@@ -26,7 +26,8 @@
 
 						<!-- Sezione destra: se l'utente ha effettuato il login -->
 						<li th:if="${userDetails}">
-							<span class="nav-btn" th:text="${userDetails.username}">utente</span>
+							<a th:href="${'/'+userDetails.username+'/dashboard'}" class="nav-btn"
+								th:text="${userDetails.username}">utente</a>
 						</li>
 						<li th:if="${userDetails}">
 							<form class="inline-form" th:action="@{/logout}" method="post">

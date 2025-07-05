@@ -1,8 +1,8 @@
 package it.uniroma3.cashlytics.Model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -41,12 +41,24 @@ public class User {
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "user")
     private Set<FinancialAccount> financialAccounts;
-    @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "user")
-    private Set<Merchant> merchants;
 
-    @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "user")
-    private Set<Category> categories;
+    /*
+     * @EqualsAndHashCode.Exclude
+     * 
+     * @OneToMany(mappedBy = "user")
+     * private Set<Merchant> merchants;
+     * 
+     * @EqualsAndHashCode.Exclude
+     * 
+     * @OneToMany(mappedBy = "user")
+     * private Set<Category> categories;
+     */
+
+    public BigDecimal getTotalBalance() {
+        return financialAccounts.stream()
+                .map(FinancialAccount::getBalance)
+                .filter(balance -> balance != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 
 }

@@ -36,7 +36,6 @@
                     (totalBalance != null and totalBalance.compareTo(T(java.math.BigDecimal).ZERO) < 0) ? 'var(--warning)' : 'var(--accent)'}|">
                     €<span th:text="${#numbers.formatDecimal(totalBalance, 1, 2)}">0.00</span>
                 </p>
-
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-credit-card"></i>
@@ -52,42 +51,48 @@
         <section style="margin-bottom: 3rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                 <h2>I Tuoi Account Finanziari</h2>
-                <button onclick="toggleAccountForm()" class="btn btn-primary"
-                    style="width: auto; padding: 0.75rem 1.5rem;">
-                    <i class="fas fa-plus"></i> Add New Account
+                <button th:unless="${#lists.isEmpty(financialAccounts)}" onclick="toggleAccountForm()"
+                    class="btn btn-primary" style="width: auto; padding: 0.75rem 1.5rem;">
+                    <i class="fas fa-plus"></i> Aggiungi Nuovo Account
                 </button>
             </div>
 
             <!-- Add Account Form (Hidden by default) -->
             <div id="addAccountForm" style="display: none; margin-bottom: 2rem;">
                 <div class="auth-container" style="margin: 0; max-width: 100%;">
-                    <h3 style="text-align: center; margin-bottom: 1.5rem;">Add New Financial Account</h3>
+                    <h3 style="text-align: center; margin-bottom: 1.5rem;">Nuovo Account Finanziario</h3>
                     <form th:action="@{'/' + ${username} + '/dashboard/add-account'}" th:object="${financialAccountDTO}"
                         method="post">
 
                         <div class="form-group">
-                            <label for="accountType">Account Type</label>
+                            <label for="accountType">Tipo Account</label>
                             <select th:field="*{accountType}" id="accountType"
                                 style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;">
-                                <option value="">Select Account Type</option>
-                                <option th:each="type : ${accountTypes}" th:value="${type}" th:text="${type}">Account
-                                    Type</option>
+                                <option value="">Seleziona il Tipo di Account</option>
+                                <option th:each="type : ${accountTypes}" th:value="${type}" th:text="${type}">Tipo
+                                    Account</option>
                             </select>
                             <span class="error" th:if="${#fields.hasErrors('accountType')}"
                                 th:errors="*{accountType}"></span>
                         </div>
 
                         <div class="form-group">
-                            <label for="balance">Initial Balance (€)</label>
+                            <label for="name">Nome Account (facoltativo)</label>
+                            <input type="text" th:field="*{name}" id="name" />
+                            <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="balance">Bilancio Iniziale (€)</label>
                             <input type="number" th:field="*{balance}" id="balance" step="0.01" min="0"
                                 placeholder="0.00" />
                             <span class="error" th:if="${#fields.hasErrors('balance')}" th:errors="*{balance}"></span>
                         </div>
 
                         <div style="display: flex; gap: 1rem;">
-                            <button type="submit" class="btn btn-primary">Create Account</button>
+                            <button type="submit" class="btn btn-primary">Crea Account</button>
                             <button type="button" onclick="toggleAccountForm()"
-                                class="btn btn-secondary">Cancel</button>
+                                class="btn btn-secondary">Annulla</button>
                         </div>
                     </form>
                 </div>
@@ -98,36 +103,37 @@
                 <div class="feature-icon">
                     <i class="fas fa-plus-circle"></i>
                 </div>
-                <h3>No Accounts Yet</h3>
-                <p>Start by adding your first financial account to track your finances.</p>
+                <h3>Ancora nessun Account</h3>
+                <p>Comincia aggiungendo il tuo primo account finanziario per tracciare le tue finanze!</p>
                 <button onclick="toggleAccountForm()" class="btn btn-accent"
                     style="width: auto; padding: 0.75rem 1.5rem; margin-top: 1rem;">
-                    Add Your First Account
+                    Aggiungi Nuovo Account
                 </button>
             </div>
-
             <div th:unless="${#lists.isEmpty(financialAccounts)}" class="features-grid">
                 <div th:each="account : ${financialAccounts}" class="feature-card">
                     <div class="feature-icon">
                         <i class="fas" th:classappend="
-                               ${account.accountType.name() == 'CHECKING'} ? ' fa-university' :
-                               (${account.accountType.name() == 'SAVINGS'} ? ' fa-piggy-bank' :
-                               (${account.accountType.name() == 'CREDIT'} ? ' fa-credit-card' :
-                               (${account.accountType.name() == 'INVESTMENT'} ? ' fa-chart-line' : ' fa-wallet')))">
+                        ${account.type.name() == 'Conto_Corrente'} ? ' fa-university' :
+                        (${account.type.name() == 'Conto_Risparmio'} ? ' fa-piggy-bank' :
+                        (${account.type.name() == 'Carta_Credito'} ? ' fa-credit-card' :
+                        (${account.type.name() == 'Carta_Debito'} ? ' fa-money-check' :
+                        (${account.type.name() == 'Investimento'} ? ' fa-chart-line' :
+                        (${account.type.name() == 'Prestito'} ? ' fa-hand-holding-usd' :
+                        (${account.type.name() == 'Crypto'} ? ' fa-bitcoin' : ' fa-wallet'))))))">
                         </i>
                     </div>
-                    <h3 th:text="${account.accountType}">Account Type</h3>
+                    <h3 th:text="${#strings.isEmpty(account.name) ? account.type.name : account.name}">Account</h3>
                     <p style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem;"
                         th:style="${account.balance >= 0} ? 'color: var(--accent);' : 'color: var(--warning);'">
                         €<span th:text="${#numbers.formatDecimal(account.balance, 1, 2)}">0.00</span>
                     </p>
-                    <p style="font-size: 0.85rem; color: var(--neutral-mid);">
-                        Account ID: <span th:text="${account.id}">123</span>
-                    </p>
+                    <!-- p style="font-size: 0.85rem; color: var(--neutral-mid);">
+                        Account ID: <span th:text="${account.id}">123</span></p -->
                     <div style="margin-top: 1rem;">
                         <a th:href="@{'/' + ${username} + '/account/' + ${account.id}}" class="btn btn-secondary"
                             style="width: auto; padding: 0.5rem 1rem; font-size: 0.9rem;">
-                            View Details
+                            Vedi Dettagli
                         </a>
                     </div>
                 </div>
@@ -135,6 +141,7 @@
         </section>
     </main>
     <div th:replace="~{fragments.html :: siteFooter}"></div>
+
     <script>
         function toggleAccountForm() {
             const form = document.getElementById('addAccountForm');
@@ -145,7 +152,6 @@
                 form.style.display = 'none';
             }
         }
-
         // Auto-hide alerts after 5 seconds
         document.addEventListener('DOMContentLoaded', function () {
             const alerts = document.querySelectorAll('.alert');

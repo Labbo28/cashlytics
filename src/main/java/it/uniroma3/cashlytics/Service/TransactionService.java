@@ -19,10 +19,8 @@ public class TransactionService {
 
     @Autowired
     private TransactionRepository transactionRepository;
-
     @Autowired
     private CategoryService categoryService;
-
     @Autowired
     private MerchantService merchantService;
 
@@ -56,8 +54,7 @@ public class TransactionService {
         // 2. Risolvi o crea Merchant
         Merchant merchant = resolveOrCreateMerchant(transactionDTO, user, bindingResult);
 
-        // 3. Se ci sono errori di binding (invalid category/merchant), interrompi e
-        // ritorna null
+        // 3. Se ci sono errori di binding (invalid category/merchant) interrompi
         if (bindingResult.hasErrors()) {
             return null;
         }
@@ -85,7 +82,6 @@ public class TransactionService {
 
         // 7. Salva transaction (e category/merchant già salvate all'occorrenza)
         transactionRepository.save(newTransaction);
-
         return newTransaction;
     }
 
@@ -168,4 +164,5 @@ public class TransactionService {
                 "Merchant is required.");
         return null;
     }
+
 }

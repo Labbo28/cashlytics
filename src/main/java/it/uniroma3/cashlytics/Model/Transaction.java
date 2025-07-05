@@ -2,7 +2,7 @@ package it.uniroma3.cashlytics.Model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
+import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
 import it.uniroma3.cashlytics.Model.Enums.TransactionType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,16 +17,16 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Data
 public class Transaction {
-
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
     private BigDecimal amount;
     private String description;
     private LocalDateTime date;
-    private boolean isRecurring;
+    private RecurrencePattern recurrence;
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
+
     @EqualsAndHashCode.Exclude
     @ManyToOne
     @JoinColumn(name = "financial_account_id")
