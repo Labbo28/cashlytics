@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <title>CashLytics - Account Finanziario</title>
+    <title th:text="'CashLytics - ' + ${userDetails.username}">CashLytics - Utente</title>
 </head>
 
 <body class="homepage-body">
@@ -22,10 +22,10 @@
     <main class="container" style="padding: 2rem;">
         <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
         <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-        <h1 style="margin-bottom: 3rem;" th:text="'Resoconto di ' + ${userDetails.username}">Resoconto di username</h1>
+        <h1 style="margin-bottom: 2rem;" th:text="'Resoconto di ' + ${userDetails.username}">Resoconto di username</h1>
 
         <!-- Summary Cards -->
-        <section class="features-grid" style="margin-bottom: 3rem;">
+        <section class="features-grid" style="margin-bottom: 2rem;">
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-wallet"></i>
@@ -36,21 +36,22 @@
                     (totalBalance != null and totalBalance.compareTo(T(java.math.BigDecimal).ZERO) < 0) ? 'var(--warning)' : 'var(--accent)'}|">
                     €<span th:text="${#numbers.formatDecimal(totalBalance, 1, 2)}">0.00</span>
                 </p>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-credit-card"></i>
-                    </div>
-                    <h3>Account Attivi</h3>
-                    <p style="font-size: 1.5rem; font-weight: 600; color: var(--primary);">
-                        <span th:text="${#lists.size(financialAccounts)}">0</span>
-                    </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-university"></i>
                 </div>
+                <h3>Account Attivi</h3>
+                <p style="font-size: 1.5rem; font-weight: 600; color: var(--primary);">
+                    <span th:text="${#lists.size(financialAccounts)}">0</span>
+                </p>
+            </div>
         </section>
 
-        <!-- Financial Accounts Section -->
-        <section style="margin-bottom: 3rem;">
+        <!-- Accounts Section -->
+        <section style="margin-bottom: 2rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2>I Tuoi Account Finanziari</h2>
+                <h1>I Tuoi Account Finanziari</h1>
                 <button th:unless="${#lists.isEmpty(financialAccounts)}" onclick="toggleAccountForm()"
                     class="btn btn-primary" style="width: auto; padding: 0.75rem 1.5rem;">
                     <i class="fas fa-plus"></i> Aggiungi Nuovo Account
@@ -60,7 +61,7 @@
             <!-- Add Account Form (Hidden by default) -->
             <div id="addAccountForm" style="display: none; margin-bottom: 2rem;">
                 <div class="auth-container" style="margin: 0; max-width: 100%;">
-                    <h3 style="text-align: center; margin-bottom: 1.5rem;">Nuovo Account Finanziario</h3>
+                    <h3 style="text-align: center; margin-bottom: 2rem;">Nuovo Account Finanziario</h3>
                     <form th:action="@{'/' + ${username} + '/dashboard/add-account'}" th:object="${financialAccountDTO}"
                         method="post">
 
@@ -68,12 +69,9 @@
                             <label for="accountType">Tipo Account</label>
                             <select th:field="*{accountType}" id="accountType"
                                 style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;">
-                                <option value="">Seleziona il Tipo di Account</option>
-                                <option th:each="type : ${accountTypes}" th:value="${type}" th:text="${type}">Tipo
-                                    Account</option>
+                                <option value="">Seleziona il tipo di account</option>
+                                <option th:each="type : ${accountTypes}" th:value="${type}" th:text="${type}"></option>
                             </select>
-                            <span class="error" th:if="${#fields.hasErrors('accountType')}"
-                                th:errors="*{accountType}"></span>
                         </div>
 
                         <div class="form-group">
@@ -140,30 +138,9 @@
             </div>
         </section>
     </main>
-    <div th:replace="~{fragments.html :: siteFooter}"></div>
 
-    <script>
-        function toggleAccountForm() {
-            const form = document.getElementById('addAccountForm');
-            if (form.style.display === 'none' || form.style.display === '') {
-                form.style.display = 'block';
-                form.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                form.style.display = 'none';
-            }
-        }
-        // Auto-hide alerts after 5 seconds
-        document.addEventListener('DOMContentLoaded', function () {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
-                setTimeout(() => {
-                    alert.style.transition = 'opacity 0.5s ease';
-                    alert.style.opacity = '0';
-                    setTimeout(() => alert.remove(), 500);
-                }, 5000);
-            });
-        });
-    </script>
+    <div th:replace="~{fragments.html :: siteFooter}"></div>
+    <script th:src="@{/js/main.js}"></script>
 </body>
 
 </html>

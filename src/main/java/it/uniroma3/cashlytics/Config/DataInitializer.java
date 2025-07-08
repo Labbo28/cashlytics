@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
 import it.uniroma3.cashlytics.Model.Credentials;
 import it.uniroma3.cashlytics.Model.User;
 import it.uniroma3.cashlytics.Repository.CredentialsRepository;
@@ -29,12 +30,14 @@ public class DataInitializer implements CommandLineRunner {
             userRepository.save(admin);
             credentialsRepository.save(credentials);
         }
-
-        User user = new User("user@cashlytics.com", "User", "User", "1234567891");
-        Credentials credentials = new Credentials("user", passwordEncoder.encode("Password123"));
-        credentials.setUser(user);
-        user.setCredentials(credentials);
-        userRepository.save(user);
-        credentialsRepository.save(credentials);
+        if (userRepository.findByCredentials_Username("user").isEmpty()) {
+            User user = new User("user@cashlytics.com", "User", "User", "1234567891");
+            Credentials credentials = new Credentials("user", passwordEncoder.encode("Password123"));
+            credentials.setUser(user);
+            user.setCredentials(credentials);
+            userRepository.save(user);
+            credentialsRepository.save(credentials);
+        }
     }
+
 }

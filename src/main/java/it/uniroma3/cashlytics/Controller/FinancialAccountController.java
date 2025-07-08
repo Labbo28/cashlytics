@@ -1,9 +1,7 @@
 package it.uniroma3.cashlytics.Controller;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import it.uniroma3.cashlytics.DTO.BudgetDTO;
 import it.uniroma3.cashlytics.DTO.TransactionDTO;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.Transaction;
@@ -43,6 +42,7 @@ public class FinancialAccountController {
     /*
      * GET: Account Details
      */
+
     @GetMapping("/{username}/account/{accountId}")
     @Transactional(readOnly = true)
     public String getAccountDetails(
@@ -64,31 +64,32 @@ public class FinancialAccountController {
         }
 
         // 3. Transazioni e Dati aggiuntivi
-        Set<Transaction> transactions = financialAccountService.getAllTransactionsByAccountId(accountId);
+        // Set<Transaction> transactions =
+        // financialAccountService.getAllTransactionsByAccountId(accountId);
         model.addAttribute("account", account);
         model.addAttribute("username", username);
-        model.addAttribute("transactions", transactions);
 
-        // 4. Elenchi di categorie e merchant per l'utente
-        model.addAttribute("categories", categoryService.findAllByUser(currentUser));
-        model.addAttribute("merchants", merchantService.findAllByUser(currentUser));
+        /*
+         * 4. Elenchi di categorie e merchant per l'utente
+         * model.addAttribute("categories", categoryService.findAllByUser(currentUser));
+         * model.addAttribute("merchants", merchantService.findAllByUser(currentUser));
+         */
 
-        // 5. Tipi di transazione (enum o valori di default)
-        model.addAttribute("transactionTypes", loadTransactionTypes());
-
-        // 6. DTO per il form (solo se non già presente)
+        // 6. DTO per i form (solo se non già presente)
         if (!model.containsAttribute("transactionDTO")) {
             model.addAttribute("transactionDTO", new TransactionDTO());
+        }
+        if (!model.containsAttribute("budgetDTO")) {
+            model.addAttribute("budgetDTO", new BudgetDTO());
         }
 
         return "accountDetails";
     }
 
     /*
-     * ===============================
      * POST: Aggiungi nuova transazione
-     * ===============================
      */
+
     @PostMapping("/{username}/account/{accountId}/add-transaction")
     @Transactional
     public String addTransaction(
@@ -105,6 +106,8 @@ public class FinancialAccountController {
         }
 
         // 2. Validazione form
+        if (transactionDTO.getDate() == null)
+            transactionDTO.setDate(LocalDate.now());
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute(
                     "org.springframework.validation.BindingResult.transactionDTO", bindingResult);
@@ -117,12 +120,6 @@ public class FinancialAccountController {
         FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
         if (!isAccountOwnedByUser(account, currentUser, redirectAttributes, username)) {
             return "redirect:/" + username + "/dashboard";
-        }
-
-        // 4. Controllo importo
-        if (transactionDTO.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Transaction amount must be greater than zero.");
-            return "redirect:/" + username + "/account/" + accountId;
         }
 
         // 5. Creazione transazione delegata al service
@@ -183,21 +180,6 @@ public class FinancialAccountController {
             return false;
         }
         return true;
-    }
-
-    /**
-     * Restituisce la lista degli enum TransactionType oppure valori base se non
-     * esiste l'enum.
-     */
-    private List<Object> loadTransactionTypes() {
-        try {
-            Class<?> transactionTypeClass = Class.forName("it.uniroma3.cashlytics.Model.Enums.TransactionType");
-            if (transactionTypeClass.isEnum()) {
-                return Arrays.asList(transactionTypeClass.getEnumConstants());
-            }
-        } catch (ClassNotFoundException ignored) {
-        }
-        return Arrays.asList("INCOME", "EXPENSE", "TRANSFER");
     }
 
 }

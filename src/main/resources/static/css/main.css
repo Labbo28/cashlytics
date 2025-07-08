@@ -1,7 +1,3 @@
-/* 
- * main.css - Unified stylesheet for CashLytics application
- * Financial management application color scheme and styling
- */
 :root {
   /* Enhanced color palette - more vibrant financial management theme */
   --primary: #1e88e5;
@@ -616,12 +612,12 @@ nav a:hover {
   }
 
   /* Positive / negative amount */
-  .amount-positive {
+  .amount.positive {
     color: var(--accent);
     font-weight: 600;
   }
 
-  .amount-negative {
+  .amount.negative {
     color: var(--warning);
     font-weight: 600;
   }
@@ -689,6 +685,363 @@ nav a:hover {
   /* Small utility for spacing within container */
   .mt-lg {
     margin-top: var(--spacing-lg);
+  }
+
+  /* Enhanced styles for account details page */
+  .page-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    padding: var(--spacing-xl) 0;
+    margin-bottom: var(--spacing-xl);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+
+  .breadcrumb a {
+    color: white;
+    text-decoration: none;
+    transition: var(--transition-fast);
+  }
+
+  .breadcrumb a:hover {
+    opacity: 0.8;
+  }
+
+  .account-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-lg);
+  }
+
+  .account-info h1 {
+    margin: 0 0 var(--spacing-sm) 0;
+    color: var(--neutral-dark);
+    font-size: 1.8rem;
+  }
+
+  .account-type {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .amount {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .account-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+  }
+
+  .transactions-section {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .transactions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--neutral-light);
+  }
+
+  .transactions-header h2 {
+    margin: 0;
+    color: var(--neutral-dark);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
+    background: var(--white);
+    border: 1px solid var(--neutral-light);
+    transition: var(--transition-fast);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .transaction-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
+  }
+
+  .transaction-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+
+  .transaction-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .transaction-icon.income {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--accent);
+  }
+
+  .transaction-icon.expense {
+    background: rgba(244, 67, 54, 0.1);
+    color: var(--warning);
+  }
+
+  .transaction-details h4 {
+    margin: 0 0 var(--spacing-xs) 0;
+    font-size: 1rem;
+    color: var(--neutral-dark);
+  }
+
+  .transaction-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 0.85rem;
+    color: var(--neutral-mid);
+  }
+
+  .transaction-type-badge {
+    background: var(--neutral-light);
+    color: var(--neutral-dark);
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .transaction-amount {
+    text-align: right;
+  }
+
+  .transaction-amount .amount {
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: block;
+  }
+
+  .transaction-amount .amount.positive {
+    color: var(--accent);
+  }
+
+  .transaction-amount .amount.negative {
+    color: var(--warning);
+  }
+
+  .no-transactions {
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--neutral-mid);
+  }
+
+  .no-transactions .icon {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-lg);
+    opacity: 0.5;
+  }
+
+  .no-transactions h3 {
+    margin-bottom: var(--spacing-md);
+    color: var(--neutral-dark);
+  }
+
+  .form-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--spacing-md);
+  }
+
+  .form-modal {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .form-modal h3 {
+    margin: 0 0 var(--spacing-lg) 0;
+    text-align: center;
+    color: var(--primary-dark);
+  }
+
+  .form-group {
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    font-weight: 500;
+    color: var(--neutral-dark);
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 1px solid var(--neutral-light);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    transition: var(--transition-fast);
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .form-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: flex-end;
+    margin-top: var(--spacing-xl);
+  }
+
+  .form-buttons .btn {
+    width: auto;
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .stat-card {
+    background: white;
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+  }
+
+  .stat-card .stat-icon {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .stat-card .stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .stat-card .stat-label {
+    font-size: 0.9rem;
+    color: var(--neutral-mid);
+  }
+
+  .filters {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .filter-group select {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--neutral-light);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 768px) {
+    .account-meta {
+      flex-direction: column;
+      gap: var(--spacing-md);
+    }
+
+    .account-actions {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .transactions-header {
+      flex-direction: column;
+      gap: var(--spacing-md);
+      align-items: flex-start;
+    }
+
+    .transaction-item {
+      flex-direction: column;
+      gap: var(--spacing-md);
+      align-items: flex-start;
+    }
+
+    .transaction-amount {
+      text-align: left;
+      width: 100%;
+    }
+
+    .filters {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 
 }
