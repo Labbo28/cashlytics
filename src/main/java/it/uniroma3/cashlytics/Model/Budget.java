@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
@@ -16,14 +17,16 @@ public class Budget {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
-    private String desc;
+    private String description;
     private BigDecimal amount;
-    private LocalDateTime startDate;
-    private RecurrencePattern recurrencePattern;
+    private LocalDateTime date;
+    private RecurrencePattern recurrence;
 
+    @EqualsAndHashCode.Exclude
     @ManyToOne
     @JoinColumn(name = "financial_account_id")
     private FinancialAccount financialAccount;
+    @EqualsAndHashCode.Exclude
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;

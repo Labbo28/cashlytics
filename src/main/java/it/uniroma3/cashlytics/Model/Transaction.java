@@ -2,6 +2,7 @@ package it.uniroma3.cashlytics.Model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
 import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
 import it.uniroma3.cashlytics.Model.Enums.TransactionType;
 import jakarta.persistence.Entity;

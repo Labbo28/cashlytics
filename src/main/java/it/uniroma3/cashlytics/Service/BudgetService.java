@@ -1,64 +1,62 @@
 package it.uniroma3.cashlytics.Service;
 
 import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
-import it.uniroma3.cashlytics.DTO.TransactionDTO;
+import it.uniroma3.cashlytics.DTO.BudgetDTO;
+import it.uniroma3.cashlytics.Model.Budget;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
-import it.uniroma3.cashlytics.Model.Transaction;
 import it.uniroma3.cashlytics.Model.User;
 import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
-import it.uniroma3.cashlytics.Model.Enums.TransactionType;
-import it.uniroma3.cashlytics.Repository.TransactionRepository;
+import it.uniroma3.cashlytics.Repository.BudgetRepository;
 
 @Service
-public class TransactionService {
+public class BudgetService {
 
     @Autowired
-    private TransactionRepository transactionRepository;
+    private BudgetRepository budgetRepository;
 
-    public Transaction createTransaction(TransactionDTO transactionDTO, FinancialAccount account,
+    public Budget createBudget(BudgetDTO budgetDTO, FinancialAccount account,
             User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             return null;
 
-        // 1. Determina tipo di transazione da amount
-        boolean isIncome = transactionDTO.getAmount().signum() >= 0;
-        TransactionType type = isIncome ? TransactionType.INCOME : TransactionType.EXPENSE;
-
         // 2. Gestione ricorrenza
-        RecurrencePattern recurrence = transactionDTO.getRecurrencePattern();
+        RecurrencePattern recurrence = budgetDTO.getRecurrencePattern();
         if (recurrence == null) {
             recurrence = RecurrencePattern.UNA_TANTUM;
         }
         // 3. Gestione data
-        LocalDateTime dateTime = transactionDTO.getDate() != null
-                ? transactionDTO.getDate().atStartOfDay()
+        LocalDateTime dateTime = budgetDTO.getDate() != null
+                ? budgetDTO.getDate().atStartOfDay()
                 : LocalDateTime.now();
 
-        // 4. Costruisci transazione
-        Transaction newTransaction = new Transaction();
-        newTransaction.setAmount(transactionDTO.getAmount());
-        newTransaction.setDescription(transactionDTO.getDescription());
-        newTransaction.setTransactionType(type);
-        newTransaction.setDate(dateTime);
-        newTransaction.setRecurrence(recurrence);
-        newTransaction.setFinancialAccount(account);
+        // 4. Costruisci budget
+        Budget newBudget = new Budget();
+        newBudget.setAmount(budgetDTO.getAmount());
+        newBudget.setDescription(budgetDTO.getDescription());
+        newBudget.setDate(dateTime);
+        newBudget.setRecurrence(recurrence);
+        newBudget.setFinancialAccount(account);
 
-        // 5. Aggiorna lista transazioni account
-        account.getTransactions().add(newTransaction);
-        // 6. Aggiorna saldo (aggiungi o sottrai)
-        account.setBalance(account.getBalance().add(transactionDTO.getAmount()));
-        // 7. Salva transazione
-        return transactionRepository.save(newTransaction);
+        // 5. Aggiorna lista budget account
+        account.getBudgets().add(newBudget);
+        // 6. Aggiorna saldo (sottrai)
+        account.setBalance(account.getBalance().subtract(budgetDTO.getAmount()));
+        // 7. Salva budget
+        return budgetRepository.save(newBudget);
     }
 
+    public void deleteBudget(Long budgetId) {
+        Budget budget = budgetRepository.findById(budgetId)
+                .orElseThrow(() -> new RuntimeException("Budget not found with id: " + budgetId));
+        budgetRepository.delete(budget);
+    }
     /*
      * private Category resolveOrCreateCategory(
-     * TransactionDTO dto,
+     * BudgetDTO dto,
      * User user,
      * BindingResult bindingResult) {
      * Long catId = dto.getCategoryId();
@@ -71,7 +69,7 @@ public class TransactionService {
      * } else {
      * bindingResult.rejectValue(
      * "categoryName",
-     * "error.transactionDTO",
+     * "error.budgetDTO",
      * "Invalid category selected.");
      * return null;
      * }
@@ -90,13 +88,13 @@ public class TransactionService {
      * }
      * bindingResult.rejectValue(
      * "categoryName",
-     * "error.transactionDTO",
+     * "error.budgetDTO",
      * "Category is required.");
      * return null;
      * }
      * 
      * private Merchant resolveOrCreateMerchant(
-     * TransactionDTO dto,
+     * BudgetDTO dto,
      * User user,
      * BindingResult bindingResult) {
      * Long merId = dto.getMerchantId();
@@ -109,7 +107,7 @@ public class TransactionService {
      * } else {
      * bindingResult.rejectValue(
      * "merchantName",
-     * "error.transactionDTO",
+     * "error.budgetDTO",
      * "Invalid merchant selected.");
      * return null;
      * }
@@ -128,10 +126,9 @@ public class TransactionService {
      * }
      * bindingResult.rejectValue(
      * "merchantName",
-     * "error.transactionDTO",
+     * "error.budgetDTO",
      * "Merchant is required.");
      * return null;
      * }
      */
-
 }

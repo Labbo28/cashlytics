@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import it.uniroma3.cashlytics.DTO.FinancialAccountDTO;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.Transaction;
@@ -44,6 +45,13 @@ public class FinancialAccountService {
     public FinancialAccount getFinancialAccountById(Long accountId) {
         return financialAccountRepository.findById(accountId)
                 .orElseThrow(() -> new RuntimeException("Financial account not found with id: " + accountId));
+    }
+
+    public void deleteAccount(Long accountId) {
+        FinancialAccount account = financialAccountRepository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Financial account not found with id: " + accountId));
+        // Si suppone cascade = CascadeType.ALL sulle transazioni
+        financialAccountRepository.delete(account);
     }
 
 }

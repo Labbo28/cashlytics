@@ -11,7 +11,6 @@ function toggleAccountForm() {
 function toggleTransactionForm() {
 	const form = document.getElementById('addTransactionForm');
 	const noTransDiv = document.getElementById('noTransactionDiv');
-
 	if (form.style.display === 'none' || form.style.display === '') {
 		form.style.display = 'block';
 		form.scrollIntoView({ behavior: 'smooth' });
@@ -28,6 +27,23 @@ function toggleTransactionForm() {
 	}
 }
 
+function toggleBudgetForm() {
+	const form = document.getElementById('addBudgetForm');
+	const div = document.getElementById('noBudgetDiv');
+	if (form.style.display === 'none' || form.style.display === '') {
+		form.style.display = 'block';
+		form.scrollIntoView({ behavior: 'smooth' });
+		if (div) {
+			div.style.display = 'none';
+		}
+	} else {
+		form.style.display = 'none';
+		if (div) {
+			div.style.display = 'block';
+		}
+	}
+}
+
 document.addEventListener('DOMContentLoaded', function () {
 	const alerts = document.querySelectorAll('.alert');
 	alerts.forEach(alert => {
@@ -37,4 +53,25 @@ document.addEventListener('DOMContentLoaded', function () {
 			setTimeout(() => alert.remove(), 500);
 		}, 5000);
 	});
+});
+
+function toggleMenu(button) {
+	const dropdown = button.nextElementSibling;
+	const allDropdowns = document.querySelectorAll('.menu-dropdown');
+	allDropdowns.forEach(menu => {
+		if (menu !== dropdown) {
+			menu.style.display = 'none';
+		}
+	});
+	dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+}
+
+// Chiude il menu cliccando fuori
+document.addEventListener('click', function (e) {
+	const isMenu = e.target.closest('.menu-wrapper');
+	if (!isMenu) {
+		document.querySelectorAll('.menu-dropdown').forEach(menu => {
+			menu.style.display = 'none';
+		});
+	}
 });

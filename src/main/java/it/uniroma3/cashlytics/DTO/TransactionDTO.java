@@ -2,7 +2,9 @@ package it.uniroma3.cashlytics.DTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
 import org.springframework.format.annotation.DateTimeFormat;
+
 import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -26,5 +28,4 @@ public class TransactionDTO {
      * private Long merchantId;
      * private String merchantName;
      */
-
 }

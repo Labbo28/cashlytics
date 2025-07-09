@@ -1044,4 +1044,8 @@ nav a:hover {
     }
   }
 
+  .menu-item:hover {
+    background-color: var(--neutral-light);
+  }
+
 }
