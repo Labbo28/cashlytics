@@ -115,7 +115,7 @@ public class FinancialAccountController {
         }
         // 5. Creazione transazione delegata al service
         Transaction newTransaction = transactionService.createTransaction(
-                transactionDTO, account, currentUser, bindingResult);
+                transactionDTO, account);
 
         // 6. Se ci sono errori o la creazione fallisce, torna al form
         if (bindingResult.hasErrors() || newTransaction == null) {

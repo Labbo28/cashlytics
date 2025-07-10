@@ -20,10 +20,8 @@ public class TransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    public Transaction createTransaction(TransactionDTO transactionDTO, FinancialAccount account,
-            User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors())
-            return null;
+    public Transaction createTransaction(TransactionDTO transactionDTO, FinancialAccount account){
+        
 
         // 1. Determina tipo di transazione da amount
         boolean isIncome = transactionDTO.getAmount().signum() >= 0;
@@ -32,6 +30,7 @@ public class TransactionService {
         // 2. Gestione ricorrenza
         RecurrencePattern recurrence = transactionDTO.getRecurrencePattern();
         if (recurrence == null) {
+
             recurrence = RecurrencePattern.UNA_TANTUM;
         }
         // 3. Gestione data
@@ -47,6 +46,11 @@ public class TransactionService {
         newTransaction.setDate(dateTime);
         newTransaction.setRecurrence(recurrence);
         newTransaction.setFinancialAccount(account);
+        if(recurrence != RecurrencePattern.UNA_TANTUM) {
+            newTransaction.setRecurring(true);
+        } else {
+            newTransaction.setRecurring(false);
+        }
 
         // 5. Aggiorna lista transazioni account
         account.getTransactions().add(newTransaction);
@@ -133,5 +137,6 @@ public class TransactionService {
      * return null;
      * }
      */
-
 }
+
+
