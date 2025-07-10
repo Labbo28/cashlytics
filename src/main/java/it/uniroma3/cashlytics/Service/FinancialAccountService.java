@@ -11,6 +11,7 @@ import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.Transaction;
 import it.uniroma3.cashlytics.Model.User;
 import it.uniroma3.cashlytics.Repository.FinancialAccountRepository;
+import jakarta.transaction.Transactional;
 
 @Service
 public class FinancialAccountService {
@@ -52,6 +53,16 @@ public class FinancialAccountService {
                 .orElseThrow(() -> new RuntimeException("Financial account not found with id: " + accountId));
         // Si suppone cascade = CascadeType.ALL sulle transazioni
         financialAccountRepository.delete(account);
+    }
+
+    @Transactional
+    public void postTransactionAndUpdateBalance(Transaction tx) {
+        FinancialAccount account = tx.getFinancialAccount();
+        BigDecimal newBalance = account.getBalance().add(tx.getAmount());
+        account.setBalance(newBalance);
+
+        account.getTransactions().add(tx);
+        financialAccountRepository.save(account);
     }
 
 }

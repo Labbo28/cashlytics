@@ -1,4 +1,4 @@
-package it.uniroma3.cashlytics.Service.strategy;
+package it.uniroma3.cashlytics.Service.recurrence.strategy;
 
 import java.time.LocalDate;
 

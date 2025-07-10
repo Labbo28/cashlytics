@@ -1,8 +1,8 @@
-package it.uniroma3.cashlytics.Service.strategy;
+package it.uniroma3.cashlytics.Service.recurrence.strategy;
 
 import java.time.LocalDate;
 
-public class MontlyStrategy implements RecurrenceStrategy{
+public class MonthlyStrategy implements RecurrenceStrategy{
 
     @Override
     public LocalDate nexDate(LocalDate date) {

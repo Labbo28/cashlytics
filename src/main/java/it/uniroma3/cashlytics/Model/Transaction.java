@@ -1,6 +1,7 @@
 package it.uniroma3.cashlytics.Model;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
@@ -54,5 +55,24 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "merchant_id")
     private Merchant merchant;
+
+
+    private LocalDate startDate;       
+    private LocalDate lastGenerated;    
+    private LocalDate endDate;         
+
+    public Transaction cloneForDate(LocalDate date) {
+        Transaction tx = new Transaction();
+        tx.setStartDate(this.startDate);  
+        tx.setLastGenerated(null);
+        tx.setEndDate(this.endDate);
+        tx.setRecurring(false);
+        tx.setRecurrence(RecurrencePattern.UNA_TANTUM);
+        tx.setAmount(this.amount);
+        tx.setDescription(this.description);
+        tx.setFinancialAccount(this.financialAccount);
+        tx.setStartDate(date);
+        return tx;
+    }
 
 }
