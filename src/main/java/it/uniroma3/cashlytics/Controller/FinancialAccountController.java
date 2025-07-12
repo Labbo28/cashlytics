@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -30,6 +31,8 @@ import it.uniroma3.cashlytics.Service.FinancialAccountService;
 import it.uniroma3.cashlytics.Service.TransactionService;
 import it.uniroma3.cashlytics.Service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @Controller
 public class FinancialAccountController {
@@ -197,6 +200,83 @@ public String deleteTransaction(
     redirectAttributes.addFlashAttribute("successMessage", "Transaction deleted successfully.");
     return "redirect:/" + username + "/account/" + accountId;
 }
+
+@GetMapping("/{username}/account/{accountId}/edit-transaction/{transactionId}")
+public String editTransactionForm(
+        @PathVariable String username,
+        @PathVariable Long accountId,
+        @PathVariable Long transactionId,
+        Model model,
+        RedirectAttributes redirectAttributes) {
+    User currentUser = getAuthenticatedUserOrRedirect(username, redirectAttributes);
+    if (currentUser == null) {
+        return "redirect:/login";
+    }      
+    FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
+    if (!isAccountOwnedByUser(account, currentUser, redirectAttributes, username)) {
+        return "redirect:/" + username + "/dashboard";
+    }   
+    Optional<Transaction> transactionOpt = transactionService.findById(transactionId);
+    if (transactionOpt.isEmpty() || !transactionOpt.get().getFinancialAccount().equals(account)) {
+        redirectAttributes.addFlashAttribute("errorMessage", "Transaction not found or unauthorized.");
+        return "redirect:/" + username + "/account/" + accountId;
+    }
+    Transaction transaction = transactionOpt.get();
+    TransactionDTO transactionDTO = new TransactionDTO();
+    transactionDTO.setAmount(transaction.getAmount());
+    transactionDTO.setDescription(transaction.getDescription());
+    transactionDTO.setDate(transaction.getStartDate());
+    transactionDTO.setRecurrencePattern(transaction.getRecurrence());
+    model.addAttribute("transaction", transaction);
+    model.addAttribute("transactionDTO", transactionDTO);
+    model.addAttribute("account", account);
+    model.addAttribute("username", username);
+    return "edit-transaction";
+} 
+
+@PostMapping("/{username}/account/{accountId}/edit-transaction/{transactionId}")
+public String editTransaction(
+        @PathVariable String username,
+        @PathVariable Long accountId,
+        @PathVariable Long transactionId,
+        @ModelAttribute("transactionDTO") @Valid TransactionDTO transactionDTO,
+        BindingResult bindingResult,
+        Model model,
+        RedirectAttributes redirectAttributes) {
+
+    User currentUser = getAuthenticatedUserOrRedirect(username, redirectAttributes);
+    if (currentUser == null) {
+        return "redirect:/login";
+    }
+
+    FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
+    if (!isAccountOwnedByUser(account, currentUser, redirectAttributes, username)) {
+        return "redirect:/" + username + "/dashboard";
+    }
+
+    Optional<Transaction> transactionOpt = transactionService.findById(transactionId);
+    if (transactionOpt.isEmpty() || !transactionOpt.get().getFinancialAccount().equals(account)) {
+        redirectAttributes.addFlashAttribute("errorMessage", "Transaction not found or unauthorized.");
+        return "redirect:/" + username + "/account/" + accountId;
+    }
+
+    Transaction transaction = transactionOpt.get();
+
+    if (bindingResult.hasErrors()) {
+        // Re-add all necessary attributes to the model when there are validation errors
+        model.addAttribute("transaction", transaction);  // ← This was missing!
+        model.addAttribute("account", account);
+        model.addAttribute("username", username);
+        model.addAttribute("transactionId", transactionId);
+        return "edit-transaction"; // torna al form con errori di validazione
+    }
+
+    transactionService.updateTransaction(transaction, transactionDTO,transaction.getAmount());
+    
+    redirectAttributes.addFlashAttribute("successMessage", "Transazione aggiornata con successo.");
+    return "redirect:/" + username + "/account/" + accountId;
+}
+
 
 
 // ============================================================================

@@ -24,7 +24,12 @@ public class FinancialAccountService {
         return financialAccountRepository.findByUser_Credentials_Username(username);
     }
 
-    public FinancialAccount createFinancialAccount(FinancialAccountDTO financialAccountDTO, User user) {
+    public FinancialAccount createFinancialAccount(FinancialAccountDTO financialAccountDTO, User user) 
+    throws IllegalArgumentException {
+        if (financialAccountDTO.getAccountType() == null) {
+            throw new IllegalArgumentException("AccountType non può essere null.");
+        }
+        
         FinancialAccount newAccount = new FinancialAccount();
         newAccount.setBalance(
                 financialAccountDTO.getBalance() != null ? financialAccountDTO.getBalance() : BigDecimal.ZERO);

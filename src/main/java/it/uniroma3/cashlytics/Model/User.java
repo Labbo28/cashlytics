@@ -3,6 +3,8 @@ package it.uniroma3.cashlytics.Model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -39,8 +41,8 @@ public class User {
     @OneToOne(cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.EAGER)
     private Credentials credentials;
     @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "user")
-    private Set<FinancialAccount> financialAccounts;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<FinancialAccount> financialAccounts = new java.util.HashSet<>();
 
     /*
      * @EqualsAndHashCode.Exclude
@@ -60,5 +62,12 @@ public class User {
                 .filter(balance -> balance != null)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-
+    @Override
+    public String toString() {
+        return "User{" +
+               "id=" + id +
+               ", credentialsId=" + (credentials != null ? credentials.getId() : null) +
+               '}';
+    }
+    
 }

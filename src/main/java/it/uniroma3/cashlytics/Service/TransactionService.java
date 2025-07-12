@@ -1,5 +1,6 @@
 package it.uniroma3.cashlytics.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import it.uniroma3.cashlytics.Model.Transaction;
 import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
 import it.uniroma3.cashlytics.Model.Enums.TransactionType;
 import it.uniroma3.cashlytics.Repository.TransactionRepository;
+import jakarta.validation.Valid;
 
 @Service
 public class TransactionService {
@@ -76,6 +78,18 @@ public class TransactionService {
         } else {
             throw new IllegalArgumentException("Transaction with ID " + transactionId + " does not exist.");
         }
+    }
+
+    public void updateTransaction(Transaction transaction, TransactionDTO transactionDTO, BigDecimal oldAmount) {
+        transaction.setAmount(transactionDTO.getAmount());
+        transaction.setDescription(transactionDTO.getDescription());
+        transaction.setStartDate(transactionDTO.getDate());
+        transaction.setRecurrence(transactionDTO.getRecurrencePattern());
+        FinancialAccount account = transaction.getFinancialAccount();
+        // Aggiorna il saldo dell'account
+        account.setBalance(account.getBalance().subtract(oldAmount).add(transactionDTO.getAmount()));
+        // Salva le modifiche
+        transactionRepository.save(transaction);
     }
 
     /*

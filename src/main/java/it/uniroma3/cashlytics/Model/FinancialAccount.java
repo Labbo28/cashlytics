@@ -16,6 +16,7 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Data
 public class FinancialAccount {
+
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
@@ -27,10 +28,22 @@ public class FinancialAccount {
     @ManyToOne
     private User user;
     @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "financialAccount", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "financialAccount", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Transaction> transactions = new HashSet<>();
+    
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "financialAccount", cascade = CascadeType.ALL)
     private Set<Budget> budgets = new HashSet<>();
+
+    @Override
+public String toString() {
+    return "FinancialAccount{" +
+           "id=" + id +
+           ", name='" + name + '\'' +
+           ", balance=" + balance +
+           ", userId=" + (user != null ? user.getId() : null) +
+           // Don't include transactions collection or full user object
+           '}';
+}
 
 }
