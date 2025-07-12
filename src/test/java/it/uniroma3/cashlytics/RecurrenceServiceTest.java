@@ -66,6 +66,7 @@ class RecurrenceServiceTest {
         );
     }
 
+
     @Test
     void oneTimeStrategyYieldsEmpty() {
         Transaction t = new Transaction();
