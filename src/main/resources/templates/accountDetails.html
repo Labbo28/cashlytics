@@ -27,6 +27,11 @@
             <h1 th:text="${'Dettagli: ' + (#strings.isEmpty(account.name) ? account.type.name : account.name)}">
               Dettagli: account
             </h1>
+             <span><a th:href="@{|/${username}/dashboard|}"
+                class="btn btn-outline-secondary">
+                Torna alla Dashboard
+             </a>
+             </span>
             
         </div>
           
