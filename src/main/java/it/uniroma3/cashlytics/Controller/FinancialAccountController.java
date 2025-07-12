@@ -1,6 +1,9 @@
 package it.uniroma3.cashlytics.Controller;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -20,11 +23,14 @@ import it.uniroma3.cashlytics.Model.Budget;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.Transaction;
 import it.uniroma3.cashlytics.Model.User;
+import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
 import it.uniroma3.cashlytics.Service.BudgetService;
 import it.uniroma3.cashlytics.Service.FinancialAccountService;
 import it.uniroma3.cashlytics.Service.TransactionService;
 import it.uniroma3.cashlytics.Service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Controller
 public class FinancialAccountController {
@@ -81,6 +87,33 @@ public class FinancialAccountController {
         }
         return "accountDetails";
     }
+
+@GetMapping("/{username}/account/{accountId}/recurring")
+public String showRecurringTransactions(
+        @PathVariable String username,
+        @PathVariable Long accountId,
+        Model model) {
+
+    Optional<FinancialAccount> accountOpt = financialAccountService.findById(accountId);
+    if (accountOpt.isEmpty()) {
+        model.addAttribute("errorMessage", "Account not found.");
+        return "redirect:/" + username + "/dashboard";
+    }
+
+    FinancialAccount account = accountOpt.get();
+    Set<Transaction> all = account.getTransactions();
+    List<Transaction> recurring = all.stream()
+        .filter(tx -> tx.getRecurrence() != RecurrencePattern.UNA_TANTUM)
+        .toList();
+
+    model.addAttribute("account", account);
+    model.addAttribute("transactions", recurring);
+    model.addAttribute("username", username);
+    model.addAttribute("recurringTxDTO", new TransactionDTO());
+    return "recurring-transactions";  // <<-- questo deve combaciare col nome del file .html
+}
+
+    
 
     /*
      * POST: Aggiungi nuova transazione
