@@ -1,15 +1,13 @@
 package it.uniroma3.cashlytics.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
-
 import it.uniroma3.cashlytics.DTO.TransactionDTO;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.Transaction;
-import it.uniroma3.cashlytics.Model.User;
 import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
 import it.uniroma3.cashlytics.Model.Enums.TransactionType;
 import it.uniroma3.cashlytics.Repository.TransactionRepository;
@@ -58,6 +56,26 @@ public class TransactionService {
         account.setBalance(account.getBalance().add(transactionDTO.getAmount()));
         // 7. Salva transazione
         return transactionRepository.save(newTransaction);
+    }
+
+    public Optional<Transaction> findById(Long transactionId) {
+        return transactionRepository.findById(transactionId);
+    }
+
+    public void deleteTransaction(Long transactionId) {
+        Optional<Transaction> transactionOpt = transactionRepository.findById(transactionId);
+        if (transactionOpt.isPresent()) {
+            Transaction transaction = transactionOpt.get();
+            FinancialAccount account = transaction.getFinancialAccount();
+            // Aggiorna il saldo dell'account
+            account.setBalance(account.getBalance().subtract(transaction.getAmount()));
+            // Rimuovi la transazione dall'account
+            account.getTransactions().remove(transaction);
+            // Elimina la transazione dal repository
+            transactionRepository.delete(transaction);
+        } else {
+            throw new IllegalArgumentException("Transaction with ID " + transactionId + " does not exist.");
+        }
     }
 
     /*

@@ -1,10 +1,11 @@
 package it.uniroma3.cashlytics.Controller;
 
 import java.time.LocalDate;
-import java.util.List;
+
 import java.util.Optional;
 import java.util.Set;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,8 +30,6 @@ import it.uniroma3.cashlytics.Service.FinancialAccountService;
 import it.uniroma3.cashlytics.Service.TransactionService;
 import it.uniroma3.cashlytics.Service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 @Controller
 public class FinancialAccountController {
@@ -88,32 +87,11 @@ public class FinancialAccountController {
         return "accountDetails";
     }
 
-@GetMapping("/{username}/account/{accountId}/recurring")
-public String showRecurringTransactions(
-        @PathVariable String username,
-        @PathVariable Long accountId,
-        Model model) {
-
-    Optional<FinancialAccount> accountOpt = financialAccountService.findById(accountId);
-    if (accountOpt.isEmpty()) {
-        model.addAttribute("errorMessage", "Account not found.");
-        return "redirect:/" + username + "/dashboard";
-    }
-
-    FinancialAccount account = accountOpt.get();
-    Set<Transaction> all = account.getTransactions();
-    List<Transaction> recurring = all.stream()
-        .filter(tx -> tx.getRecurrence() != RecurrencePattern.UNA_TANTUM)
-        .toList();
-
-    model.addAttribute("account", account);
-    model.addAttribute("transactions", recurring);
-    model.addAttribute("username", username);
-    model.addAttribute("recurringTxDTO", new TransactionDTO());
-    return "recurring-transactions";  // <<-- questo deve combaciare col nome del file .html
-}
-
     
+
+// ============================================================================
+// === Section: Transactions
+// ============================================================================
 
     /*
      * POST: Aggiungi nuova transazione
@@ -163,6 +141,67 @@ public String showRecurringTransactions(
         redirectAttributes.addFlashAttribute("successMessage", "Transaction added successfully!");
         return "redirect:/" + username + "/account/" + accountId;
     }
+
+    @GetMapping("/{username}/account/{accountId}/recurring")
+public String showRecurringTransactions(
+        @PathVariable String username,
+        @PathVariable Long accountId,
+        Model model) {
+
+    Optional<FinancialAccount> accountOpt = financialAccountService.findById(accountId);
+
+    if (accountOpt.isEmpty()) {
+        model.addAttribute("errorMessage", "Account not found.");
+        return "redirect:/" + username + "/dashboard";
+    }
+
+    FinancialAccount account = accountOpt.get();
+    Set<Transaction> all = account.getTransactions();
+
+    List<Transaction> recurring = all.stream()
+            .filter(tx -> tx.getRecurrence() != RecurrencePattern.UNA_TANTUM)
+            .toList();
+
+    model.addAttribute("account", account);
+    model.addAttribute("transactions", recurring);
+    model.addAttribute("username", username);
+    
+
+    return "recurring-transactions";
+}
+
+@PostMapping("/{username}/account/{accountId}/delete-transaction/{transactionId}")
+public String deleteTransaction(
+        @PathVariable String username,
+        @PathVariable Long accountId,
+        @PathVariable Long transactionId,
+        RedirectAttributes redirectAttributes) {
+
+    User currentUser = getAuthenticatedUserOrRedirect(username, redirectAttributes);
+    if (currentUser == null) {
+        return "redirect:/login";
+    }
+
+    FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
+    if (!isAccountOwnedByUser(account, currentUser, redirectAttributes, username)) {
+        return "redirect:/" + username + "/dashboard";
+    }
+
+    Optional<Transaction> transactionOpt = transactionService.findById(transactionId);
+    if (transactionOpt.isEmpty() || !transactionOpt.get().getFinancialAccount().equals(account)) {
+        redirectAttributes.addFlashAttribute("errorMessage", "Transaction not found or unauthorized.");
+        return "redirect:/" + username + "/account/" + accountId;
+    }
+
+    transactionService.deleteTransaction(transactionId);
+    redirectAttributes.addFlashAttribute("successMessage", "Transaction deleted successfully.");
+    return "redirect:/" + username + "/account/" + accountId;
+}
+
+
+// ============================================================================
+// === Section: Budget
+// ============================================================================
 
     /*
      * POST: Aggiungi nuovo budget
@@ -228,6 +267,7 @@ public String showRecurringTransactions(
     @PostMapping("/{username}/account/{accountId}/delete-budget/{budgetId}")
     public String deleteBudget(@PathVariable String username, @PathVariable Long accountId, @PathVariable Long budgetId,
             RedirectAttributes redirectAttributes) {
+            
         try {
             budgetService.deleteBudget(budgetId);
             redirectAttributes.addFlashAttribute("successMessage", "Budget eliminato con successo.");

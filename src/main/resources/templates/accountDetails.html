@@ -23,10 +23,13 @@
     <main class="container" style="padding: 2rem;">
         <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
         <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-        <h1 style="margin-bottom: 2rem;"
-            th:text="${'Dettagli: ' + (#strings.isEmpty(account.name) ? account.type.name : account.name)}">
-            Dettagli: account</h1>
-
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1 th:text="${'Dettagli: ' + (#strings.isEmpty(account.name) ? account.type.name : account.name)}">
+              Dettagli: account
+            </h1>
+            
+        </div>
+          
         <!-- Saldo Account -->
         <section class="features-grid" style="margin-bottom: 2rem;">
             <div class="feature-card">
@@ -34,8 +37,7 @@
                     <i class="fas fa-money-bill-wave"></i>
                 </div>
                 <h3>Saldo Attuale</h3>
-                <p
-                    th:style="|font-size: 1.5rem; font-weight: 600; color: ${
+                <p th:style="|font-size: 1.5rem; font-weight: 600; color: ${
                     account.balance.compareTo(T(java.math.BigDecimal).ZERO) < 0 ? 'var(--warning)' : 'var(--accent)'}|">
                     €<span th:text="${#numbers.formatDecimal(account.balance, 1, 2)}">0.00</span>
                 </p>
@@ -64,6 +66,10 @@
         <section style="margin-bottom: 2rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                 <h1>Transazioni</h1>
+                <span><a th:href="@{'/' + ${username} + '/account/' + ${account.id} + '/recurring'}"
+                    class="btn btn-outline-secondary">
+                   <i class="fas fa-sync-alt"></i> Transazioni Ricorrenti
+                 </a></span>
                 <button onclick="toggleTransactionForm()" class="btn btn-primary"
                     style="width: auto; padding: 0.75rem 1.5rem;">
                     <i class="fas fa-plus"></i> Annota Nuova Transazione
@@ -101,8 +107,7 @@
                             <select id="recurrencePattern" th:field="*{recurrencePattern}"
                                 style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;">
                                 <option value="">Seleziona la ricorrenza della transazione</option>
-                                <option
-                                    th:each="p : ${T(it.uniroma3.cashlytics.Model.Enums.RecurrencePattern).values()}"
+                                <option th:each="p : ${T(it.uniroma3.cashlytics.Model.Enums.RecurrencePattern).values()}"
                                     th:if="${p.name() != 'UNA_TANTUM'}" th:value="${p}" th:text="${p}"></option>
                             </select>
                         </div>
@@ -127,7 +132,7 @@
 
             <!-- Lista Transazioni -->
             <div th:unless="${#lists.isEmpty(transactions)}" class="features-grid" style="text-align: center;">
-                <div th:each="trans : ${transactions}" class="feature-card">
+                <div th:each="trans : ${transactions}" class="feature-card" style="position: relative;">
                     <h3 style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem;"
                         th:style="${trans.amount >= 0} ? 'color: var(--accent);' : 'color: var(--warning);'">
                         <span
@@ -139,6 +144,21 @@
                         <span th:unless="${trans.recurrence.name() == 'UNA_TANTUM'}" th:text="${trans.recurrence}"
                             style="margin-left: 1.25rem; font-style: italic;"></span>
                     </p>
+
+                    <!-- Pulsanti Modifica & Elimina Transazione -->
+                    <div style="position: absolute; top: 0.5rem; right: 0.5rem; display: flex; gap: 0.5rem;">
+                        <a th:href="@{'/' + ${username} + '/account/' + ${account.id} + '/edit-transaction/' + ${trans.id}}"
+                           class="btn btn-sm btn-outline-primary" title="Modifica">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/delete-transaction/' + ${trans.id}}"
+                              method="post" onsubmit="return confirm('Eliminare questa transazione?');">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Elimina">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </section>
@@ -152,7 +172,8 @@
                     <i class="fas fa-plus"></i> Crea Nuovo Budget
                 </button>
             </div>
-            <div id="noBudgetDiv" th:if="${#lists.isEmpty(budgets)}" class="feature-card" style="text-align: center;">
+            <div id="noBudgetDiv" th:if="${#lists.isEmpty(account.budgets)}" class="feature-card"
+                style="text-align: center;">
                 <p>Nessun budget creato con questo account.</p>
             </div>
 
@@ -209,41 +230,36 @@
             </div>
 
             <!-- Lista Budget -->
-            <div th:unless="${#lists.isEmpty(budgets)}" class="features-grid" style="text-align: center;">
-                <div th:each="trans : ${budgets}" class="feature-card">
-
-                    <div class="menu-wrapper" style="position: relative;">
-                        <!-- Icona tre puntini -->
-                        <button class="menu-button" onclick="toggleMenu(this)"
-                            style="position: absolute; top: 0.5rem; right: 0.5rem; background: none; border: none; cursor: pointer;">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-
-                        <!-- Menu dropdown -->
-                        <div class="menu-dropdown"
-                            style="display: none; position: absolute; top: 2rem; right: 0; background: white; border: 1px solid var(--neutral-light); border-radius: 0.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); z-index: 10;">
-                            <form
-                                th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/delete-budget/' + ${trans.id}}"
-                                method="post" onsubmit="return confirm('Sei sicuro di voler eliminare questo budget?');"
-                                style="margin: 0;">
-                                <button type="submit" class="menu-item"
-                                    style="background: none; border: none; padding: 0.75rem 1rem; width: 100%; text-align: left; cursor: pointer; color: red;">
-                                    <i class="fas fa-trash-alt"></i> Elimina Budget
-                                </button>
-                            </form>
-                        </div>
+            <div th:unless="${#lists.isEmpty(account.budgets)}" class="features-grid" style="text-align: center;">
+                <div th:each="b : ${account.budgets}" class="feature-card" style="position: relative;">
+                    
+                    <!-- Pulsanti Modifica & Elimina Budget -->
+                    <div style="position: absolute; top: 0.5rem; right: 0.5rem; display: flex; gap: 0.5rem;">
+                        <a th:href="@{'/' + ${username} + '/account/' + ${account.id} + '/edit-budget/' + ${b.id}}"
+                           class="btn btn-sm btn-outline-primary" title="Modifica Budget">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/delete-budget/' + ${b.id}}"
+                              method="post"
+                              onsubmit="return confirm('Eliminare questo budget?');">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Elimina Budget">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
                     </div>
 
                     <h3 style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem;"
-                        th:style="${trans.amount >= 0} ? 'color: var(--accent);' : 'color: var(--warning);'">
-                        <span
-                            th:text="${trans.amount < 0 ? '-€' + #numbers.formatDecimal(trans.amount.abs(), 1, 2) : '€' + #numbers.formatDecimal(trans.amount, 1, 2)}">
-                            €0.00</span>
+                        th:style="${b.amount >= 0} ? 'color: var(--accent);' : 'color: var(--warning);'">
+                        <span th:text="${b.amount < 0 ? '-€' + #numbers.formatDecimal(b.amount.abs(),1,2) : '€' + #numbers.formatDecimal(b.amount,1,2)}">
+                            €0.00
+                        </span>
                     </h3>
-                    <h3 th:text="${trans.description}" style="margin-bottom: 0.25rem;">Transazione</h3>
-                    <p><span th:text="${#temporals.format(trans.date, 'dd/MM/yyyy')}">01/01/2025</span>
-                        <span th:unless="${trans.recurrence.name() == 'UNA_TANTUM'}" th:text="${trans.recurrence}"
-                            style="margin-left: 1.25rem; font-style: italic;"></span>
+                    <p th:text="${b.description}" style="margin-bottom: 0.25rem;">Descrizione Budget</p>
+                    <p>
+                        <span th:text="${#temporals.format(b.date,'dd/MM/yyyy')}">01/01/2025</span>
+                        <span th:unless="${b.recurrence.name() == 'UNA_TANTUM'}" th:text="${b.recurrence}"
+                              style="margin-left: 1.25rem; font-style: italic;"></span>
                     </p>
                 </div>
             </div>
