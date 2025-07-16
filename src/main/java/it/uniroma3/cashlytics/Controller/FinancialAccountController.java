@@ -282,7 +282,7 @@ public String editTransaction(
         return "edit-transaction"; // torna al form con errori di validazione
     }
 
-    transactionService.updateTransaction(transaction, transactionDTO,transaction.getAmount(), bindingResult);
+    transactionService.updateTransaction(transaction, transactionDTO,transaction.getAmount(),currentUser);
     
     redirectAttributes.addFlashAttribute("successMessage", "Transazione aggiornata con successo.");
     return "redirect:/" + username + "/account/" + accountId;

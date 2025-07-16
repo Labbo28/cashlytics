@@ -30,7 +30,7 @@ public class TransactionService {
     public Transaction createTransaction(TransactionDTO transactionDTO, FinancialAccount account, User user, BindingResult bindingResult) {
 
         // Risolvi merchant
-        Merchant merchant = resolveOrCreateMerchant(transactionDTO, user, bindingResult);
+        Merchant merchant = resolveOrCreateMerchant(transactionDTO, user);
         if (merchant == null) {
             return null;
         }
@@ -91,9 +91,10 @@ public class TransactionService {
         }
     }
 
-    public void updateTransaction(Transaction transaction, TransactionDTO transactionDTO, BigDecimal oldAmount, User user, BindingResult bindingResult) {
+    public void updateTransaction
+    (Transaction transaction, TransactionDTO transactionDTO, BigDecimal oldAmount, User user) {
         // Risolvi merchant per l'aggiornamento
-        Merchant merchant = resolveOrCreateMerchant(transactionDTO, user, bindingResult);
+        Merchant merchant = resolveOrCreateMerchant(transactionDTO, user);
         if (merchant == null) {
             return;
         }
@@ -110,7 +111,7 @@ public class TransactionService {
         transactionRepository.save(transaction);
     }
 
-    private Merchant resolveOrCreateMerchant(TransactionDTO dto, User user, BindingResult bindingResult) {
+    private Merchant resolveOrCreateMerchant(TransactionDTO dto, User user) {
         Long merId = dto.getMerchantId();
         String merName = dto.getMerchantName() != null ? dto.getMerchantName().trim() : "";
 
@@ -118,10 +119,7 @@ public class TransactionService {
             Optional<Merchant> opt = merchantService.findByIdAndUser(merId, user);
             if (opt.isPresent()) {
                 return opt.get();
-            } else {
-                bindingResult.rejectValue("merchantName", "error.transactionDTO", "Invalid merchant selected.");
-                return null;
-            }
+            } 
         }
 
         if (!merName.isEmpty()) {
@@ -136,7 +134,7 @@ public class TransactionService {
             }
         }
 
-        bindingResult.rejectValue("merchantName", "error.transactionDTO", "Merchant is required.");
+        
         return null;
     }
 }
