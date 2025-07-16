@@ -33,6 +33,9 @@ import it.uniroma3.cashlytics.Service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import it.uniroma3.cashlytics.Model.Merchant;
+import it.uniroma3.cashlytics.Service.MerchantService;
+
 
 @Controller
 public class FinancialAccountController {
@@ -45,6 +48,8 @@ public class FinancialAccountController {
     private TransactionService transactionService;
     @Autowired
     private BudgetService budgetService;
+    @Autowired
+    private MerchantService merchantService;
 
     /*
      * GET: Account Details
@@ -74,11 +79,12 @@ public class FinancialAccountController {
         model.addAttribute("username", username);
         model.addAttribute("transactions", account.getTransactions());
         model.addAttribute("budgets", account.getBudgets());
+        
         /*
          * 4. Elenchi di categorie e merchant per l'utente
          * model.addAttribute("categories", categoryService.findAllByUser(currentUser));
          * model.addAttribute("merchants", merchantService.findAllByUser(currentUser));
-         */
+        */ model.addAttribute("merchants", merchantService.findAllByUser(currentUser));
 
         // 6. DTO per i form (solo se non già presente)
         if (!model.containsAttribute("transactionDTO")) {
@@ -129,7 +135,7 @@ public class FinancialAccountController {
         }
         // 5. Creazione transazione delegata al service
         Transaction newTransaction = transactionService.createTransaction(
-                transactionDTO, account);
+                transactionDTO, account, currentUser, bindingResult);
 
         // 6. Se ci sono errori o la creazione fallisce, torna al form
         if (bindingResult.hasErrors() || newTransaction == null) {
@@ -227,10 +233,14 @@ public String editTransactionForm(
     transactionDTO.setDescription(transaction.getDescription());
     transactionDTO.setDate(transaction.getStartDate());
     transactionDTO.setRecurrencePattern(transaction.getRecurrence());
+    if (transaction.getMerchant() != null) {
+    transactionDTO.setMerchantId(transaction.getMerchant().getId());
+}
     model.addAttribute("transaction", transaction);
     model.addAttribute("transactionDTO", transactionDTO);
     model.addAttribute("account", account);
     model.addAttribute("username", username);
+    model.addAttribute("merchants", merchantService.findAllByUser(currentUser));
     return "edit-transaction";
 } 
 
@@ -268,10 +278,11 @@ public String editTransaction(
         model.addAttribute("account", account);
         model.addAttribute("username", username);
         model.addAttribute("transactionId", transactionId);
+        model.addAttribute("merchants", merchantService.findAllByUser(currentUser)); 
         return "edit-transaction"; // torna al form con errori di validazione
     }
 
-    transactionService.updateTransaction(transaction, transactionDTO,transaction.getAmount());
+    transactionService.updateTransaction(transaction, transactionDTO,transaction.getAmount(), bindingResult);
     
     redirectAttributes.addFlashAttribute("successMessage", "Transazione aggiornata con successo.");
     return "redirect:/" + username + "/account/" + accountId;

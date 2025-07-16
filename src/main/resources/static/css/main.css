@@ -1,35 +1,28 @@
-:root {
-  /* Enhanced color palette - more vibrant financial management theme */
-  --primary: #1e88e5;
-  /* Brighter blue - primary brand color */
-  --primary-light: #4dabff;
-  /* Lighter shade of primary */
-  --primary-dark: #005cb2;
-  /* Darker shade of primary for hover states */
-  --secondary: #0277bd;
-  /* Secondary accent blue */
-  --accent: #4caf50;
-  /* Brighter green - for positive financial elements */
-  --accent-light: #80e27e;
-  /* Light green for backgrounds */
-  --warning: #f44336;
-  /* Brighter red - for errors, warnings */
-  --warning-light: #ffcdd2;
-  /* Light red for warning backgrounds */
-  --neutral-dark: #263238;
-  /* Dark grey - for text */
-  --neutral-mid: #78909c;
-  /* Mid grey - for subtle elements */
-  --neutral-light: #eceff1;
-  /* Light grey - backgrounds */
-  --white: #FFFFFF;
-  /* White - for cards, containers */
+/* 
+ * main.css - Unified stylesheet for CashLytics application
+ * Financial management application color scheme and styling
+ */
 
+ :root {
+  /* Enhanced color palette - more vibrant financial management theme */
+  --primary: #1e88e5;       /* Brighter blue - primary brand color */
+  --primary-light: #4dabff; /* Lighter shade of primary */
+  --primary-dark: #005cb2;  /* Darker shade of primary for hover states */
+  --secondary: #0277bd;     /* Secondary accent blue */
+  --accent: #4caf50;        /* Brighter green - for positive financial elements */
+  --accent-light: #80e27e;  /* Light green for backgrounds */
+  --warning: #f44336;       /* Brighter red - for errors, warnings */
+  --warning-light: #ffcdd2; /* Light red for warning backgrounds */
+  --neutral-dark: #263238;  /* Dark grey - for text */
+  --neutral-mid: #78909c;   /* Mid grey - for subtle elements */
+  --neutral-light: #eceff1; /* Light grey - backgrounds */
+  --white: #FFFFFF;         /* White - for cards, containers */
+  
   /* Typography */
   --font-family: 'Roboto', 'Segoe UI', sans-serif;
   --heading-weight: 600;
   --body-weight: 400;
-
+  
   /* Spacing */
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
@@ -37,17 +30,17 @@
   --spacing-lg: 1.5rem;
   --spacing-xl: 2rem;
   --spacing-xxl: 3rem;
-
+  
   /* Border radius */
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
-
+  
   /* Box shadows */
   --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.15);
   --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.15);
-
+  
   /* Transitions */
   --transition-fast: all 0.2s ease;
   --transition-normal: all 0.3s ease;
@@ -68,16 +61,11 @@ body {
   font-size: 16px;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   color: var(--primary-dark);
   font-weight: var(--heading-weight);
   margin-bottom: var(--spacing-md);
-  margin-top: 0;
+  line-height: 1.3;
 }
 
 h1 {
@@ -145,16 +133,6 @@ a:hover {
   margin-bottom: var(--spacing-lg);
 }
 
-.inline-form {
-  background: none;
-  padding: 0;
-  margin: 0;
-  border: none;
-  font-family: var(--font-family);
-  display: inline;
-  vertical-align: middle;
-}
-
 label {
   display: block;
   margin-bottom: var(--spacing-sm);
@@ -206,7 +184,6 @@ input:focus {
 }
 
 .btn-primary:hover {
-  color: var(--white);
   background-color: var(--primary-dark);
   transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
@@ -296,7 +273,7 @@ nav a:hover {
   color: var(--neutral-mid);
 }
 
-.form-divider::before,
+.form-divider::before, 
 .form-divider::after {
   content: "";
   flex: 1;
@@ -337,12 +314,10 @@ nav a:hover {
 .homepage-header {
   background-color: var(--white);
   box-shadow: var(--shadow-sm);
-  padding: var(--spacing-sm) 0;
-  position: relative;
-  z-index: 100;
-  width: 100%;
+  padding: var(--spacing-md) 0;
+  position: sticky;
   top: 0;
-  margin-top: -30px !important;
+  z-index: 100;
 }
 
 .main-nav {
@@ -352,10 +327,8 @@ nav a:hover {
 }
 
 .logo {
-  font-family: 'Lato', sans-serif;
+  font-size: 1.8rem;
   font-weight: 700;
-  font-style: italic;
-  font-size: 3rem;
   color: var(--primary);
 }
 
@@ -370,16 +343,6 @@ nav a:hover {
   border-radius: var(--radius-md);
   font-weight: 500;
   transition: var(--transition-fast);
-  text-decoration: none;
-  color: var(--primary);
-  display: inline-block;
-  border: none;
-  background: none;
-  font-family: var(--font-family);
-  font-size: 1rem;
-  cursor: pointer;
-  line-height: 1.5;
-  vertical-align: middle;
 }
 
 .nav-btn:hover {
@@ -392,7 +355,6 @@ nav a:hover {
 }
 
 .nav-btn-primary:hover {
-  color: var(--white);
   background-color: var(--primary-dark);
 }
 
@@ -419,7 +381,6 @@ nav a:hover {
   font-size: 2.8rem;
   margin-bottom: var(--spacing-md);
   color: var(--neutral-dark);
-  line-height: 3.3rem;
 }
 
 .hero p {
@@ -525,19 +486,19 @@ nav a:hover {
     flex-direction: column;
     text-align: center;
   }
-
+  
   .hero h1 {
     font-size: 2.2rem;
   }
-
+  
   .cta-buttons {
     justify-content: center;
   }
-
+  
   .features-grid {
     grid-template-columns: 1fr;
   }
-
+  
   .auth-container {
     margin: var(--spacing-lg) var(--spacing-md);
     padding: var(--spacing-lg);
@@ -548,504 +509,21 @@ nav a:hover {
   .nav-links {
     gap: var(--spacing-sm);
   }
-
+  
   .cta-buttons {
     flex-direction: column;
   }
-
+  
   .hero h1 {
     font-size: 1.8rem;
   }
-
+  
   .hero p {
     font-size: 1rem;
   }
-
+  
   .main-nav {
     flex-direction: column;
     gap: var(--spacing-md);
   }
-
-  /* ── ADDED for transaction-card styling ───────────────────────────────────── */
-
-  .transaction-item {
-    background-color: var(--white);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
-    box-shadow: var(--shadow-sm);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: var(--transition-fast);
-  }
-
-  .transaction-item:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-  }
-
-  .transaction-details {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-  }
-
-  .transaction-description {
-    font-weight: 500;
-    color: var(--neutral-dark);
-  }
-
-  .transaction-date {
-    font-size: 0.9rem;
-    color: var(--neutral-mid);
-  }
-
-  .transaction-type-badge {
-    display: inline-block;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-    font-weight: 500;
-    background-color: var(--neutral-light);
-    color: var(--neutral-dark);
-  }
-
-  /* Positive / negative amount */
-  .amount.positive {
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  .amount.negative {
-    color: var(--warning);
-    font-weight: 600;
-  }
-
-  /* Card-style wrapper for “Account Header” */
-  .account-header {
-    background-color: var(--white);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-lg);
-    box-shadow: var(--shadow-sm);
-    margin-bottom: var(--spacing-lg);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  /* Style for the “balance” text */
-  .account-info .balance {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--primary-dark);
-  }
-
-  /* Modal “form-overlay” improvements */
-  .form-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-
-  .form-overlay .form-modal {
-    background-color: var(--white);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-xl);
-    width: 100%;
-    max-width: 480px;
-    box-shadow: var(--shadow-lg);
-    position: relative;
-  }
-
-  .form-overlay .form-modal h3 {
-    margin-bottom: var(--spacing-lg);
-    text-align: center;
-    color: var(--primary-dark);
-  }
-
-  /* Button placement inside modal */
-  .form-modal .btn+.btn {
-    margin-left: var(--spacing-sm);
-  }
-
-  /* Override for “Add Transaction” button to be smaller */
-  .btn-sm {
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: 0.9rem;
-  }
-
-  /* Small utility for spacing within container */
-  .mt-lg {
-    margin-top: var(--spacing-lg);
-  }
-
-  /* Enhanced styles for account details page */
-  .page-header {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    color: white;
-    padding: var(--spacing-xl) 0;
-    margin-bottom: var(--spacing-xl);
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  }
-
-  .breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-md);
-    font-size: 0.9rem;
-    opacity: 0.9;
-  }
-
-  .breadcrumb a {
-    color: white;
-    text-decoration: none;
-    transition: var(--transition-fast);
-  }
-
-  .breadcrumb a:hover {
-    opacity: 0.8;
-  }
-
-  .account-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: var(--spacing-lg);
-  }
-
-  .account-info h1 {
-    margin: 0 0 var(--spacing-sm) 0;
-    color: var(--neutral-dark);
-    font-size: 1.8rem;
-  }
-
-  .account-type {
-    display: inline-block;
-    background: var(--primary);
-    color: white;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-    font-weight: 500;
-    margin-bottom: var(--spacing-sm);
-  }
-
-  .amount {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin: 0;
-  }
-
-  .account-actions {
-    display: flex;
-    gap: var(--spacing-sm);
-    align-items: center;
-  }
-
-  .transactions-section {
-    background: white;
-    border-radius: var(--radius-md);
-    padding: var(--spacing-xl);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .transactions-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-xl);
-    padding-bottom: var(--spacing-md);
-    border-bottom: 2px solid var(--neutral-light);
-  }
-
-  .transactions-header h2 {
-    margin: 0;
-    color: var(--neutral-dark);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-  }
-
-  .transaction-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-lg);
-    border-radius: var(--radius-md);
-    margin-bottom: var(--spacing-md);
-    background: var(--white);
-    border: 1px solid var(--neutral-light);
-    transition: var(--transition-fast);
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .transaction-item:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--primary);
-  }
-
-  .transaction-left {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-  }
-
-  .transaction-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    font-weight: 600;
-  }
-
-  .transaction-icon.income {
-    background: rgba(76, 175, 80, 0.1);
-    color: var(--accent);
-  }
-
-  .transaction-icon.expense {
-    background: rgba(244, 67, 54, 0.1);
-    color: var(--warning);
-  }
-
-  .transaction-details h4 {
-    margin: 0 0 var(--spacing-xs) 0;
-    font-size: 1rem;
-    color: var(--neutral-dark);
-  }
-
-  .transaction-meta {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    font-size: 0.85rem;
-    color: var(--neutral-mid);
-  }
-
-  .transaction-type-badge {
-    background: var(--neutral-light);
-    color: var(--neutral-dark);
-    padding: 2px 8px;
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-
-  .transaction-amount {
-    text-align: right;
-  }
-
-  .transaction-amount .amount {
-    font-size: 1.2rem;
-    font-weight: 600;
-    display: block;
-  }
-
-  .transaction-amount .amount.positive {
-    color: var(--accent);
-  }
-
-  .transaction-amount .amount.negative {
-    color: var(--warning);
-  }
-
-  .no-transactions {
-    text-align: center;
-    padding: var(--spacing-xxl);
-    color: var(--neutral-mid);
-  }
-
-  .no-transactions .icon {
-    font-size: 4rem;
-    margin-bottom: var(--spacing-lg);
-    opacity: 0.5;
-  }
-
-  .no-transactions h3 {
-    margin-bottom: var(--spacing-md);
-    color: var(--neutral-dark);
-  }
-
-  .form-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: var(--spacing-md);
-  }
-
-  .form-modal {
-    background: white;
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-xl);
-    width: 100%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: var(--shadow-lg);
-  }
-
-  .form-modal h3 {
-    margin: 0 0 var(--spacing-lg) 0;
-    text-align: center;
-    color: var(--primary-dark);
-  }
-
-  .form-group {
-    margin-bottom: var(--spacing-lg);
-  }
-
-  .form-group label {
-    display: block;
-    margin-bottom: var(--spacing-sm);
-    font-weight: 500;
-    color: var(--neutral-dark);
-  }
-
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    width: 100%;
-    padding: var(--spacing-md);
-    border: 1px solid var(--neutral-light);
-    border-radius: var(--radius-md);
-    font-size: 1rem;
-    transition: var(--transition-fast);
-  }
-
-  .form-group input:focus,
-  .form-group select:focus,
-  .form-group textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
-  }
-
-  .form-group textarea {
-    resize: vertical;
-    min-height: 80px;
-  }
-
-  .form-buttons {
-    display: flex;
-    gap: var(--spacing-md);
-    justify-content: flex-end;
-    margin-top: var(--spacing-xl);
-  }
-
-  .form-buttons .btn {
-    width: auto;
-    padding: var(--spacing-md) var(--spacing-lg);
-  }
-
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-xl);
-  }
-
-  .stat-card {
-    background: white;
-    padding: var(--spacing-lg);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    text-align: center;
-  }
-
-  .stat-card .stat-icon {
-    font-size: 1.5rem;
-    margin-bottom: var(--spacing-sm);
-  }
-
-  .stat-card .stat-value {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: var(--spacing-xs);
-  }
-
-  .stat-card .stat-label {
-    font-size: 0.9rem;
-    color: var(--neutral-mid);
-  }
-
-  .filters {
-    display: flex;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .filter-group {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-  }
-
-  .filter-group select {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border: 1px solid var(--neutral-light);
-    border-radius: var(--radius-sm);
-    font-size: 0.9rem;
-  }
-
-  @media (max-width: 768px) {
-    .account-meta {
-      flex-direction: column;
-      gap: var(--spacing-md);
-    }
-
-    .account-actions {
-      width: 100%;
-      justify-content: space-between;
-    }
-
-    .transactions-header {
-      flex-direction: column;
-      gap: var(--spacing-md);
-      align-items: flex-start;
-    }
-
-    .transaction-item {
-      flex-direction: column;
-      gap: var(--spacing-md);
-      align-items: flex-start;
-    }
-
-    .transaction-amount {
-      text-align: left;
-      width: 100%;
-    }
-
-    .filters {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  }
-
-  .menu-item:hover {
-    background-color: var(--neutral-light);
-  }
-
 }

@@ -22,10 +22,6 @@ public class TransactionDTO {
     private LocalDate date;
     @Enumerated(EnumType.STRING)
     private RecurrencePattern recurrencePattern;
-    /*
-     * private Long categoryId;
-     * private String categoryName;
-     * private Long merchantId;
-     * private String merchantName;
-     */
+    private Long merchantId;
+    private String merchantName;
 }
