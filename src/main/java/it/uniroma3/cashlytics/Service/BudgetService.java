@@ -1,11 +1,16 @@
 package it.uniroma3.cashlytics.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import it.uniroma3.cashlytics.DTO.BudgetDTO;
+import it.uniroma3.cashlytics.Exceptions.ResourceNotFoundException;
+import it.uniroma3.cashlytics.Exceptions.UnauthorizedAccessException;
 import it.uniroma3.cashlytics.Model.Budget;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.User;
@@ -17,6 +22,12 @@ public class BudgetService {
 
     @Autowired
     private BudgetRepository budgetRepository;
+    @Autowired
+    UserService userService;
+
+    public Optional<Budget> findById(Long transactionId) {
+        return budgetRepository.findById(transactionId);
+    }
 
     public Budget createBudget(BudgetDTO budgetDTO, FinancialAccount account,
             User user, BindingResult bindingResult) {
@@ -49,86 +60,42 @@ public class BudgetService {
         return budgetRepository.save(newBudget);
     }
 
-    public void deleteBudget(Long budgetId) {
-        Budget budget = budgetRepository.findById(budgetId)
-                .orElseThrow(() -> new RuntimeException("Budget not found with id: " + budgetId));
+    @Transactional
+    public void deleteBudgetForUser(Long budgetId, String username) {
+        Budget budget = getBudgetByUsername(budgetId, username);
         budgetRepository.delete(budget);
     }
-    /*
-     * private Category resolveOrCreateCategory(
-     * BudgetDTO dto,
-     * User user,
-     * BindingResult bindingResult) {
-     * Long catId = dto.getCategoryId();
-     * String catName = dto.getCategoryName() != null ? dto.getCategoryName().trim()
-     * : "";
-     * if (catId != null) {
-     * Optional<Category> opt = categoryService.findByIdAndUser(catId, user);
-     * if (opt.isPresent()) {
-     * return opt.get();
-     * } else {
-     * bindingResult.rejectValue(
-     * "categoryName",
-     * "error.budgetDTO",
-     * "Invalid category selected.");
-     * return null;
-     * }
-     * }
-     * if (!catName.isEmpty()) {
-     * Optional<Category> optByName = categoryService.findByNameAndUser(catName,
-     * user);
-     * if (optByName.isPresent()) {
-     * return optByName.get();
-     * } else {
-     * Category newCat = new Category();
-     * newCat.setName(catName);
-     * newCat.setUser(user);
-     * return categoryService.save(newCat);
-     * }
-     * }
-     * bindingResult.rejectValue(
-     * "categoryName",
-     * "error.budgetDTO",
-     * "Category is required.");
-     * return null;
-     * }
-     * 
-     * private Merchant resolveOrCreateMerchant(
-     * BudgetDTO dto,
-     * User user,
-     * BindingResult bindingResult) {
-     * Long merId = dto.getMerchantId();
-     * String merName = dto.getMerchantName() != null ? dto.getMerchantName().trim()
-     * : "";
-     * if (merId != null) {
-     * Optional<Merchant> opt = merchantService.findByIdAndUser(merId, user);
-     * if (opt.isPresent()) {
-     * return opt.get();
-     * } else {
-     * bindingResult.rejectValue(
-     * "merchantName",
-     * "error.budgetDTO",
-     * "Invalid merchant selected.");
-     * return null;
-     * }
-     * }
-     * if (!merName.isEmpty()) {
-     * Optional<Merchant> optByName = merchantService.findByNameAndUser(merName,
-     * user);
-     * if (optByName.isPresent()) {
-     * return optByName.get();
-     * } else {
-     * Merchant newMer = new Merchant();
-     * newMer.setName(merName);
-     * newMer.setUser(user);
-     * return merchantService.save(newMer);
-     * }
-     * }
-     * bindingResult.rejectValue(
-     * "merchantName",
-     * "error.budgetDTO",
-     * "Merchant is required.");
-     * return null;
-     * }
+
+    /**
+     * Verifica se un budget appartiene a un utente specifico (per Spring Security)
      */
+    public boolean isBudgetOwnedByUser(Long budgetId, String username) {
+        try {
+            Budget budget = findById(budgetId)
+                    .orElse(null);
+            if (budget == null) {
+                return false;
+            }
+            User user = userService.getUserByUsername(username);
+            return budget.getFinancialAccount().getUser().equals(user);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Recupera un budget verificando che appartenga all'utente
+     */
+    @Transactional(readOnly = true)
+    public Budget getBudgetByUsername(Long budgetId, String username) {
+        Budget budget = findById(budgetId)
+                .orElseThrow(() -> new ResourceNotFoundException(budgetId));
+
+        User user = userService.getUserByUsername(username);
+        if (!budget.getFinancialAccount().getUser().equals(user)) {
+            throw new UnauthorizedAccessException("budget", budgetId);
+        }
+        return budget;
+    }
+
 }

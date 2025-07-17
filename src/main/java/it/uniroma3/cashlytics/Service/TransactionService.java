@@ -7,15 +7,17 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import it.uniroma3.cashlytics.DTO.TransactionDTO;
-import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
-import it.uniroma3.cashlytics.Model.Enums.TransactionType;
+import it.uniroma3.cashlytics.Exceptions.ResourceNotFoundException;
+import it.uniroma3.cashlytics.Exceptions.UnauthorizedAccessException;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.Merchant;
 import it.uniroma3.cashlytics.Model.Transaction;
 import it.uniroma3.cashlytics.Model.User;
+import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
+import it.uniroma3.cashlytics.Model.Enums.TransactionType;
 import it.uniroma3.cashlytics.Repository.TransactionRepository;
 
 @Service
@@ -23,18 +25,21 @@ public class TransactionService {
 
     @Autowired
     private TransactionRepository transactionRepository;
-
     @Autowired
     private MerchantService merchantService;
+    @Autowired
+    private UserService userService;
 
-    public Transaction createTransaction(TransactionDTO transactionDTO, FinancialAccount account, User user, BindingResult bindingResult) {
+    public Optional<Transaction> findById(Long transactionId) {
+        return transactionRepository.findById(transactionId);
+    }
 
+    public Transaction createTransaction(TransactionDTO transactionDTO, FinancialAccount account, User user) {
         // Risolvi merchant
         Merchant merchant = resolveOrCreateMerchant(transactionDTO, user);
         if (merchant == null) {
             return null;
         }
-
         // Determina tipo di transazione da amount
         boolean isIncome = transactionDTO.getAmount().signum() >= 0;
         TransactionType type = isIncome ? TransactionType.INCOME : TransactionType.EXPENSE;
@@ -44,7 +49,6 @@ public class TransactionService {
         if (recurrence == null) {
             recurrence = RecurrencePattern.UNA_TANTUM;
         }
-
         // Gestione data
         LocalDateTime dateTime = transactionDTO.getDate() != null
                 ? transactionDTO.getDate().atStartOfDay()
@@ -60,7 +64,7 @@ public class TransactionService {
         newTransaction.setFinancialAccount(account);
         newTransaction.setMerchant(merchant);
 
-        if(recurrence != RecurrencePattern.UNA_TANTUM) {
+        if (recurrence != RecurrencePattern.UNA_TANTUM) {
             newTransaction.setRecurring(true);
         } else {
             newTransaction.setRecurring(false);
@@ -72,10 +76,6 @@ public class TransactionService {
         account.setBalance(account.getBalance().add(transactionDTO.getAmount()));
 
         return transactionRepository.save(newTransaction);
-    }
-
-    public Optional<Transaction> findById(Long transactionId) {
-        return transactionRepository.findById(transactionId);
     }
 
     public void deleteTransaction(Long transactionId) {
@@ -91,8 +91,8 @@ public class TransactionService {
         }
     }
 
-    public void updateTransaction
-    (Transaction transaction, TransactionDTO transactionDTO, BigDecimal oldAmount, User user) {
+    public void updateTransaction(Transaction transaction, TransactionDTO transactionDTO, BigDecimal oldAmount,
+            User user) {
         // Risolvi merchant per l'aggiornamento
         Merchant merchant = resolveOrCreateMerchant(transactionDTO, user);
         if (merchant == null) {
@@ -111,17 +111,63 @@ public class TransactionService {
         transactionRepository.save(transaction);
     }
 
+    /**
+     * Verifica se una transazione appartiene a un utente specifico (per Spring
+     * Security)
+     */
+    public boolean isTransactionOwnedByUser(Long transactionId, String username) {
+        try {
+            Transaction transaction = findById(transactionId)
+                    .orElse(null);
+            if (transaction == null) {
+                return false;
+            }
+            User user = userService.getUserByUsername(username);
+            return transaction.getFinancialAccount().getUser().equals(user);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Recupera una transazione verificando che appartenga all'utente
+     */
+    @Transactional(readOnly = true)
+    public Transaction getTransactionByUsername(Long transactionId, String username) {
+        Transaction transaction = findById(transactionId)
+                .orElseThrow(() -> new ResourceNotFoundException(transactionId));
+
+        User user = userService.getUserByUsername(username);
+        if (!transaction.getFinancialAccount().getUser().equals(user)) {
+            throw new UnauthorizedAccessException("transaction", transactionId);
+        }
+        return transaction;
+    }
+
+    /**
+     * Converte una Transaction in TransactionDTO
+     */
+    public TransactionDTO convertToDTO(Transaction transaction) {
+        TransactionDTO dto = new TransactionDTO();
+        dto.setAmount(transaction.getAmount());
+        dto.setDescription(transaction.getDescription());
+        dto.setDate(transaction.getStartDate());
+        dto.setRecurrencePattern(transaction.getRecurrence());
+        if (transaction.getMerchant() != null) {
+            dto.setMerchantId(transaction.getMerchant().getId());
+        }
+        return dto;
+    }
+
     private Merchant resolveOrCreateMerchant(TransactionDTO dto, User user) {
         Long merId = dto.getMerchantId();
         String merName = dto.getMerchantName() != null ? dto.getMerchantName().trim() : "";
-
         if (merId != null) {
             Optional<Merchant> opt = merchantService.findByIdAndUser(merId, user);
             if (opt.isPresent()) {
                 return opt.get();
-            } 
+            }
         }
-
         if (!merName.isEmpty()) {
             Optional<Merchant> optByName = merchantService.findByNameAndUser(merName, user);
             if (optByName.isPresent()) {
@@ -133,8 +179,6 @@ public class TransactionService {
                 return merchantService.save(newMer);
             }
         }
-
-        
         return null;
     }
 }
