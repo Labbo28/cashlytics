@@ -9,21 +9,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import it.uniroma3.cashlytics.DTO.BudgetDTO;
 import it.uniroma3.cashlytics.DTO.TransactionDTO;
-import it.uniroma3.cashlytics.Model.Budget;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
-import it.uniroma3.cashlytics.Model.Transaction;
-import it.uniroma3.cashlytics.Model.User;
-import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
-import it.uniroma3.cashlytics.Service.BudgetService;
 import it.uniroma3.cashlytics.Service.FinancialAccountService;
 import it.uniroma3.cashlytics.Service.MerchantService;
 import it.uniroma3.cashlytics.Service.TransactionService;
@@ -35,12 +28,6 @@ public class FinancialAccountController {
 
     @Autowired
     private FinancialAccountService financialAccountService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private TransactionService transactionService;
-    @Autowired
-    private BudgetService budgetService;
     @Autowired
     private MerchantService merchantService;
 

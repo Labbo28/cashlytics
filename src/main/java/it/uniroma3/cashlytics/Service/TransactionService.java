@@ -1,4 +1,3 @@
-// TransactionService.java - Aggiornato con gestione Merchant
 package it.uniroma3.cashlytics.Service;
 
 import java.math.BigDecimal;
@@ -95,9 +94,6 @@ public class TransactionService {
             User user) {
         // Risolvi merchant per l'aggiornamento
         Merchant merchant = resolveOrCreateMerchant(transactionDTO, user);
-        if (merchant == null) {
-            return;
-        }
 
         transaction.setAmount(transactionDTO.getAmount());
         transaction.setDescription(transactionDTO.getDescription());
@@ -179,6 +175,7 @@ public class TransactionService {
                 return merchantService.save(newMer);
             }
         }
+
         return null;
     }
 }

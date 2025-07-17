@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
 
 import it.uniroma3.cashlytics.DTO.BudgetDTO;
 import it.uniroma3.cashlytics.Exceptions.ResourceNotFoundException;
@@ -29,22 +28,19 @@ public class BudgetService {
         return budgetRepository.findById(transactionId);
     }
 
-    public Budget createBudget(BudgetDTO budgetDTO, FinancialAccount account,
-            User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors())
-            return null;
-
-        // 2. Gestione ricorrenza
+    public Budget createBudget(BudgetDTO budgetDTO, FinancialAccount account, User user) {
+        // Gestione ricorrenza
         RecurrencePattern recurrence = budgetDTO.getRecurrencePattern();
         if (recurrence == null) {
             recurrence = RecurrencePattern.UNA_TANTUM;
         }
-        // 3. Gestione data
+
+        // Gestione data
         LocalDateTime dateTime = budgetDTO.getDate() != null
                 ? budgetDTO.getDate().atStartOfDay()
                 : LocalDateTime.now();
 
-        // 4. Costruisci budget
+        // Costruisci budget
         Budget newBudget = new Budget();
         newBudget.setAmount(budgetDTO.getAmount());
         newBudget.setDescription(budgetDTO.getDescription());
@@ -52,11 +48,11 @@ public class BudgetService {
         newBudget.setRecurrence(recurrence);
         newBudget.setFinancialAccount(account);
 
-        // 5. Aggiorna lista budget account
+        // Aggiorna lista budget account
         account.getBudgets().add(newBudget);
-        // 6. Aggiorna saldo (sottrai)
+        // Aggiorna saldo (sottrai)
         account.setBalance(account.getBalance().subtract(budgetDTO.getAmount()));
-        // 7. Salva budget
+
         return budgetRepository.save(newBudget);
     }
 
