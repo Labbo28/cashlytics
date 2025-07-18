@@ -49,7 +49,7 @@ public class BudgetService {
         Budget budget = budgetRepository.findById(budgetId)
                 .orElseThrow(() -> new RuntimeException("Budget not found with id: " + budgetId));
         // Aggiorna saldo (aggiungi)
-        account.setBalance(account.getBalance().subtract(budget.getAmount()));
+        account.setBalance(account.getBalance().add(budget.getAmount()));
         budgetRepository.delete(budget);
     }
 

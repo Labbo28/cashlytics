@@ -71,7 +71,8 @@ public class BudgetController {
 			RedirectAttributes redirectAttributes) {
 
 		try {
-			budgetService.deleteBudget(budgetId);
+			FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
+			budgetService.deleteBudget(budgetId, account);
 			redirectAttributes.addFlashAttribute("successMessage", "Budget eliminato con successo.");
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("errorMessage", "Errore: " + e.getMessage());
@@ -79,4 +80,5 @@ public class BudgetController {
 
 		return "redirect:/" + username + "/account/" + accountId;
 	}
+
 }
