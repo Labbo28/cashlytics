@@ -1,12 +1,17 @@
 package it.uniroma3.cashlytics.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
 import it.uniroma3.cashlytics.DTO.BudgetDTO;
 import it.uniroma3.cashlytics.Model.Budget;
+import it.uniroma3.cashlytics.Model.Category;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
+import it.uniroma3.cashlytics.Model.Merchant;
 import it.uniroma3.cashlytics.Model.User;
 import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
 import it.uniroma3.cashlytics.Repository.BudgetRepository;
@@ -16,6 +21,14 @@ public class BudgetService {
 
     @Autowired
     private BudgetRepository budgetRepository;
+    @Autowired
+    private MerchantService merchantService;
+    @Autowired
+    private CategoryService categoryService;
+
+    public Optional<Budget> findById(Long budgetId) {
+        return budgetRepository.findById(budgetId);
+    }
 
     public Budget createBudget(BudgetDTO budgetDTO, FinancialAccount account, User user) {
         // Gestione ricorrenza

@@ -19,17 +19,19 @@ public class FinancialAccountService {
 
     @Autowired
     FinancialAccountRepository financialAccountRepository;
+    @Autowired
+    UserService userService;
 
     public List<FinancialAccount> getAllFinancialAccountByUsername(String username) {
         return financialAccountRepository.findByUser_Credentials_Username(username);
     }
 
-    public FinancialAccount createFinancialAccount(FinancialAccountDTO financialAccountDTO, User user) 
-    throws IllegalArgumentException {
+    public FinancialAccount createFinancialAccount(FinancialAccountDTO financialAccountDTO, User user)
+            throws IllegalArgumentException {
         if (financialAccountDTO.getAccountType() == null) {
-            throw new IllegalArgumentException("AccountType non può essere null.");
+            throw new IllegalArgumentException("Specifica il tipo di account.");
         }
-        
+
         FinancialAccount newAccount = new FinancialAccount();
         newAccount.setBalance(
                 financialAccountDTO.getBalance() != null ? financialAccountDTO.getBalance() : BigDecimal.ZERO);
@@ -73,6 +75,23 @@ public class FinancialAccountService {
 
     public Optional<FinancialAccount> findById(Long accountId) {
         return financialAccountRepository.findById(accountId);
+    }
+
+    /**
+     * Verifica se un account appartiene ad un utente specifico (per Spring
+     * Security)
+     */
+    public boolean isAccountOwnedByUser(Long accountId, String username) {
+        try {
+            FinancialAccount account = findById(accountId).orElse(null);
+            if (account == null) {
+                return false;
+            }
+            User user = userService.getUserByUsername(username);
+            return account.getUser().equals(user);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }

@@ -1,6 +1,5 @@
 package it.uniroma3.cashlytics.Controller;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -20,10 +19,11 @@ import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.Transaction;
 import it.uniroma3.cashlytics.Model.User;
 import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
+import it.uniroma3.cashlytics.Service.CategoryService;
 import it.uniroma3.cashlytics.Service.FinancialAccountService;
+import it.uniroma3.cashlytics.Service.MerchantService;
 import it.uniroma3.cashlytics.Service.TransactionService;
 import it.uniroma3.cashlytics.Service.UserService;
-import it.uniroma3.cashlytics.Service.MerchantService;
 import jakarta.validation.Valid;
 
 @Controller
@@ -37,58 +37,44 @@ public class TransactionController {
 	private UserService userService;
 	@Autowired
 	private MerchantService merchantService;
+	@Autowired
+	private CategoryService categoryService;
 
+	/*
+	 * POST: Aggiungi nuova transazione
+	 */
 	@PostMapping("/{username}/account/{accountId}/add-transaction")
 	@Transactional
-	public String addTransaction(
-			@PathVariable String username,
+	public String addTransaction(@PathVariable String username,
 			@PathVariable Long accountId,
 			@Valid TransactionDTO transactionDTO,
 			BindingResult bindingResult,
 			RedirectAttributes redirectAttributes) {
-
-		if (transactionDTO.getDate() == null) {
-			transactionDTO.setDate(LocalDate.now());
-		}
-
 		if (bindingResult.hasErrors()) {
 			redirectAttributes.addFlashAttribute(
 					"org.springframework.validation.BindingResult.transactionDTO", bindingResult);
 			redirectAttributes.addFlashAttribute("transactionDTO", transactionDTO);
-			redirectAttributes.addFlashAttribute("errorMessage", "Please correct the errors in the form.");
 			return "redirect:/" + username + "/account/" + accountId;
 		}
-
 		FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
 		User user = userService.getUserByUsername(username);
-
-		Transaction newTransaction = transactionService.createTransaction(transactionDTO, account, user);
+		Transaction newTransaction = transactionService.createTransaction(transactionDTO, account, user, bindingResult);
 
 		if (newTransaction == null) {
-			redirectAttributes.addFlashAttribute("errorMessage", "Failed to create transaction.");
+			redirectAttributes.addFlashAttribute("errorMessage", "Non è stato possibile aggiungere la transazione.");
 			return "redirect:/" + username + "/account/" + accountId;
 		}
+		redirectAttributes.addFlashAttribute("successMessage", "Transazione aggiunta con successo!");
 
-		redirectAttributes.addFlashAttribute("successMessage", "Transaction added successfully!");
 		return "redirect:/" + username + "/account/" + accountId;
 	}
 
 	@GetMapping("/{username}/account/{accountId}/recurring")
-	public String showRecurringTransactions(
-			@PathVariable String username,
+	public String showRecurringTransactions(@PathVariable String username,
 			@PathVariable Long accountId,
 			Model model) {
-
-		Optional<FinancialAccount> accountOpt = financialAccountService.findById(accountId);
-
-		if (accountOpt.isEmpty()) {
-			model.addAttribute("errorMessage", "Account not found.");
-			return "redirect:/" + username + "/dashboard";
-		}
-
-		FinancialAccount account = accountOpt.get();
+		FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
 		Set<Transaction> all = account.getTransactions();
-
 		List<Transaction> recurring = all.stream()
 				.filter(tx -> tx.getRecurrence() != RecurrencePattern.UNA_TANTUM)
 				.toList();
@@ -100,37 +86,38 @@ public class TransactionController {
 		return "recurring-transactions";
 	}
 
+	/*
+	 * POST: Rimuovi transazione esistente
+	 */
 	@PostMapping("/{username}/account/{accountId}/delete-transaction/{transactionId}")
-	public String deleteTransaction(
-			@PathVariable String username,
+	public String deleteTransaction(@PathVariable String username,
 			@PathVariable Long accountId,
 			@PathVariable Long transactionId,
 			RedirectAttributes redirectAttributes) {
-
 		try {
 			transactionService.deleteTransaction(transactionId);
-			redirectAttributes.addFlashAttribute("successMessage", "Transaction deleted successfully.");
+			redirectAttributes.addFlashAttribute("successMessage", "Transazione rimossa con successo.");
 		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("errorMessage", "Error deleting transaction: " + e.getMessage());
+			redirectAttributes.addFlashAttribute("errorMessage", "Non è stato possibile rimuovere la transazione.");
+			System.out.println("Errore: " + e.getMessage());
 		}
-
 		return "redirect:/" + username + "/account/" + accountId;
 	}
 
+	/**
+	 * GET: Form modifica transazione
+	 */
 	@GetMapping("/{username}/account/{accountId}/edit-transaction/{transactionId}")
-	public String editTransactionForm(
-			@PathVariable String username,
+	public String editTransactionForm(@PathVariable String username,
 			@PathVariable Long accountId,
 			@PathVariable Long transactionId,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-
 		Optional<Transaction> transactionOpt = transactionService.findById(transactionId);
 		if (transactionOpt.isEmpty()) {
-			redirectAttributes.addFlashAttribute("errorMessage", "Transaction not found.");
+			redirectAttributes.addFlashAttribute("errorMessage", "Transazione non trovata.");
 			return "redirect:/" + username + "/account/" + accountId;
 		}
-
 		Transaction transaction = transactionOpt.get();
 		FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
 		User user = userService.getUserByUsername(username);
@@ -143,28 +130,33 @@ public class TransactionController {
 		if (transaction.getMerchant() != null) {
 			transactionDTO.setMerchantId(transaction.getMerchant().getId());
 		}
-
+		if (transaction.getCategory() != null) {
+			transactionDTO.setCategoryId(transaction.getCategory().getId());
+		}
 		model.addAttribute("transaction", transaction);
 		model.addAttribute("transactionDTO", transactionDTO);
 		model.addAttribute("account", account);
 		model.addAttribute("username", username);
 		model.addAttribute("merchants", merchantService.findAllByUser(user));
+		model.addAttribute("categories", categoryService.findAllByUser(user));
 
 		return "edit-transaction";
 	}
 
+	/*
+	 * POST: Modifica transazione esistente
+	 */
 	@PostMapping("/{username}/account/{accountId}/edit-transaction/{transactionId}")
-	public String editTransaction(
-			@PathVariable String username,
+	@Transactional
+	public String editTransaction(@PathVariable String username,
 			@PathVariable Long accountId,
 			@PathVariable Long transactionId,
-			@ModelAttribute("transactionDTO") @Valid TransactionDTO transactionDTO,
+			@ModelAttribute @Valid TransactionDTO transactionDTO,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-
+		Optional<Transaction> transactionOpt = transactionService.findById(transactionId);
 		if (bindingResult.hasErrors()) {
-			Optional<Transaction> transactionOpt = transactionService.findById(transactionId);
 			if (transactionOpt.isPresent()) {
 				Transaction transaction = transactionOpt.get();
 				FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
@@ -175,21 +167,20 @@ public class TransactionController {
 				model.addAttribute("username", username);
 				model.addAttribute("transactionId", transactionId);
 				model.addAttribute("merchants", merchantService.findAllByUser(user));
+				model.addAttribute("categories", categoryService.findAllByUser(user));
 			}
 			return "edit-transaction";
 		}
 
-		Optional<Transaction> transactionOpt = transactionService.findById(transactionId);
 		if (transactionOpt.isEmpty()) {
-			redirectAttributes.addFlashAttribute("errorMessage", "Transaction not found.");
+			redirectAttributes.addFlashAttribute("errorMessage", "Transazione non trovata.");
 			return "redirect:/" + username + "/account/" + accountId;
 		}
-
 		Transaction transaction = transactionOpt.get();
 		User user = userService.getUserByUsername(username);
 
-		transactionService.updateTransaction(transaction, transactionDTO, transaction.getAmount(), user);
-		redirectAttributes.addFlashAttribute("successMessage", "Transazione aggiornata con successo.");
+		transactionService.updateTransaction(transaction, transactionDTO, transaction.getAmount(), user, bindingResult);
+		redirectAttributes.addFlashAttribute("successMessage", "Transazione aggiornata con successo!");
 		return "redirect:/" + username + "/account/" + accountId;
 	}
 

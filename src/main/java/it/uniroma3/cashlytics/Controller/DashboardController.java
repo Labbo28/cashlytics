@@ -1,6 +1,7 @@
 package it.uniroma3.cashlytics.Controller;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import it.uniroma3.cashlytics.DTO.FinancialAccountDTO;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.User;
@@ -119,18 +121,15 @@ public class DashboardController {
                 redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.financialAccountDTO",
                         bindingResult);
                 redirectAttributes.addFlashAttribute("financialAccountDTO", financialAccountDTO);
-                redirectAttributes.addFlashAttribute("errorMessage", "Please correct the errors in the form.");
+                redirectAttributes.addFlashAttribute("errorMessage", "Sono presenti degli errori nella form.");
                 return "redirect:/" + username + "/dashboard";
             }
 
             // Recupera l'utente
             User user = userService.getUserByUsername(username);
-            FinancialAccount newAccount = financialAccountService.createFinancialAccount(financialAccountDTO, user);
-            // TODO eventuali altre logiche dopo la creazione
+            financialAccountService.createFinancialAccount(financialAccountDTO, user);
         } catch (Exception e) {
-            System.err.println("Error creating financial account: " + e.getMessage());
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("errorMessage", "Error creating account. Please try again.");
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/" + username + "/dashboard";
     }

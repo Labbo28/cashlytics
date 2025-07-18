@@ -1,6 +1,9 @@
 package it.uniroma3.cashlytics.Controller;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -23,13 +26,15 @@ public class FinancialAccountController {
     @Autowired
     private MerchantService merchantService;
 
+    /**
+     * GET: Account Details
+     */
+    @PreAuthorize("@financialAccountService.isAccountOwnedByUser(#accountId, authentication.name)")
     @GetMapping("/{username}/account/{accountId}")
     @Transactional(readOnly = true)
-    public String getAccountDetails(
-            @PathVariable String username,
+    public String getAccountDetails(@PathVariable String username,
             @PathVariable Long accountId,
             Model model) {
-
         FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
 
         model.addAttribute("account", account);
@@ -39,17 +44,24 @@ public class FinancialAccountController {
         model.addAttribute("merchants", merchantService.findAllByUser(account.getUser()));
 
         if (!model.containsAttribute("transactionDTO")) {
-            model.addAttribute("transactionDTO", new TransactionDTO());
+            TransactionDTO transactionDTO = new TransactionDTO();
+            transactionDTO.setDate(LocalDate.now()); // Imposta la data di oggi
+            model.addAttribute("transactionDTO", transactionDTO);
         }
         if (!model.containsAttribute("budgetDTO")) {
-            model.addAttribute("budgetDTO", new BudgetDTO());
+            BudgetDTO budgetDTO = new BudgetDTO();
+            budgetDTO.setDate(LocalDate.now());
+            model.addAttribute("budgetDTO", budgetDTO);
         }
         return "accountDetails";
     }
 
+    /**
+     * POST: Delete Account
+     */
+    @PreAuthorize("@financialAccountService.isAccountOwnedByUser(#accountId, authentication.name)")
     @PostMapping("/{username}/dashboard/delete-account/{accountId}")
-    public String deleteAccount(
-            @PathVariable String username,
+    public String deleteAccount(@PathVariable String username,
             @PathVariable Long accountId,
             RedirectAttributes redirectAttributes) {
         try {

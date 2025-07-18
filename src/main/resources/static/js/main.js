@@ -75,3 +75,34 @@ document.addEventListener('click', function (e) {
 		});
 	}
 });
+
+function handleMerchantSelection(value) {
+	const newMerchantForm = document.getElementById('newMerchantForm');
+	const merchantNameInput = document.getElementById('merchantName');
+
+	if (value === 'add_new') {
+		// Mostra il form per nuovo merchant
+		newMerchantForm.style.display = 'block';
+		merchantNameInput.focus();
+
+		// Resetta il valore del select per evitare problemi di validazione
+		document.getElementById('merchantId').value = '';
+	} else {
+		// Nascondi il form per nuovo merchant
+		newMerchantForm.style.display = 'none';
+		merchantNameInput.value = '';
+	}
+}
+
+function cancelNewMerchant() {
+	const newMerchantForm = document.getElementById('newMerchantForm');
+	const merchantSelect = document.getElementById('merchantId');
+	const merchantNameInput = document.getElementById('merchantName');
+
+	// Nascondi il form
+	newMerchantForm.style.display = 'none';
+
+	// Resetta i valori
+	merchantSelect.value = '';
+	merchantNameInput.value = '';
+}
