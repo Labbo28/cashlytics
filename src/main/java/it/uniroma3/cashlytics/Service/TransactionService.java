@@ -1,13 +1,10 @@
-// TransactionService.java - Aggiornato con gestione Merchant
 package it.uniroma3.cashlytics.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 
 import it.uniroma3.cashlytics.DTO.TransactionDTO;
 import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
@@ -23,17 +20,12 @@ public class TransactionService {
 
     @Autowired
     private TransactionRepository transactionRepository;
-
     @Autowired
     private MerchantService merchantService;
 
-    public Transaction createTransaction(TransactionDTO transactionDTO, FinancialAccount account, User user, BindingResult bindingResult) {
-
+    public Transaction createTransaction(TransactionDTO transactionDTO, FinancialAccount account, User user) {
         // Risolvi merchant
         Merchant merchant = resolveOrCreateMerchant(transactionDTO, user);
-        if (merchant == null) {
-            return null;
-        }
 
         // Determina tipo di transazione da amount
         boolean isIncome = transactionDTO.getAmount().signum() >= 0;
@@ -60,7 +52,7 @@ public class TransactionService {
         newTransaction.setFinancialAccount(account);
         newTransaction.setMerchant(merchant);
 
-        if(recurrence != RecurrencePattern.UNA_TANTUM) {
+        if (recurrence != RecurrencePattern.UNA_TANTUM) {
             newTransaction.setRecurring(true);
         } else {
             newTransaction.setRecurring(false);
@@ -91,13 +83,10 @@ public class TransactionService {
         }
     }
 
-    public void updateTransaction
-    (Transaction transaction, TransactionDTO transactionDTO, BigDecimal oldAmount, User user) {
+    public void updateTransaction(Transaction transaction, TransactionDTO transactionDTO, BigDecimal oldAmount,
+            User user) {
         // Risolvi merchant per l'aggiornamento
         Merchant merchant = resolveOrCreateMerchant(transactionDTO, user);
-        if (merchant == null) {
-            return;
-        }
 
         transaction.setAmount(transactionDTO.getAmount());
         transaction.setDescription(transactionDTO.getDescription());
@@ -119,7 +108,7 @@ public class TransactionService {
             Optional<Merchant> opt = merchantService.findByIdAndUser(merId, user);
             if (opt.isPresent()) {
                 return opt.get();
-            } 
+            }
         }
 
         if (!merName.isEmpty()) {
@@ -133,8 +122,7 @@ public class TransactionService {
                 return merchantService.save(newMer);
             }
         }
-
-        
         return null;
     }
+
 }
