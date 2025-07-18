@@ -3,7 +3,6 @@ package it.uniroma3.cashlytics.Config;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,10 +23,8 @@ public class DataInitializer implements CommandLineRunner {
 
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private CredentialsRepository credentialsRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -63,17 +60,17 @@ public class DataInitializer implements CommandLineRunner {
                 user.setFinancialAccounts(new HashSet<>()); // fallback
             }
         }
-
         if (user.getFinancialAccounts().isEmpty()) {
-            
             initUserData(user);
         }
     }
 
-    private void resetAccounts(User user) {
-        user.getFinancialAccounts().clear();
-        userRepository.save(user);
-    }
+    /*
+     * private void resetAccounts(User user) {
+     * user.getFinancialAccounts().clear();
+     * userRepository.save(user);
+     * }
+     */
 
     private void initUserData(User user) {
         // Crea account
@@ -94,7 +91,7 @@ public class DataInitializer implements CommandLineRunner {
         tx1.setRecurring(false);
         tx1.setFinancialAccount(account);
 
-        //crea una transazione ricorrente
+        // Crea una transazione ricorrente
         Transaction tx2 = new Transaction();
         tx2.setAmount(BigDecimal.valueOf(-50));
         tx2.setDescription("Monthly subscription");
@@ -105,7 +102,6 @@ public class DataInitializer implements CommandLineRunner {
         tx2.setStartDate(LocalDateTime.now().toLocalDate());
         tx2.setLastGenerated(LocalDateTime.now().toLocalDate());
         tx2.setFinancialAccount(account);
-        
 
         // Relazioni bidirezionali
         account.getTransactions().add(tx1);

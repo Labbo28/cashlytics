@@ -1,5 +1,4 @@
 package it.uniroma3.cashlytics.Controller;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +13,7 @@ import it.uniroma3.cashlytics.DTO.TransactionDTO;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Service.FinancialAccountService;
 import it.uniroma3.cashlytics.Service.MerchantService;
+
 
 @Controller
 public class FinancialAccountController {
@@ -32,20 +32,14 @@ public class FinancialAccountController {
 
         FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
 
+
         model.addAttribute("account", account);
         model.addAttribute("username", username);
         model.addAttribute("transactions", account.getTransactions());
         model.addAttribute("budgets", account.getBudgets());
+
         model.addAttribute("merchants", merchantService.findAllByUser(account.getUser()));
 
-        if (!model.containsAttribute("transactionDTO")) {
-            model.addAttribute("transactionDTO", new TransactionDTO());
-        }
-        if (!model.containsAttribute("budgetDTO")) {
-            model.addAttribute("budgetDTO", new BudgetDTO());
-        }
-        return "accountDetails";
-    }
 
     @PostMapping("/{username}/dashboard/delete-account/{accountId}")
     public String deleteAccount(
@@ -62,3 +56,5 @@ public class FinancialAccountController {
     }
 
 }
+
+     

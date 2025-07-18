@@ -4,32 +4,55 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import it.uniroma3.cashlytics.DTO.FinancialAccountDTO;
+import it.uniroma3.cashlytics.Exceptions.ResourceNotFoundException;
+import it.uniroma3.cashlytics.Exceptions.UnauthorizedAccessException;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.Transaction;
 import it.uniroma3.cashlytics.Model.User;
 import it.uniroma3.cashlytics.Repository.FinancialAccountRepository;
-import jakarta.transaction.Transactional;
 
 @Service
 public class FinancialAccountService {
 
     @Autowired
     FinancialAccountRepository financialAccountRepository;
+    @Autowired
+    private UserService userService;
 
-    public List<FinancialAccount> getAllFinancialAccountByUsername(String username) {
+    public Optional<FinancialAccount> findById(Long accountId) {
+        return financialAccountRepository.findById(accountId);
+    }
+
+    public List<FinancialAccount> getAllFinancialAccountsByUsername(String username) {
         return financialAccountRepository.findByUser_Credentials_Username(username);
     }
 
-    public FinancialAccount createFinancialAccount(FinancialAccountDTO financialAccountDTO, User user) 
-    throws IllegalArgumentException {
+    /**
+     * Recupera un account verificando che appartenga all'utente
+     */
+    @Transactional(readOnly = true)
+    public FinancialAccount getFinancialAccountByUsername(Long accountId, String username) {
+        FinancialAccount account = findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException(accountId));
+
+        User user = userService.getUserByUsername(username);
+        if (!account.getUser().equals(user)) {
+            throw new UnauthorizedAccessException("account", accountId);
+        }
+        return account;
+    }
+
+    public FinancialAccount createFinancialAccount(FinancialAccountDTO financialAccountDTO, User user)
+            throws IllegalArgumentException {
         if (financialAccountDTO.getAccountType() == null) {
             throw new IllegalArgumentException("AccountType non può essere null.");
         }
-        
         FinancialAccount newAccount = new FinancialAccount();
         newAccount.setBalance(
                 financialAccountDTO.getBalance() != null ? financialAccountDTO.getBalance() : BigDecimal.ZERO);
@@ -54,13 +77,29 @@ public class FinancialAccountService {
                 .orElseThrow(() -> new RuntimeException("Financial account not found with id: " + accountId));
     }
 
-    public void deleteAccount(Long accountId) {
-        FinancialAccount account = financialAccountRepository.findById(accountId)
-                .orElseThrow(() -> new RuntimeException("Financial account not found with id: " + accountId));
-        // Si suppone cascade = CascadeType.ALL sulle transazioni
+    @Transactional
+    public void deleteAccountForUser(Long accountId, String username) {
+        FinancialAccount account = getFinancialAccountByUsername(accountId, username);
         financialAccountRepository.delete(account);
     }
 
+    /**
+     * Verifica se un account appartiene a un utente specifico (per Spring Security)
+     */
+    public boolean isAccountOwnedByUser(Long accountId, String username) {
+        try {
+            FinancialAccount account = findById(accountId).orElse(null);
+            if (account == null) {
+                return false;
+            }
+            User user = userService.getUserByUsername(username);
+            return account.getUser().equals(user);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /* Eseguito ogni giorno a mezzanotte */
     @Transactional
     public void postTransactionAndUpdateBalance(Transaction tx) {
         FinancialAccount account = tx.getFinancialAccount();
@@ -69,10 +108,6 @@ public class FinancialAccountService {
 
         account.getTransactions().add(tx);
         financialAccountRepository.save(account);
-    }
-
-    public Optional<FinancialAccount> findById(Long accountId) {
-        return financialAccountRepository.findById(accountId);
     }
 
 }

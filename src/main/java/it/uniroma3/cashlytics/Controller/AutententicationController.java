@@ -56,23 +56,20 @@ public class AutententicationController {
      *         login)
      */
     @PostMapping("/register")
-    public String registerUser(@Valid UserRegistrationDTO userRegistrationDTO,
+    public String registerUser(@Valid UserRegistrationDTO userRegistrationDTO, Model model,
             BindingResult bindingResult,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+            RedirectAttributes redirectAttributes) {
         // Check for validation errors from form inputs
         if (bindingResult.hasErrors()) {
             return "register";
         }
-
         try {
             // Attempt to register the user
             autenticationService.registerUser(userRegistrationDTO);
 
-            // Add success message that will appear on the login page
+            // We use redirectAttributes to show success (or error) messages
             redirectAttributes.addFlashAttribute("successMessage",
                     "Registration successful! You can now login.");
-
             return "redirect:/";
         } catch (UserAlreadyExistsException e) {
             // Handle username already taken scenario

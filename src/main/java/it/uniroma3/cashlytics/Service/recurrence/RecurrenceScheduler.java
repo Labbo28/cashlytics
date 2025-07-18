@@ -19,16 +19,16 @@ public class RecurrenceScheduler {
     private final Clock clock;
 
     public RecurrenceScheduler(TransactionRepository txRepo,
-                               RecurrenceService recurrenceService,
-                               FinancialAccountService accountService,
-                               Clock clock) {
+            RecurrenceService recurrenceService,
+            FinancialAccountService accountService,
+            Clock clock) {
         this.txRepo = txRepo;
         this.recurrenceService = recurrenceService;
         this.accountService = accountService;
         this.clock = clock;
     }
 
-    /** Eseguito ogni giorno a mezzanotte */
+    /* Eseguito ogni giorno a mezzanotte */
     @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void runDaily() {

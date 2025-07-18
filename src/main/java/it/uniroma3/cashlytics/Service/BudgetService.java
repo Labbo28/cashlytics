@@ -1,10 +1,13 @@
 package it.uniroma3.cashlytics.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import it.uniroma3.cashlytics.DTO.BudgetDTO;
+import it.uniroma3.cashlytics.Exceptions.ResourceNotFoundException;
+import it.uniroma3.cashlytics.Exceptions.UnauthorizedAccessException;
 import it.uniroma3.cashlytics.Model.Budget;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.User;
@@ -16,6 +19,14 @@ public class BudgetService {
 
     @Autowired
     private BudgetRepository budgetRepository;
+    @Autowired
+    UserService userService;
+
+
+    public Optional<Budget> findById(Long transactionId) {
+        return budgetRepository.findById(transactionId);
+    }
+
 
     public Budget createBudget(BudgetDTO budgetDTO, FinancialAccount account, User user) {
         // Gestione ricorrenza
@@ -45,12 +56,43 @@ public class BudgetService {
         return budgetRepository.save(newBudget);
     }
 
-    public void deleteBudget(Long budgetId, FinancialAccount account) {
-        Budget budget = budgetRepository.findById(budgetId)
-                .orElseThrow(() -> new RuntimeException("Budget not found with id: " + budgetId));
-        // Aggiorna saldo (aggiungi)
-        account.setBalance(account.getBalance().add(budget.getAmount()));
+    @Transactional
+    public void deleteBudgetForUser(Long budgetId, String username) {
+        Budget budget = getBudgetByUsername(budgetId, username);
         budgetRepository.delete(budget);
     }
 
+    /**
+     * Verifica se un budget appartiene a un utente specifico (per Spring Security)
+     */
+    public boolean isBudgetOwnedByUser(Long budgetId, String username) {
+        try {
+            Budget budget = findById(budgetId)
+                    .orElse(null);
+            if (budget == null) {
+                return false;
+            }
+            User user = userService.getUserByUsername(username);
+            return budget.getFinancialAccount().getUser().equals(user);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Recupera un budget verificando che appartenga all'utente
+     */
+    @Transactional(readOnly = true)
+    public Budget getBudgetByUsername(Long budgetId, String username) {
+        Budget budget = findById(budgetId)
+                .orElseThrow(() -> new ResourceNotFoundException(budgetId));
+
+        User user = userService.getUserByUsername(username);
+        if (!budget.getFinancialAccount().getUser().equals(user)) {
+            throw new UnauthorizedAccessException("budget", budgetId);
+        }
+        return budget;
+    }
+
 }
+
