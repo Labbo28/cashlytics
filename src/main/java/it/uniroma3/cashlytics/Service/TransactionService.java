@@ -3,11 +3,9 @@ package it.uniroma3.cashlytics.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import it.uniroma3.cashlytics.DTO.TransactionDTO;
 import it.uniroma3.cashlytics.Exceptions.ResourceNotFoundException;
 import it.uniroma3.cashlytics.Exceptions.UnauthorizedAccessException;
@@ -29,6 +27,7 @@ public class TransactionService {
     @Autowired
     private UserService userService;
 
+
     public Optional<Transaction> findById(Long transactionId) {
         return transactionRepository.findById(transactionId);
     }
@@ -39,6 +38,7 @@ public class TransactionService {
         if (merchant == null) {
             return null;
         }
+
         // Determina tipo di transazione da amount
         boolean isIncome = transactionDTO.getAmount().signum() >= 0;
         TransactionType type = isIncome ? TransactionType.INCOME : TransactionType.EXPENSE;
@@ -176,6 +176,8 @@ public class TransactionService {
             }
         }
 
+
         return null;
     }
+
 }

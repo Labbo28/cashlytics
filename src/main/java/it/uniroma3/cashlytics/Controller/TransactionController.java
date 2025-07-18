@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +29,7 @@ import jakarta.validation.Valid;
 
 @Controller
 public class TransactionController {
+
 
     @Autowired
     private TransactionService transactionService;
@@ -195,4 +195,5 @@ public class TransactionController {
         redirectAttributes.addFlashAttribute("successMessage", "Transazione aggiornata con successo.");
         return "redirect:/" + username + "/account/" + accountId;
     }
+
 }

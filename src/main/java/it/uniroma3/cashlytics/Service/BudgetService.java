@@ -2,11 +2,9 @@ package it.uniroma3.cashlytics.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import it.uniroma3.cashlytics.DTO.BudgetDTO;
 import it.uniroma3.cashlytics.Exceptions.ResourceNotFoundException;
 import it.uniroma3.cashlytics.Exceptions.UnauthorizedAccessException;
@@ -24,9 +22,11 @@ public class BudgetService {
     @Autowired
     UserService userService;
 
+
     public Optional<Budget> findById(Long transactionId) {
         return budgetRepository.findById(transactionId);
     }
+
 
     public Budget createBudget(BudgetDTO budgetDTO, FinancialAccount account, User user) {
         // Gestione ricorrenza
@@ -95,3 +95,4 @@ public class BudgetService {
     }
 
 }
+

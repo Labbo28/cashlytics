@@ -1,7 +1,6 @@
 package it.uniroma3.cashlytics.Controller;
 
 
-
 import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,68 @@ import jakarta.validation.Valid;
 
 @Controller
 public class BudgetController {
+
+	@Autowired
+	private BudgetService budgetService;
+	@Autowired
+	private FinancialAccountService financialAccountService;
+	@Autowired
+	private UserService userService;
+
+	@PostMapping("/{username}/account/{accountId}/add-budget")
+	@Transactional
+	public String addBudget(
+			@PathVariable String username,
+			@PathVariable Long accountId,
+			@Valid BudgetDTO budgetDTO,
+			BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
+
+		if (budgetDTO.getDate() == null) {
+			budgetDTO.setDate(LocalDate.now());
+		}
+
+		if (bindingResult.hasErrors()) {
+			redirectAttributes.addFlashAttribute(
+					"org.springframework.validation.BindingResult.budgetDTO", bindingResult);
+			redirectAttributes.addFlashAttribute("budgetDTO", budgetDTO);
+			redirectAttributes.addFlashAttribute("errorMessage", "Please correct the errors in the form.");
+			return "redirect:/" + username + "/account/" + accountId;
+		}
+
+		FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
+		User user = userService.getUserByUsername(username);
+
+		Budget newBudget = budgetService.createBudget(budgetDTO, account, user);
+
+		if (newBudget == null) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Failed to create budget.");
+			return "redirect:/" + username + "/account/" + accountId;
+		}
+
+		redirectAttributes.addFlashAttribute("successMessage", "Budget added successfully!");
+		return "redirect:/" + username + "/account/" + accountId;
+	}
+
+	@PostMapping("/{username}/account/{accountId}/delete-budget/{budgetId}")
+	public String deleteBudget(
+			@PathVariable String username,
+			@PathVariable Long accountId,
+			@PathVariable Long budgetId,
+			RedirectAttributes redirectAttributes) {
+
+		try {
+			FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
+			budgetService.deleteBudget(budgetId, account);
+			redirectAttributes.addFlashAttribute("successMessage", "Budget eliminato con successo.");
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Errore: " + e.getMessage());
+		}
+
+		return "redirect:/" + username + "/account/" + accountId;
+	}
+
+}
 
     @Autowired
     private BudgetService budgetService;
@@ -83,3 +144,4 @@ public class BudgetController {
         return "redirect:/" + username + "/account/" + accountId;
     }
 }
+
