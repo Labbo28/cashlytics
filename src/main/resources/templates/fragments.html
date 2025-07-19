@@ -56,6 +56,169 @@
 			</div>
 		</footer>
 	</div>
+
+	<div th:fragment="newMerchantForm">
+		<div id="newMerchantForm"
+			style="display: none; margin-top: 1rem; margin-bottom: 1rem; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); background-color: var(--neutral-light);">
+			<h4 style="margin-bottom: 1rem; color: var(--primary);">Crea nuovo esercente</h4>
+			<div class="form-group">
+				<label for="merchantName">Nome esercente</label>
+				<input type="text" id="merchantName" th:field="*{merchantName}" />
+				<span class="error" th:if="${#fields.hasErrors('merchantName')}" th:errors="*{merchantName}"></span>
+			</div>
+			<div style="display: flex; gap: 1rem; margin-top: 1rem;">
+				<button type="button" class="btn btn-secondary" onclick="cancelNewMerchant()">
+					Annulla
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<div th:fragment="newCategoryForm">
+		<div id="newCategoryForm"
+			style="display: none; margin-top: 1rem; margin-bottom: 1rem; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); background-color: var(--neutral-light);">
+			<h4 style="margin-bottom: 1rem; color: var(--primary);">Crea nuova categoria</h4>
+
+			<div class="form-group">
+				<label for="categoryName">Nome categoria</label>
+				<input type="text" id="categoryName" th:field="*{categoryName}" />
+				<span class="error" th:if="${#fields.hasErrors('categoryName')}" th:errors="*{categoryName}"></span>
+			</div>
+
+			<div class="form-group">
+				<label for="categoryIcon">Icona</label>
+				<div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin-top: 0.5rem;">
+					<label class="icon-option" for="icon-shopping">
+						<input type="radio" id="icon-shopping" name="icon" value="fas fa-shopping-cart"
+							th:field="*{categoryIcon}" />
+						<div class="icon-preview">
+							<i class="fas fa-shopping-cart"></i>
+						</div>
+					</label>
+					<label class="icon-option" for="icon-food">
+						<input type="radio" id="icon-food" name="icon" value="fas fa-utensils"
+							th:field="*{categoryIcon}" />
+						<div class="icon-preview">
+							<i class="fas fa-utensils"></i>
+						</div>
+					</label>
+					<label class="icon-option" for="icon-transport">
+						<input type="radio" id="icon-transport" name="icon" value="fas fa-car"
+							th:field="*{categoryIcon}" />
+						<div class="icon-preview">
+							<i class="fas fa-car"></i>
+						</div>
+					</label>
+					<label class="icon-option" for="icon-entertainment">
+						<input type="radio" id="icon-entertainment" name="icon" value="fas fa-gamepad"
+							th:field="*{categoryIcon}" />
+						<div class="icon-preview">
+							<i class="fas fa-gamepad"></i>
+						</div>
+					</label>
+					<label class="icon-option" for="icon-health">
+						<input type="radio" id="icon-health" name="icon" value="fas fa-heartbeat"
+							th:field="*{categoryIcon}" />
+						<div class="icon-preview">
+							<i class="fas fa-heartbeat"></i>
+						</div>
+					</label>
+					<label class="icon-option" for="icon-home">
+						<input type="radio" id="icon-home" name="icon" value="fas fa-home" th:field="*{categoryIcon}" />
+						<div class="icon-preview">
+							<i class="fas fa-home"></i>
+						</div>
+					</label>
+					<label class="icon-option" for="icon-education">
+						<input type="radio" id="icon-education" name="icon" value="fas fa-graduation-cap"
+							th:field="*{categoryIcon}" />
+						<div class="icon-preview">
+							<i class="fas fa-graduation-cap"></i>
+						</div>
+					</label>
+					<label class="icon-option" for="icon-travel">
+						<input type="radio" id="icon-travel" name="icon" value="fas fa-plane"
+							th:field="*{categoryIcon}" />
+						<div class="icon-preview">
+							<i class="fas fa-plane"></i>
+						</div>
+					</label>
+					<label class="icon-option" for="icon-bills">
+						<input type="radio" id="icon-bills" name="icon" value="fas fa-receipt"
+							th:field="*{categoryIcon}" />
+						<div class="icon-preview">
+							<i class="fas fa-receipt"></i>
+						</div>
+					</label>
+					<label class="icon-option" for="icon-salary">
+						<input type="radio" id="icon-salary" name="icon" value="fas fa-dollar-sign"
+							th:field="*{categoryIcon}" />
+						<div class="icon-preview">
+							<i class="fas fa-dollar-sign"></i>
+						</div>
+					</label>
+				</div>
+				<span class="error" th:if="${#fields.hasErrors('categoryIcon')}" th:errors="*{categoryIcon}"></span>
+			</div>
+
+			<div class="form-group">
+				<label for="categoryColor">Colore</label>
+				<div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin-top: 0.5rem;">
+					<label class="color-option" for="color-red">
+						<input type="radio" id="color-red" name="color" value="#E53E3E" th:field="*{categoryColor}" />
+						<div class="color-preview" style="background-color: #E53E3E;"></div>
+					</label>
+					<label class="color-option" for="color-orange">
+						<input type="radio" id="color-orange" name="color" value="#FF8C00"
+							th:field="*{categoryColor}" />
+						<div class="color-preview" style="background-color: #FF8C00;"></div>
+					</label>
+					<label class="color-option" for="color-yellow">
+						<input type="radio" id="color-yellow" name="color" value="#FFD700"
+							th:field="*{categoryColor}" />
+						<div class="color-preview" style="background-color: #FFD700;"></div>
+					</label>
+					<label class="color-option" for="color-green">
+						<input type="radio" id="color-green" name="color" value="#38A169" th:field="*{categoryColor}" />
+						<div class="color-preview" style="background-color: #38A169;"></div>
+					</label>
+					<label class="color-option" for="color-blue">
+						<input type="radio" id="color-blue" name="color" value="#3182CE" th:field="*{categoryColor}" />
+						<div class="color-preview" style="background-color: #3182CE;"></div>
+					</label>
+					<label class="color-option" for="color-indigo">
+						<input type="radio" id="color-indigo" name="color" value="#5A67D8"
+							th:field="*{categoryColor}" />
+						<div class="color-preview" style="background-color: #5A67D8;"></div>
+					</label>
+					<label class="color-option" for="color-purple">
+						<input type="radio" id="color-purple" name="color" value="#805AD5"
+							th:field="*{categoryColor}" />
+						<div class="color-preview" style="background-color: #805AD5;"></div>
+					</label>
+					<label class="color-option" for="color-pink">
+						<input type="radio" id="color-pink" name="color" value="#D53F8C" th:field="*{categoryColor}" />
+						<div class="color-preview" style="background-color: #D53F8C;"></div>
+					</label>
+					<label class="color-option" for="color-teal">
+						<input type="radio" id="color-teal" name="color" value="#319795" th:field="*{categoryColor}" />
+						<div class="color-preview" style="background-color: #319795;"></div>
+					</label>
+					<label class="color-option" for="color-gray">
+						<input type="radio" id="color-gray" name="color" value="#718096" th:field="*{categoryColor}" />
+						<div class="color-preview" style="background-color: #718096;"></div>
+					</label>
+				</div>
+				<span class="error" th:if="${#fields.hasErrors('categoryColor')}" th:errors="*{categoryColor}"></span>
+			</div>
+
+			<div style="display: flex; gap: 1rem; margin-top: 1rem;">
+				<button type="button" class="btn btn-secondary" onclick="cancelNewCategory()">
+					Annulla
+				</button>
+			</div>
+		</div>
+	</div>
 </body>
 
 </html>

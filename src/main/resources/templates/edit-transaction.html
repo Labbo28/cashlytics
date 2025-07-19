@@ -6,22 +6,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" th:href="@{/css/main.css}">
+    <!-- Font import from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <title>Modifica Transazione</title>
 </head>
 
-<body class="homepage-body">
-<div th:replace="~{fragments.html :: siteHeader}"></div>
+<body>
+    <div th:replace="~{fragments.html :: siteHeader}"></div>
 
-<main class="container" style="padding: 2rem;">
-    <h1>Modifica Transazione</h1>
+    <div class="auth-container">
+        <h1>Modifica Transazione</h1>
+        <br>
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-
-    <div class="auth-container" style="margin: 2rem 0; max-width: 600px;">
         <form th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/edit-transaction/' + ${transaction.id}}"
-              th:object="${transactionDTO}" method="post">
-
+            th:object="${transactionDTO}" method="post">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
             <!-- Importo -->
@@ -33,19 +38,19 @@
 
             <!-- Data -->
             <div class="form-group">
-                <label for="date">Data Attuale: <span th:text="${#temporals.format(transactionDTO.date, 'dd/MM/yyyy')}">--/--/----</span></label>
+                <label for="date">Data Attuale: <span
+                        th:text="${#temporals.format(transactionDTO.date, 'dd/MM/yyyy')}">--/--/----</span></label>
                 <input type="date" id="date" th:field="*{date}" />
                 <span class="error" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></span>
             </div>
 
             <!-- Merchant -->
             <div class="form-group">
-                <label for="merchantId">Merchant Attuale: <span th:text="${transaction.merchant?.name ?: 'Nessuno'}">-</span></label>
+                <label for="merchantId">Merchant Attuale: <span
+                        th:text="${transaction.merchant?.name ?: 'Nessuno'}">-</span></label>
                 <select id="merchantId" th:field="*{merchantId}">
                     <option value="">Seleziona merchant esistente</option>
-                    <option th:each="merchant : ${merchants}" 
-                            th:value="${merchant.id}" 
-                            th:text="${merchant.name}">
+                    <option th:each="merchant : ${merchants}" th:value="${merchant.id}" th:text="${merchant.name}">
                     </option>
                 </select>
                 <span class="error" th:if="${#fields.hasErrors('merchantId')}" th:errors="*{merchantId}"></span>
@@ -60,18 +65,20 @@
 
             <!-- Ricorrenza -->
             <div class="form-group">
-                <label for="recurrencePattern">Ricorrenza Attuale: <span th:text="${transactionDTO.recurrencePattern}">--</span></label>
+                <label for="recurrencePattern">Ricorrenza Attuale: <span
+                        th:text="${transactionDTO.recurrencePattern}">--</span></label>
                 <select id="recurrencePattern" th:field="*{recurrencePattern}">
                     <option value="">Seleziona la ricorrenza</option>
                     <option th:each="p : ${T(it.uniroma3.cashlytics.Model.Enums.RecurrencePattern).values()}"
-                            th:value="${p}" th:text="${p}">
+                        th:value="${p}" th:text="${p}">
                     </option>
                 </select>
             </div>
 
             <!-- Descrizione -->
             <div class="form-group">
-                <label for="description">Descrizione Attuale: <span th:text="${transactionDTO.description}">-</span></label>
+                <label for="description">Descrizione Attuale: <span
+                        th:text="${transactionDTO.description}">-</span></label>
                 <input type="text" id="description" th:field="*{description}" />
                 <span class="error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
             </div>
@@ -82,9 +89,10 @@
             </div>
         </form>
     </div>
-</main>
+    </main>
 
-<div th:replace="~{fragments.html :: siteFooter}"></div>
-<script th:src="@{/js/main.js}"></script>
+    <div th:replace="~{fragments.html :: siteFooter}"></div>
+    <script th:src="@{/js/main.js}"></script>
 </body>
+
 </html>

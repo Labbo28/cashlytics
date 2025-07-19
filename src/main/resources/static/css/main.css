@@ -570,7 +570,7 @@ nav a:hover {
     gap: var(--spacing-md);
   }
 
-  /* ── ADDED for transaction-card styling ───────────────────────────────────── */
+  /* ── ADDED for transaction-card styling ── */
 
   .transaction-item {
     background-color: var(--white);
@@ -691,4 +691,80 @@ nav a:hover {
     margin-top: var(--spacing-lg);
   }
 
+}
+
+/* Stili per la selezione delle icone */
+.icon-option {
+  cursor: pointer;
+  display: block;
+}
+
+.icon-option input[type="radio"] {
+  display: none;
+}
+
+.icon-preview {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--neutral-mid);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+  background-color: var(--neutral-light);
+}
+
+.icon-option input[type="radio"]:checked+.icon-preview {
+  border-color: var(--primary);
+  background-color: var(--primary);
+  color: white;
+  transform: scale(1.1);
+}
+
+.icon-preview:hover {
+  border-color: var(--primary);
+  background-color: var(--primary-light);
+}
+
+/* Stili per la selezione dei colori */
+.color-option {
+  cursor: pointer;
+  display: block;
+}
+
+.color-option input[type="radio"] {
+  display: none;
+}
+
+.color-preview {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--neutral-mid);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.color-option input[type="radio"]:checked+.color-preview {
+  border-color: var(--primary);
+  transform: scale(1.1);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.color-option input[type="radio"]:checked+.color-preview::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: bold;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+}
+
+.color-preview:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }

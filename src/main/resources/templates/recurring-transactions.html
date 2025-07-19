@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <title>CashLytics – Transazioni Ricorrenti</title>
+    <title th:text="'CashLytics - ' + ${userDetails.username}">CashLytics - Utente</title>
 </head>
 
 <body class="homepage-body">
@@ -19,9 +19,8 @@
         <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
         <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-        <a th:href="@{'/' + ${username} + '/account/' + ${account.id}}"
-           class="btn btn-secondary"
-           style="margin-bottom: 2rem;">
+        <a th:href="@{'/' + ${username} + '/account/' + ${account.id}}" class="btn btn-secondary"
+            style="margin-bottom: 2rem;">
             <i class="fas fa-arrow-left"></i> Torna all'Account
         </a>
 
@@ -29,8 +28,7 @@
             <h1 style="margin-bottom: 2rem;">Transazioni Ricorrenti</h1>
 
             <!-- Messaggio se non ci sono transazioni -->
-            <div th:if="${#lists.isEmpty(transactions)}"
-                 class="feature-card" style="text-align: center;">
+            <div th:if="${#lists.isEmpty(transactions)}" class="feature-card" style="text-align: center;">
                 <p>Nessuna transazione ricorrente definita.</p>
             </div>
 
@@ -41,11 +39,12 @@
                     <!-- Azioni: Modifica & Elimina -->
                     <div style="position: absolute; top: 0.5rem; right: 0.5rem; display: flex; gap: 0.5rem;">
                         <a th:href="@{'/' + ${username} + '/account/' + ${account.id} + '/recurring/edit/' + ${trans.id}}"
-                           class="btn btn-sm btn-outline-primary" title="Modifica">
+                            class="btn btn-sm btn-outline-primary" title="Modifica">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <form th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/delete-transaction/' + ${trans.id}}"
-                              method="post" onsubmit="return confirm('Eliminare questa ricorrenza?');">
+                        <form
+                            th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/delete-transaction/' + ${trans.id}}"
+                            method="post" onsubmit="return confirm('Eliminare questa ricorrenza?');">
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <button type="submit" class="btn btn-sm btn-outline-danger" title="Elimina">
                                 <i class="fas fa-trash-alt"></i>
@@ -77,4 +76,5 @@
     <div th:replace="~{fragments.html :: siteFooter}"></div>
     <script th:src="@{/js/main.js}"></script>
 </body>
+
 </html>

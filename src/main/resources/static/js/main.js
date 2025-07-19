@@ -94,6 +94,23 @@ function handleMerchantSelection(value) {
 	}
 }
 
+function handleCategorySelection(value) {
+	const newCategoryForm = document.getElementById('newCategoryForm');
+	const categoryNameInput = document.getElementById('categoryName');
+
+	if (value === 'add_new') {
+		newCategoryForm.style.display = 'block';
+		categoryNameInput.focus();
+		document.getElementById('categoryId').value = '';
+		// Reset form fields
+		categoryNameInput.value = '';
+		document.querySelectorAll('input[name="icon"]').forEach(radio => radio.checked = false);
+		document.querySelectorAll('input[name="color"]').forEach(radio => radio.checked = false);
+	} else {
+		newCategoryForm.style.display = 'none';
+	}
+}
+
 function cancelNewMerchant() {
 	const newMerchantForm = document.getElementById('newMerchantForm');
 	const merchantSelect = document.getElementById('merchantId');
@@ -105,4 +122,17 @@ function cancelNewMerchant() {
 	// Resetta i valori
 	merchantSelect.value = '';
 	merchantNameInput.value = '';
+}
+
+function cancelNewCategory() {
+	const newCategoryForm = document.getElementById('newCategoryForm');
+	const categorySelect = document.getElementById('categoryId');
+
+	newCategoryForm.style.display = 'none';
+	categorySelect.value = ''; // Reset selection
+
+	// Clear form fields
+	document.getElementById('categoryName').value = '';
+	document.querySelectorAll('input[name="icon"]').forEach(radio => radio.checked = false);
+	document.querySelectorAll('input[name="color"]').forEach(radio => radio.checked = false);
 }

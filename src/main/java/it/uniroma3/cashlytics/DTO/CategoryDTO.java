@@ -14,7 +14,9 @@ public class CategoryDTO {
 	@Size(min = 2, max = 50, message = "Il nome deve essere tra 2 e 50 caratteri")
 	private String name;
 
-	@Pattern(regexp = "^https?://.*", message = "L'icona deve essere un URL valido")
+	// @Pattern(regexp = "^https?://.*", message = "L'icona deve essere un URL
+	// valido")
+	@Pattern(regexp = "^fa[srb]? fa-.+", message = "L'icona deve essere una classe Font Awesome valida")
 	private String icon; // URL dell'icona
 
 	@Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "Il colore deve essere in formato hex (es. #FF5733)")
