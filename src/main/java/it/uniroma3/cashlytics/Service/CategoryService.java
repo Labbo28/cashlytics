@@ -149,21 +149,19 @@ public class CategoryService {
      * Risolve o crea una categoria basata sui dati del DTO per le transazioni.
      */
     public Category resolveOrCreateCategory(TransactionDTO dto, User user, BindingResult bindingResult) {
-        Long categoryId = dto.getCategoryId();
-        String categoryName = dto.getCategoryName();
-
         // Caso 1: ID categoria fornito
+        Long categoryId = dto.getCategoryId();
         if (categoryId != null) {
             Optional<Category> opt = findByIdAndUser(categoryId, user);
             if (opt.isPresent()) {
                 return opt.get();
             } else {
-                bindingResult.rejectValue("categoryId", "error.transactionDTO", "Categoria selezionata non valida.");
+                bindingResult.rejectValue("categoryId", "error.transactionDTO", "Categoria non valida.");
                 return null;
             }
         }
-
-        // Caso 2: Nome categoria fornito
+        // Caso 2: Categoria fornita
+        String categoryName = dto.getCategoryName();
         if (categoryName != null && !categoryName.trim().isEmpty()) {
             String trimmedName = categoryName.trim();
             Optional<Category> optByName = findByNameAndUser(trimmedName, user);

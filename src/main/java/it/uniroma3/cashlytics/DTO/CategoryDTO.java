@@ -10,12 +10,11 @@ public class CategoryDTO {
 
 	private Long id;
 
-	@NotBlank(message = "Il nome della categoria è obbligatorio")
-	@Size(min = 2, max = 50, message = "Il nome deve essere tra 2 e 50 caratteri")
+	@Size(max = 50, message = "Il nome non può essere più lungo di 50 caratteri")
 	private String name;
 
 	// @Pattern(regexp = "^https?://.*", message = "L'icona deve essere un URL
-	// valido")
+	@NotBlank(message = "L'icona della categoria è obbligatoria")
 	@Pattern(regexp = "^fa[srb]? fa-.+", message = "L'icona deve essere una classe Font Awesome valida")
 	private String icon; // URL dell'icona
 

@@ -31,18 +31,17 @@ public class TransactionService {
         return transactionRepository.findById(transactionId);
     }
 
-    public Transaction createTransaction(TransactionDTO transactionDTO, FinancialAccount account, User user,
-            BindingResult bindingResult) {
+    public Transaction createTransaction(TransactionDTO transactionDTO,
+            FinancialAccount account, User user, BindingResult bindingResult) {
         // Risolvi merchant e category (possono essere null)
         Merchant merchant = merchantService.resolveOrCreateMerchant(transactionDTO, user, bindingResult);
         Category category = categoryService.resolveOrCreateCategory(transactionDTO, user, bindingResult);
 
         // Se ci sono errori nella risoluzione merchant o category, interrompi
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors())
             return null;
-        }
 
-        // Determina tipo di transazione da amount
+        // Determina tipo di transazione dall'importo
         boolean isIncome = transactionDTO.getAmount().signum() >= 0;
         TransactionType type = isIncome ? TransactionType.INCOME : TransactionType.EXPENSE;
 
@@ -51,7 +50,6 @@ public class TransactionService {
         if (recurrence == null) {
             recurrence = RecurrencePattern.UNA_TANTUM;
         }
-
         // Gestione data
         LocalDateTime dateTime = transactionDTO.getDate() != null
                 ? transactionDTO.getDate().atStartOfDay()
@@ -67,16 +65,10 @@ public class TransactionService {
         newTransaction.setFinancialAccount(account);
         newTransaction.setMerchant(merchant); // Può essere null
         newTransaction.setCategory(category); // Può essere null
+        newTransaction.setRecurring(recurrence != RecurrencePattern.UNA_TANTUM);
 
-        if (recurrence != RecurrencePattern.UNA_TANTUM) {
-            newTransaction.setRecurring(true);
-        } else {
-            newTransaction.setRecurring(false);
-        }
-
-        // Aggiorna lista transazioni account
-        account.getTransactions().add(newTransaction);
         // Aggiorna saldo
+        account.getTransactions().add(newTransaction);
         account.setBalance(account.getBalance().add(transactionDTO.getAmount()));
 
         return transactionRepository.save(newTransaction);
@@ -102,30 +94,30 @@ public class TransactionService {
         Category category = categoryService.resolveOrCreateCategory(transactionDTO, user, bindingResult);
 
         // Se ci sono errori nella risoluzione merchant o category, interrompi
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors())
             return;
+
+        // Determina tipo di transazione dall'importo
+        boolean isIncome = transactionDTO.getAmount().signum() >= 0;
+        TransactionType type = isIncome ? TransactionType.INCOME : TransactionType.EXPENSE;
+
+        // Gestione ricorrenza
+        RecurrencePattern recurrence = transactionDTO.getRecurrencePattern();
+        if (recurrence == null) {
+            recurrence = RecurrencePattern.UNA_TANTUM;
         }
 
         // Aggiorna i campi della transazione
         transaction.setAmount(transactionDTO.getAmount());
         transaction.setDescription(transactionDTO.getDescription());
+        transaction.setTransactionType(type);
         transaction.setDate(transactionDTO.getDate().atStartOfDay());
+        transaction.setRecurrence(recurrence);
         transaction.setMerchant(merchant); // Può essere null
         transaction.setCategory(category); // Può essere null
-
-        // Aggiorna il tipo di transazione basato sull'importo
-        boolean isIncome = transactionDTO.getAmount().signum() >= 0;
-        TransactionType type = isIncome ? TransactionType.INCOME : TransactionType.EXPENSE;
-        transaction.setTransactionType(type);
-
-        // Aggiorna ricorrenza
-        RecurrencePattern recurrence = transactionDTO.getRecurrencePattern();
-        if (recurrence == null) {
-            recurrence = RecurrencePattern.UNA_TANTUM;
-        }
-        transaction.setRecurrence(recurrence);
         transaction.setRecurring(recurrence != RecurrencePattern.UNA_TANTUM);
 
+        // Aggiorna saldo
         FinancialAccount account = transaction.getFinancialAccount();
         account.setBalance(account.getBalance().subtract(oldAmount).add(transactionDTO.getAmount()));
 

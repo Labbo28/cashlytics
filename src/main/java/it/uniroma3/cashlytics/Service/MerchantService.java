@@ -49,30 +49,33 @@ public class MerchantService {
      * Risolve o crea un merchant basato sui dati del DTO per le transazioni.
      */
     public Merchant resolveOrCreateMerchant(TransactionDTO dto, User user, BindingResult bindingResult) {
+        // Caso 1: Merchant ID fornito → verifica che esista
         Long merchantId = dto.getMerchantId();
-        String merchantName = dto.getMerchantName() != null ? dto.getMerchantName().trim() : "";
         if (merchantId != null) {
             Optional<Merchant> opt = findByIdAndUser(merchantId, user);
             if (opt.isPresent()) {
                 return opt.get();
             } else {
-                bindingResult.rejectValue("merchantId", "error.transactionDTO", "Merchant selezionato non valido.");
+                bindingResult.rejectValue("merchantId", "error.transactionDTO", "Esercente non valido.");
                 return null;
             }
         }
-
-        if (!merchantName.isEmpty()) {
-            Optional<Merchant> optByName = findByNameAndUser(merchantName, user);
-            if (optByName.isPresent()) {
-                return optByName.get();
-            } else {
-                Merchant newMer = new Merchant();
-                newMer.setName(merchantName);
-                newMer.setUser(user);
-                return save(newMer);
-            }
+        // Caso 2: Merchant nuovo → nome obbligatorio
+        String merchantName = dto.getMerchantName() != null ? dto.getMerchantName().trim() : "";
+        if (merchantName.isBlank()) {
+            bindingResult.rejectValue("merchantName", "error.transactionDTO", "Inserisci il nome dell'esercente.");
+            return null;
         }
-        return null;
+        // Cerca se esiste già un esercente con quel nome per l’utente
+        Optional<Merchant> optByName = findByNameAndUser(merchantName, user);
+        if (optByName.isPresent()) {
+            return optByName.get(); // Evita duplicati
+        }
+        // Altrimenti, crea nuovo merchant
+        Merchant newMer = new Merchant();
+        newMer.setName(merchantName);
+        newMer.setUser(user);
+        return save(newMer);
     }
 
 }
