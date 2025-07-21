@@ -18,10 +18,9 @@
     <main class="container" style="padding: 2rem;">
         <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
         <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-
         <a th:href="@{'/' + ${username} + '/account/' + ${account.id}}" class="btn btn-secondary"
             style="margin-bottom: 2rem;">
-            <i class="fas fa-arrow-left"></i> Torna all'Account
+            <i class="fas fa-arrow-left"></i> Torna indietro
         </a>
 
         <section style="margin-bottom: 2rem;">

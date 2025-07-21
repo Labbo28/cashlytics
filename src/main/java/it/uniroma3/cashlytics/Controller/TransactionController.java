@@ -66,6 +66,7 @@ public class TransactionController {
 			redirectAttributes.addFlashAttribute(
 					"org.springframework.validation.BindingResult.transactionDTO", bindingResult);
 			redirectAttributes.addFlashAttribute("transactionDTO", transactionDTO);
+			redirectAttributes.addFlashAttribute("openAllForms", true);
 			return "redirect:/" + username + "/account/" + accountId;
 		}
 		redirectAttributes.addFlashAttribute("successMessage", "Transazione aggiunta con successo!");
@@ -129,7 +130,7 @@ public class TransactionController {
 		TransactionDTO transactionDTO = new TransactionDTO();
 		transactionDTO.setAmount(transaction.getAmount());
 		transactionDTO.setDescription(transaction.getDescription());
-		transactionDTO.setDate(transaction.getStartDate());
+		transactionDTO.setDate(transaction.getDate().toLocalDate());
 		transactionDTO.setRecurrencePattern(transaction.getRecurrence());
 		if (transaction.getMerchant() != null) {
 			transactionDTO.setMerchantId(transaction.getMerchant().getId());
@@ -175,7 +176,6 @@ public class TransactionController {
 			}
 			return "edit-transaction";
 		}
-
 		if (transactionOpt.isEmpty()) {
 			redirectAttributes.addFlashAttribute("errorMessage", "Transazione non trovata.");
 			return "redirect:/" + username + "/account/" + accountId;
