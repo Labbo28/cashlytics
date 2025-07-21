@@ -36,7 +36,6 @@ public class TransactionService {
         // Risolvi merchant e category (possono essere null)
         Merchant merchant = merchantService.resolveOrCreateMerchant(transactionDTO, user, bindingResult);
         Category category = categoryService.resolveOrCreateCategory(transactionDTO, user, bindingResult);
-
         // Se ci sono errori nella risoluzione merchant o category, interrompi
         if (bindingResult.hasErrors())
             return null;
@@ -44,7 +43,6 @@ public class TransactionService {
         // Determina tipo di transazione dall'importo
         boolean isIncome = transactionDTO.getAmount().signum() >= 0;
         TransactionType type = isIncome ? TransactionType.INCOME : TransactionType.EXPENSE;
-
         // Gestione ricorrenza
         RecurrencePattern recurrence = transactionDTO.getRecurrencePattern();
         if (recurrence == null) {
@@ -92,7 +90,6 @@ public class TransactionService {
         // Risolvi merchant e category (possono essere null)
         Merchant merchant = merchantService.resolveOrCreateMerchant(transactionDTO, user, bindingResult);
         Category category = categoryService.resolveOrCreateCategory(transactionDTO, user, bindingResult);
-
         // Se ci sono errori nella risoluzione merchant o category, interrompi
         if (bindingResult.hasErrors())
             return;
@@ -100,7 +97,6 @@ public class TransactionService {
         // Determina tipo di transazione dall'importo
         boolean isIncome = transactionDTO.getAmount().signum() >= 0;
         TransactionType type = isIncome ? TransactionType.INCOME : TransactionType.EXPENSE;
-
         // Gestione ricorrenza
         RecurrencePattern recurrence = transactionDTO.getRecurrencePattern();
         if (recurrence == null) {

@@ -93,6 +93,7 @@
                     <h3 style="text-align: center; margin-bottom: 2rem;">Nuova Transazione</h3>
                     <form th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/add-transaction'}"
                         th:object="${transactionDTO}" method="post">
+
                         <!-- CSRF Token -->
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <!-- Importo: positivo o negativo -->
@@ -124,7 +125,7 @@
 
                         <!-- Merchant -->
                         <div class="form-group">
-                            <label for="merchantId">Esercente</label>
+                            <label for="merchantId">Esercente (facoltativo)</label>
                             <select id="merchantId" th:field="*{merchantId}"
                                 style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;"
                                 onchange="handleMerchantSelection(this.value)">
@@ -141,7 +142,7 @@
 
                         <!-- Categoria -->
                         <div class="form-group">
-                            <label for="categoryId">Categoria</label>
+                            <label for="categoryId">Categoria (facoltativa)</label>
                             <select id="categoryId" th:field="*{categoryId}"
                                 style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;"
                                 onchange="handleCategorySelection(this.value)">
@@ -340,6 +341,14 @@
     </main>
     <div th:replace="~{fragments.html :: siteFooter}"></div>
     <script th:src="@{/js/main.js}"></script>
+    <script th:if="${openAllForms}" defer>
+        document.addEventListener('DOMContentLoaded', function () {
+            toggleTransactionForm();
+            handleCategorySelection('add_new');
+            handleMerchantSelection('add_new');
+        });
+        document.getElementById('addTransactionForm').scrollIntoView({ behavior: 'smooth' });
+    </script>
 </body>
 
 </html>

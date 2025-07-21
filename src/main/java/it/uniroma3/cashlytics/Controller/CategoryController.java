@@ -45,30 +45,37 @@ public class CategoryController {
 
 	/*
 	 * POST: Aggiungi nuova categoria
+	 * 
+	 * @PostMapping("/{username}/categories/add")
+	 * 
+	 * @Transactional
+	 * public String addCategory(@PathVariable String username,
+	 * 
+	 * @Valid CategoryDTO categoryDTO,
+	 * BindingResult bindingResult,
+	 * RedirectAttributes redirectAttributes) {
+	 * if (bindingResult.hasErrors()) {
+	 * redirectAttributes.addFlashAttribute(
+	 * "org.springframework.validation.BindingResult.categoryDTO",
+	 * bindingResult);
+	 * redirectAttributes.addFlashAttribute("categoryDTO", categoryDTO);
+	 * return "redirect:/" + username + "/categories";
+	 * }
+	 * User currentUser = userService.getUserByUsername(username);
+	 * Category newCategory = categoryService.createCategory(categoryDTO,
+	 * currentUser, bindingResult);
+	 * 
+	 * if (newCategory == null) {
+	 * redirectAttributes.addFlashAttribute("errorMessage",
+	 * "Non è stato possibile creare la categoria.");
+	 * return "redirect:/" + username + "/categories";
+	 * }
+	 * redirectAttributes.addFlashAttribute("successMessage",
+	 * "Categoria creata con successo!");
+	 * 
+	 * return "redirect:/" + username + "/categories";
+	 * }
 	 */
-	@PostMapping("/{username}/categories/add")
-	@Transactional
-	public String addCategory(@PathVariable String username,
-			@Valid CategoryDTO categoryDTO,
-			BindingResult bindingResult,
-			RedirectAttributes redirectAttributes) {
-		if (bindingResult.hasErrors()) {
-			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.categoryDTO",
-					bindingResult);
-			redirectAttributes.addFlashAttribute("categoryDTO", categoryDTO);
-			return "redirect:/" + username + "/categories";
-		}
-		User currentUser = userService.getUserByUsername(username);
-		Category newCategory = categoryService.createCategory(categoryDTO, currentUser, bindingResult);
-
-		if (newCategory == null) {
-			redirectAttributes.addFlashAttribute("errorMessage", "Non è stato possibile creare la categoria.");
-			return "redirect:/" + username + "/categories";
-		}
-		redirectAttributes.addFlashAttribute("successMessage", "Categoria creata con successo!");
-
-		return "redirect:/" + username + "/categories";
-	}
 
 	/*
 	 * POST: Cancella categoria esistente
