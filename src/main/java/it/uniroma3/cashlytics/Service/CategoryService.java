@@ -86,7 +86,6 @@ public class CategoryService {
                 return null;
             }
         }
-
         return save(category);
     }
 
@@ -149,7 +148,7 @@ public class CategoryService {
      * Risolve o crea una categoria basata sui dati del DTO per le transazioni.
      */
     public Category resolveOrCreateCategory(TransactionDTO dto, User user, BindingResult bindingResult) {
-        // Caso 1: ID categoria fornito
+        // Caso 1: ID categoria fornito → cerco quella categoria
         Long categoryId = dto.getCategoryId();
         if (categoryId != null) {
             Optional<Category> opt = findByIdAndUser(categoryId, user);
@@ -160,25 +159,36 @@ public class CategoryService {
                 return null;
             }
         }
-        // Caso 2: Categoria fornita
-        String categoryName = dto.getCategoryName();
-        if (categoryName != null && !categoryName.trim().isEmpty()) {
-            String trimmedName = categoryName.trim();
-            Optional<Category> optByName = findByNameAndUser(trimmedName, user);
-            if (optByName.isPresent()) {
-                return optByName.get();
-            } else {
-                // Crea nuova categoria con valori di default
-                Category newCategory = new Category();
-                newCategory.setName(trimmedName);
-                newCategory.setIcon("https://cdn-icons-png.flaticon.com/512/1077/1077976.png"); // Icona di default
-                newCategory.setColor("#6C757D"); // Colore grigio di default
-                newCategory.setUser(user);
-                return save(newCategory);
-            }
+
+        // Estrai i campi (name, icon, color)
+        String name = dto.getCategoryName() != null ? dto.getCategoryName().trim() : "";
+        String icon = dto.getCategoryIcon() != null ? dto.getCategoryIcon().trim() : "";
+        String color = dto.getCategoryColor() != null ? dto.getCategoryColor().trim() : "";
+        // Se nessun campo è compilato, ignora la categoria
+        boolean allEmpty = name.isBlank() && icon.isBlank() && color.isBlank();
+        if (allEmpty) {
+            return null;
         }
-        // Caso 3: Nessuna categoria fornita - OK, ritorna null
-        return null;
+        // Se è stata richiesta una categoria ma manca il nome → ERRORE
+        if (name.isBlank()) {
+            bindingResult.rejectValue("categoryName", "error.transactionDTO",
+                    "Inserisci il nome della categoria.");
+            return null;
+        }
+
+        // Categoria con nome esistente → restituiscila
+        Optional<Category> optByName = findByNameAndUser(name, user);
+        if (optByName.isPresent()) {
+            return optByName.get();
+        }
+
+        // Crea nuova categoria (nome valido, icona/colore opzionali)
+        Category newCat = new Category();
+        newCat.setName(name);
+        newCat.setIcon(!icon.isBlank() ? icon : "fas fa-euro-sign");
+        newCat.setColor(!color.isBlank() ? color : "#718096");
+        newCat.setUser(user);
+        return save(newCat);
     }
 
     /**

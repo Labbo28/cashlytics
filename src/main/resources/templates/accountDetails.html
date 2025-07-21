@@ -176,20 +176,26 @@
             <!-- Lista Transazioni -->
             <div th:unless="${#lists.isEmpty(transactions)}" class="features-grid" style="text-align: center;">
                 <div th:each="trans : ${transactions}" class="feature-card" style="position: relative;">
-                    <h3 style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem;"
-                        th:style="${trans.amount >= 0} ? 'color: var(--accent);' : 'color: var(--warning);'">
-                        <span
-                            th:text="${trans.amount < 0 ? '-€' + #numbers.formatDecimal(trans.amount.abs(), 1, 2) : '€' + #numbers.formatDecimal(trans.amount, 1, 2)}">
-                            €0.00</span>
-                    </h3>
-                    <h3 th:text="${trans.description}" style="margin-bottom: 0.25rem;">Transazione</h3>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
+                        <h3 style="font-size: 1.3rem; font-weight: 600;"
+                            th:style="${trans.amount >= 0} ? 'color: var(--accent);' : 'color: var(--warning);'">
+                            <span style="margin-right: 0.9rem;"
+                                th:text="${trans.amount < 0 ? '-€' + #numbers.formatDecimal(trans.amount.abs(), 1, 2) : '€' + #numbers.formatDecimal(trans.amount, 1, 2)}">
+                                €0.00</span>
+                        </h3>
+                        <!-- Mostra category se presente -->
+                        <div th:if="${trans.category != null}" class="category-badge" th:title="${trans.category.name}"
+                            th:style="'background-color: ' + ${trans.category.color} + '; margin-bottom: 0.9rem;'">
+                            <i th:class="${trans.category.icon}"></i>
+                        </div>
+                    </div>
 
+                    <h3 th:text="${trans.description}" style="margin-bottom: 0.25rem;">Transazione</h3>
                     <!-- Mostra merchant se presente -->
                     <p th:if="${trans.merchant != null}"
                         style="margin-bottom: 0.25rem; font-style: italic; color: var(--neutral-dark);">
                         <i class="fas fa-store"></i> <span th:text="${trans.merchant.name}">Merchant</span>
                     </p>
-
                     <p><span th:text="${#temporals.format(trans.date, 'dd/MM/yyyy')}">01/01/2025</span>
                         <span th:unless="${trans.recurrence.name() == 'UNA_TANTUM'}" th:text="${trans.recurrence}"
                             style="margin-left: 1.25rem; font-style: italic;"></span>
@@ -197,7 +203,6 @@
 
                     <!-- Menu a tendina per la transazione -->
                     <div class="menu-wrapper" style="position: absolute; top: 1rem; right: 1.5rem;">
-                        <!-- Icona tre puntini -->
                         <button class="menu-button" onclick="toggleMenu(this)"
                             style="background: none; border: none; cursor: pointer;">
                             <i class="fas fa-ellipsis-v"></i>
@@ -212,7 +217,6 @@
                                 style="display: block; padding: 0.75rem 1rem; text-decoration: none; color: var(--primary);">
                                 <i class="fas fa-edit"></i> Modifica
                             </a>
-
                             <!-- Elimina -->
                             <form
                                 th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/delete-transaction/' + ${trans.id}}"

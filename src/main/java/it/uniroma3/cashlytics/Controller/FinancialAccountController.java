@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import it.uniroma3.cashlytics.DTO.BudgetDTO;
 import it.uniroma3.cashlytics.DTO.TransactionDTO;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
+import it.uniroma3.cashlytics.Service.CategoryService;
 import it.uniroma3.cashlytics.Service.FinancialAccountService;
 import it.uniroma3.cashlytics.Service.MerchantService;
 
@@ -25,6 +26,8 @@ public class FinancialAccountController {
     private FinancialAccountService financialAccountService;
     @Autowired
     private MerchantService merchantService;
+    @Autowired
+    private CategoryService categoryService;
 
     /**
      * GET: Account Details
@@ -42,6 +45,7 @@ public class FinancialAccountController {
         model.addAttribute("transactions", account.getTransactions());
         model.addAttribute("budgets", account.getBudgets());
         model.addAttribute("merchants", merchantService.findAllByUser(account.getUser()));
+        model.addAttribute("categories", categoryService.findMainCategoriesByUser(account.getUser()));
 
         if (!model.containsAttribute("transactionDTO")) {
             TransactionDTO transactionDTO = new TransactionDTO();

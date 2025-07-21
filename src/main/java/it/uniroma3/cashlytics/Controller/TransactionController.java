@@ -61,7 +61,11 @@ public class TransactionController {
 		Transaction newTransaction = transactionService.createTransaction(transactionDTO, account, user, bindingResult);
 
 		if (newTransaction == null) {
-			redirectAttributes.addFlashAttribute("errorMessage", "Non è stato possibile aggiungere la transazione.");
+			// Se ci sono errori di validazione (es. categoria/merchant non validi),
+			// rilancia il form con messaggi
+			redirectAttributes.addFlashAttribute(
+					"org.springframework.validation.BindingResult.transactionDTO", bindingResult);
+			redirectAttributes.addFlashAttribute("transactionDTO", transactionDTO);
 			return "redirect:/" + username + "/account/" + accountId;
 		}
 		redirectAttributes.addFlashAttribute("successMessage", "Transazione aggiunta con successo!");

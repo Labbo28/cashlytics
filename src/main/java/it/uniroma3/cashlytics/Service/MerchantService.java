@@ -49,7 +49,7 @@ public class MerchantService {
      * Risolve o crea un merchant basato sui dati del DTO per le transazioni.
      */
     public Merchant resolveOrCreateMerchant(TransactionDTO dto, User user, BindingResult bindingResult) {
-        // Caso 1: Merchant ID fornito → verifica che esista
+        // Caso 1: ID merchant fornito → verifica che esista
         Long merchantId = dto.getMerchantId();
         if (merchantId != null) {
             Optional<Merchant> opt = findByIdAndUser(merchantId, user);
@@ -60,20 +60,25 @@ public class MerchantService {
                 return null;
             }
         }
-        // Caso 2: Merchant nuovo → nome obbligatorio
-        String merchantName = dto.getMerchantName() != null ? dto.getMerchantName().trim() : "";
-        if (merchantName.isBlank()) {
-            bindingResult.rejectValue("merchantName", "error.transactionDTO", "Inserisci il nome dell'esercente.");
+
+        // Estrai i dati dal DTO
+        String name = dto.getMerchantName() != null ? dto.getMerchantName().trim() : "";
+        // In futuro potresti avere più campi (eg. icona)
+        boolean anyMerchantFieldFilled = !name.isBlank(); // Puoi aggiungere altri campi qui se necessario
+        // Se nessun campo compilato → ignora il merchant
+        if (!anyMerchantFieldFilled) {
             return null;
         }
-        // Cerca se esiste già un esercente con quel nome per l’utente
-        Optional<Merchant> optByName = findByNameAndUser(merchantName, user);
+
+        // Se esiste già un merchant con quel nome → riutilizzalo
+        Optional<Merchant> optByName = findByNameAndUser(name, user);
         if (optByName.isPresent()) {
-            return optByName.get(); // Evita duplicati
+            return optByName.get(); // evita duplicati
         }
-        // Altrimenti, crea nuovo merchant
+
+        // Altrimenti, creane uno nuovo
         Merchant newMer = new Merchant();
-        newMer.setName(merchantName);
+        newMer.setName(name);
         newMer.setUser(user);
         return save(newMer);
     }
