@@ -334,6 +334,12 @@
                         </form>
                     </div>
 
+                    <!-- Categoria badge -->
+                    <div th:if="${b.category != null}" class="category-badge" th:title="${b.category.name}"
+                        th:style="'background-color: ' + ${b.category.color} + '; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.9rem; margin-right: 0.7rem; width: 2.2rem; height: 2.2rem; border-radius: 50%;'">
+                        <i th:class="${b.category.icon}" style="font-size: 1.2rem;"></i>
+                    </div>
+
                     <h3 style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem;"
                         th:style="${b.amount >= 0} ? 'color: var(--accent);' : 'color: var(--warning);'">
                         <span
