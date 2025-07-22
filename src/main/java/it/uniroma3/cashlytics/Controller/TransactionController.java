@@ -1,8 +1,10 @@
 package it.uniroma3.cashlytics.Controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import it.uniroma3.cashlytics.DTO.TransactionDTO;
@@ -74,6 +77,9 @@ public class TransactionController {
 		return "redirect:/" + username + "/account/" + accountId;
 	}
 
+	/*
+	 * GET: Filtra transazioni in base a parametri come ricorrenza, categoria, etc.
+	 */
 	@GetMapping("/{username}/account/{accountId}/recurring")
 	public String showRecurringTransactions(@PathVariable String username,
 			@PathVariable Long accountId,
@@ -85,10 +91,35 @@ public class TransactionController {
 				.toList();
 
 		model.addAttribute("account", account);
-		model.addAttribute("transactions", recurring);
+		model.addAttribute("transactions", all);
+		model.addAttribute("recurring-transactions", recurring);
 		model.addAttribute("username", username);
 
 		return "recurring-transactions";
+	}
+
+	@GetMapping("/{username}/account/{accountId}/filter")
+	public String filterTransactions(@PathVariable String username,
+			@PathVariable Long accountId,
+			@RequestParam(required = false) Boolean onlyRecurring,
+			Model model) {
+		FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
+		Set<Transaction> allTransactions = account.getTransactions();
+
+		// Filtraggio opzionale
+		List<Transaction> filtered = allTransactions.stream()
+				.filter(tx -> onlyRecurring == null || !onlyRecurring
+						|| tx.getRecurrence() != RecurrencePattern.UNA_TANTUM)
+				.toList();
+
+		model.addAttribute("account", account);
+		model.addAttribute("transactions", filtered);
+		model.addAttribute("username", username);
+		model.addAttribute("param", Map.of("onlyRecurring", onlyRecurring != null && onlyRecurring));
+
+		// eventuali calcoli su totalIncome, totalExpenses, netBalance...
+
+		return "recurring-transactions"; // oppure altra view di filtro
 	}
 
 	/*

@@ -136,3 +136,33 @@ function cancelNewCategory() {
 	document.querySelectorAll('input[name="icon"]').forEach(radio => radio.checked = false);
 	document.querySelectorAll('input[name="color"]').forEach(radio => radio.checked = false);
 }
+
+function resetFilters() {
+	// Resetta tutti i campi del form
+	document.getElementById('filterForm').reset();
+
+	// Ricarica la pagina senza parametri
+	window.location.href = window.location.pathname;
+}
+
+function toggleAdvanced() {
+	const advanced = document.getElementById('advancedOptions');
+	const isVisible = advanced.style.display !== 'none';
+	advanced.style.display = isVisible ? 'none' : 'block';
+
+	// Cambia testo del pulsante
+	const btn = event.target;
+	if (isVisible) {
+		btn.innerHTML = '<i class="fas fa-cog"></i> Opzioni Avanzate';
+	} else {
+		btn.innerHTML = '<i class="fas fa-times"></i> Nascondi Opzioni';
+	}
+}
+
+// Auto-submit del form quando si cambiano i filtri rapidi
+document.querySelectorAll('#filterForm select, #filterForm input').forEach(element => {
+	element.addEventListener('change', function () {
+		// Opzionale: submit automatico quando si cambia un filtro
+		// document.getElementById('filterForm').submit();
+	});
+});

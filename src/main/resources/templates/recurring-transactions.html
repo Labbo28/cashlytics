@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <title th:text="'CashLytics - ' + ${userDetails.username}">CashLytics - Utente</title>
+    <title>CashLytics - Filtra Transazioni</title>
 </head>
 
 <body class="homepage-body">
@@ -18,62 +18,324 @@
     <main class="container" style="padding: 2rem;">
         <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
         <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-        <a th:href="@{'/' + ${username} + '/account/' + ${account.id}}" class="btn btn-secondary"
-            style="margin-bottom: 2rem;">
-            <i class="fas fa-arrow-left"></i> Torna indietro
-        </a>
 
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>
+                <i class="fas fa-filter"></i> Filtra Transazioni
+                <span th:if="${account}" style="font-size: 0.8em; color: var(--neutral-mid);">
+                    - <span
+                        th:text="${#strings.isEmpty(account.name) ? account.type.name : account.name}">Account</span>
+                </span>
+            </h1>
+            <a th:href="@{'/' + ${username} + '/account/' + ${account.id}}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Torna all'Account
+            </a>
+        </div>
+
+        <!-- Pannello Filtri -->
         <section style="margin-bottom: 2rem;">
-            <h1 style="margin-bottom: 2rem;">Transazioni Ricorrenti</h1>
+            <div class="auth-container"
+                style="margin: 0; max-width: 100%; background: var(--neutral-light); border: 1px solid var(--neutral-mid);">
+                <h3 style="text-align: center; margin-bottom: 2rem; color: var(--primary);">
+                    <i class="fas fa-search"></i> Criteri di Ricerca
+                </h3>
 
-            <!-- Messaggio se non ci sono transazioni -->
-            <div th:if="${#lists.isEmpty(transactions)}" class="feature-card" style="text-align: center;">
-                <p>Nessuna transazione ricorrente definita.</p>
-            </div>
+                <form th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/filter'}" method="get"
+                    id="filterForm">
 
-            <!-- Lista transazioni già filtrate dal controller -->
-            <div th:unless="${#lists.isEmpty(transactions)}" class="features-grid">
-                <div th:each="trans : ${transactions}" class="feature-card" style="position: relative;">
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
 
-                    <!-- Azioni: Modifica & Elimina -->
-                    <div style="position: absolute; top: 0.5rem; right: 0.5rem; display: flex; gap: 0.5rem;">
-                        <a th:href="@{'/' + ${username} + '/account/' + ${account.id} + '/recurring/edit/' + ${trans.id}}"
-                            class="btn btn-sm btn-outline-primary" title="Modifica">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <form
-                            th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/delete-transaction/' + ${trans.id}}"
-                            method="post" onsubmit="return confirm('Eliminare questa ricorrenza?');">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Elimina">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </form>
+                        <!-- Filtro per Importo -->
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-euro-sign"></i> Filtro Importo
+                            </label>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <input type="number" name="minAmount" step="0.01" th:value="${param.minAmount}"
+                                    placeholder="Min €" style="flex: 1;" />
+                                <span>-</span>
+                                <input type="number" name="maxAmount" step="0.01" th:value="${param.maxAmount}"
+                                    placeholder="Max €" style="flex: 1;" />
+                            </div>
+                        </div>
+
+                        <!-- Filtro per Tipo Transazione -->
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-exchange-alt"></i> Tipo Transazione
+                            </label>
+                            <select name="transactionType"
+                                style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;">
+                                <option value="">Tutte</option>
+                                <option value="INCOME" th:selected="${param.transactionType == 'INCOME'}">
+                                    Solo Entrate (+)
+                                </option>
+                                <option value="EXPENSE" th:selected="${param.transactionType == 'EXPENSE'}">
+                                    Solo Uscite (-)
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Filtro per Periodo -->
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-calendar-alt"></i> Periodo
+                            </label>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <input type="date" name="startDate" th:value="${param.startDate}" style="flex: 1;" />
+                                <span>-</span>
+                                <input type="date" name="endDate" th:value="${param.endDate}" style="flex: 1;" />
+                            </div>
+                        </div>
+
+                        <!-- Filtro per Ricorrenza -->
+                        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" name="onlyRecurring" id="onlyRecurring"
+                                th:checked="${param.onlyRecurring == 'true'}" />
+                            <label for="onlyRecurring" style="margin: 0;">
+                                <i class="fas fa-sync-alt"></i> Mostra solo transazioni ricorrenti
+                            </label>
+                        </div>
+
+                        <!-- Filtro per Merchant -->
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-store"></i> Merchant
+                            </label>
+                            <select name="merchantId"
+                                style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;">
+                                <option value="">Tutti i merchant</option>
+                                <option th:each="merchant : ${merchants}" th:value="${merchant.id}"
+                                    th:text="${merchant.name}"
+                                    th:selected="${param.merchantId == merchant.id.toString()}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Filtro per Descrizione -->
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-comment"></i> Descrizione
+                            </label>
+                            <input type="text" name="description" th:value="${param.description}"
+                                placeholder="Cerca nella descrizione..." />
+                        </div>
                     </div>
 
-                    <!-- Dati della ricorrenza -->
-                    <h3 th:style="${trans.amount >= 0} 
-                                  ? 'color: var(--accent);' 
-                                  : 'color: var(--warning);'">
-                        <span th:text="${trans.amount < 0 
-                            ? '-€' + #numbers.formatDecimal(trans.amount.abs(),1,2) 
-                            : '€' + #numbers.formatDecimal(trans.amount,1,2)}">
-                            €0.00
-                        </span>
-                    </h3>
-                    <p th:text="${trans.description}" style="margin: 0.25rem 0;">Descrizione</p>
-                    <p>
-                        <span th:text="${#temporals.format(trans.startDate,'dd/MM/yyyy')}">01/01/2025</span>
-                        <span th:text="${trans.recurrence}" style="margin-left:1rem; font-style:italic;"></span>
+                    <!-- Pulsanti di Azione -->
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center; flex-wrap: wrap;">
+                        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">
+                            <i class="fas fa-search"></i> Applica Filtri
+                        </button>
+                        <button type="button" onclick="resetFilters()" class="btn btn-secondary"
+                            style="padding: 0.75rem 2rem;">
+                            <i class="fas fa-eraser"></i> Cancella Filtri
+                        </button>
+                        <button type="button" onclick="toggleAdvanced()" class="btn btn-outline-primary"
+                            style="padding: 0.75rem 2rem;">
+                            <i class="fas fa-cog"></i> Opzioni Avanzate
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Opzioni Avanzate (nascoste inizialmente) -->
+        <section id="advancedOptions" style="display: none; margin-bottom: 2rem;">
+            <div class="auth-container" style="margin: 0; max-width: 100%; background: var(--accent); color: white;">
+                <h4 style="text-align: center; margin-bottom: 1.5rem;">
+                    <i class="fas fa-tools"></i> Opzioni Avanzate
+                </h4>
+                <form th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/filter'}" method="get">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+
+                        <!-- Ordinamento -->
+                        <div class="form-group">
+                            <label style="color: white;">
+                                <i class="fas fa-sort"></i> Ordina per
+                            </label>
+                            <select name="sortBy"
+                                style="width: 100%; padding: 0.75rem; border: none; border-radius: var(--radius-md); font-size: 0.9rem;">
+                                <option value="date" th:selected="${param.sortBy == 'date'}">Data</option>
+                                <option value="amount" th:selected="${param.sortBy == 'amount'}">Importo</option>
+                                <option value="description" th:selected="${param.sortBy == 'description'}">Descrizione
+                                </option>
+                                <option value="merchant" th:selected="${param.sortBy == 'merchant'}">Merchant</option>
+                            </select>
+                        </div>
+
+                        <!-- Direzione ordinamento -->
+                        <div class="form-group">
+                            <label style="color: white;">
+                                <i class="fas fa-sort-amount-up"></i> Direzione
+                            </label>
+                            <select name="sortDirection"
+                                style="width: 100%; padding: 0.75rem; border: none; border-radius: var(--radius-md); font-size: 0.9rem;">
+                                <option value="desc" th:selected="${param.sortDirection == 'desc'}">Decrescente</option>
+                                <option value="asc" th:selected="${param.sortDirection == 'asc'}">Crescente</option>
+                            </select>
+                        </div>
+
+                        <!-- Limite risultati -->
+                        <div class="form-group">
+                            <label style="color: white;">
+                                <i class="fas fa-list-ol"></i> Max Risultati
+                            </label>
+                            <select name="limit"
+                                style="width: 100%; padding: 0.75rem; border: none; border-radius: var(--radius-md); font-size: 0.9rem;">
+                                <option value="">Tutti</option>
+                                <option value="10" th:selected="${param.limit == '10'}">10</option>
+                                <option value="25" th:selected="${param.limit == '25'}">25</option>
+                                <option value="50" th:selected="${param.limit == '50'}">50</option>
+                                <option value="100" th:selected="${param.limit == '100'}">100</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <button type="submit" class="btn"
+                            style="background: white; color: var(--accent); padding: 0.75rem 2rem;">
+                            <i class="fas fa-filter"></i> Applica Filtri Avanzati
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Statistiche Rapide -->
+        <section th:if="${transactions and not #lists.isEmpty(transactions)}" style="margin-bottom: 2rem;">
+            <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div class="feature-card" style="text-align: center;">
+                    <div class="feature-icon">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <h4>Risultati Trovati</h4>
+                    <p style="font-size: 1.3rem; font-weight: 600; color: var(--primary);">
+                        <span th:text="${#lists.size(transactions)}">0</span>
+                    </p>
+                </div>
+                <div class="feature-card" style="text-align: center;">
+                    <div class="feature-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h4>Totale Entrate</h4>
+                    <p style="font-size: 1.3rem; font-weight: 600; color: var(--accent);">
+                        €<span th:text="${#numbers.formatDecimal(totalIncome ?: 0, 1, 2)}">0.00</span>
+                    </p>
+                </div>
+                <div class="feature-card" style="text-align: center;">
+                    <div class="feature-icon">
+                        <i class="fas fa-minus-circle"></i>
+                    </div>
+                    <h4>Totale Uscite</h4>
+                    <p style="font-size: 1.3rem; font-weight: 600; color: var(--warning);">
+                        €<span
+                            th:text="${#numbers.formatDecimal(totalExpenses ? totalExpenses.abs() : 0, 1, 2)}">0.00</span>
+                    </p>
+                </div>
+                <div class="feature-card" style="text-align: center;">
+                    <div class="feature-icon">
+                        <i class="fas fa-equals"></i>
+                    </div>
+                    <h4>Bilancio Filtrato</h4>
+                    <p
+                        th:style="|font-size: 1.3rem; font-weight: 600; color: ${
+                        (netBalance != null and netBalance.compareTo(T(java.math.BigDecimal).ZERO) < 0) ? 'var(--warning)' : 'var(--accent)'}|">
+                        €<span th:text="${#numbers.formatDecimal(netBalance ?: 0, 1, 2)}">0.00</span>
                     </p>
                 </div>
             </div>
+        </section>
 
+        <!-- Risultati -->
+        <section>
+            <!-- Messaggio quando non ci sono risultati -->
+            <div th:if="${transactions == null or #lists.isEmpty(transactions)}" class="feature-card"
+                style="text-align: center;">
+                <div class="feature-icon">
+                    <i class="fas fa-search-minus" style="color: var(--neutral-mid);"></i>
+                </div>
+                <h3>Nessuna transazione trovata</h3>
+                <p>Prova a modificare i criteri di ricerca o a rimuovere alcuni filtri.</p>
+            </div>
+
+            <!-- Lista Transazioni Filtrate -->
+            <div th:unless="${transactions == null or #lists.isEmpty(transactions)}">
+                <h2 style="margin-bottom: 1.5rem;">
+                    <i class="fas fa-receipt"></i> Transazioni Filtrate
+                    <span style="font-size: 0.7em; color: var(--neutral-mid);">
+                        (<span th:text="${#lists.size(transactions)}">0</span> risultati)
+                    </span>
+                </h2>
+
+                <div class="features-grid">
+                    <div th:each="trans : ${transactions}" class="feature-card" style="position: relative;">
+
+                        <!-- Pulsanti Azione -->
+                        <div style="position: absolute; top: 0.5rem; right: 0.5rem; display: flex; gap: 0.5rem;">
+                            <a th:href="@{'/' + ${username} + '/account/' + ${account.id} + '/edit-transaction/' + ${trans.id}}"
+                                class="btn btn-sm btn-outline-primary" title="Modifica">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form
+                                th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/delete-transaction/' + ${trans.id}}"
+                                method="post" onsubmit="return confirm('Eliminare questa transazione?');">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Elimina">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Badge per tipo ricorrenza -->
+                        <div th:unless="${trans.recurrence.name() == 'UNA_TANTUM'}"
+                            style="position: absolute; top: 0.5rem; left: 0.5rem;">
+                            <span
+                                style="background: var(--accent); color: white; padding: 0.2rem 0.5rem; border-radius: 1rem; font-size: 0.7rem;">
+                                <i class="fas fa-sync-alt"></i> <span th:text="${trans.recurrence}">Ricorrente</span>
+                            </span>
+                        </div>
+
+                        <!-- Importo -->
+                        <h3 style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem; margin-top: 2rem;"
+                            th:style="${trans.amount >= 0} ? 'color: var(--accent);' : 'color: var(--warning);'">
+                            <span
+                                th:text="${trans.amount < 0 ? '-€' + #numbers.formatDecimal(trans.amount.abs(), 1, 2) : '€' + #numbers.formatDecimal(trans.amount, 1, 2)}">
+                                €0.00
+                            </span>
+                        </h3>
+
+                        <!-- Descrizione -->
+                        <h4 th:text="${trans.description ?: 'Senza descrizione'}"
+                            style="margin-bottom: 0.5rem; color: var(--neutral-dark);">
+                            Transazione
+                        </h4>
+
+                        <!-- Merchant -->
+                        <p th:if="${trans.merchant != null}"
+                            style="margin-bottom: 0.5rem; font-style: italic; color: var(--neutral-mid);">
+                            <i class="fas fa-store"></i> <span th:text="${trans.merchant.name}">Merchant</span>
+                        </p>
+
+                        <!-- Data -->
+                        <p style="margin-bottom: 0.25rem; color: var(--neutral-dark);">
+                            <i class="fas fa-calendar"></i>
+                            <span th:text="${#temporals.format(trans.date, 'dd/MM/yyyy')}">01/01/2025</span>
+                        </p>
+
+                        <!-- ID Transazione (per debug/riferimento) -->
+                        <p style="font-size: 0.75rem; color: var(--neutral-light); margin-top: 1rem;">
+                            ID: <span th:text="${trans.id}">123</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
     <div th:replace="~{fragments.html :: siteFooter}"></div>
     <script th:src="@{/js/main.js}"></script>
+
 </body>
 
 </html>
