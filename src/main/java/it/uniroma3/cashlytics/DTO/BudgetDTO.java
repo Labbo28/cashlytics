@@ -25,8 +25,9 @@ public class BudgetDTO {
     private TransactionType transactionType;
     @Enumerated(EnumType.STRING)
     private RecurrencePattern recurrencePattern;
+
+    private Long categoryId;
     /*
-     * private Long categoryId;
      * private String categoryName;
      * private Long merchantId;
      * private String merchantName;

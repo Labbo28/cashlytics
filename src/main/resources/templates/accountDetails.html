@@ -283,6 +283,19 @@
                             </select>
                         </div>
 
+                        <!-- Categoria (obbligatoria) -->
+                        <div class="form-group">
+                            <label for="categoryId">Categoria <span style="color: red;">*</span></label>
+                            <select id="categoryId" th:field="*{categoryId}"
+                                style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;"
+                                required>
+                                <option value="">Seleziona categoria</option>
+                                <option th:each="category : ${categories}" th:value="${category.id}"
+                                    th:text="${category.name}"></option>
+                            </select>
+                            <span class="error" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></span>
+                        </div>
+
                         <!-- Descrizione -->
                         <div class="form-group">
                             <label for="description">Descrizione (facoltativa)</label>

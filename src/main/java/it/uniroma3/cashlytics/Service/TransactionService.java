@@ -16,6 +16,8 @@ import it.uniroma3.cashlytics.Model.User;
 import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
 import it.uniroma3.cashlytics.Model.Enums.TransactionType;
 import it.uniroma3.cashlytics.Repository.TransactionRepository;
+import it.uniroma3.cashlytics.Repository.BudgetRepository;
+import it.uniroma3.cashlytics.Model.Budget;
 
 @Service
 public class TransactionService {
@@ -26,6 +28,8 @@ public class TransactionService {
     private MerchantService merchantService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private BudgetRepository budgetRepository;
 
     public Optional<Transaction> findById(Long transactionId) {
         return transactionRepository.findById(transactionId);
@@ -68,6 +72,15 @@ public class TransactionService {
         // Aggiorna saldo
         account.getTransactions().add(newTransaction);
         account.setBalance(account.getBalance().add(transactionDTO.getAmount()));
+
+        // If expense and has category, subtract from matching budget
+        if (!isIncome && category != null) {
+            Budget budget = budgetRepository.findByFinancialAccountAndCategory(account, category);
+            if (budget != null) {
+                budget.setAmount(budget.getAmount().subtract(transactionDTO.getAmount().abs()));
+                budgetRepository.save(budget);
+            }
+        }
 
         return transactionRepository.save(newTransaction);
     }
