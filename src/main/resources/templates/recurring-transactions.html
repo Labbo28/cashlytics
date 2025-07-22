@@ -18,15 +18,14 @@
     <main class="container" style="padding: 2rem;">
         <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
         <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-        <a th:href="@{'/' + ${username} + '/account/' + ${account.id}}" class="btn btn-secondary">
+
+        <a th:href="@{'/' + ${username} + '/account/' + ${account.id}}" class="btn btn-secondary"
+            style="margin-bottom: 2rem;">
             <i class="fas fa-arrow-left"></i> Torna all'Account
         </a>
-
-        <h1>
-            <i class="fas fa-filter"></i> Filtra Transazioni
-            <span th:if="${account}" style="font-size: 0.8em; color: var(--neutral-mid);">
-                - <span th:text="${#strings.isEmpty(account.name) ? account.type.name : account.name}">Account</span>
-            </span>
+        <h1 style="margin-bottom: 2rem;">
+            <i class="fas fa-filter"></i> Filtra Transazioni - <span
+                th:text="${#strings.isEmpty(account.name) ? account.type.name : account.name}">Account</span>
         </h1>
 
         <!-- Pannello Filtri -->
@@ -87,10 +86,11 @@
                         </div>
 
                         <!-- Filtro per Ricorrenza -->
-                        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div class="form-group"
+                            style="display: flex; align-items: center; margin-top: 2rem; margin-right: 2rem;">
                             <input type="checkbox" name="onlyRecurring" id="onlyRecurring"
-                                th:checked="${param.onlyRecurring}" />
-                            <label for="onlyRecurring" style="margin: 0;">
+                                th:checked="${param.onlyRecurring}" style="transform: scale(2); margin-right: -3rem;" />
+                            <label for="onlyRecurring" style="margin: 0; user-select: none; cursor: pointer;">
                                 <i class="fas fa-sync-alt"></i> Mostra solo transazioni ricorrenti
                             </label>
                         </div>
@@ -193,76 +193,14 @@
             </div>
 
             <!-- Lista Transazioni Filtrate -->
-            <div th:unless="${transactions == null or #lists.isEmpty(transactions)}">
-                <h2 style="margin-bottom: 1.5rem;">
-                    <i class="fas fa-receipt"></i> Transazioni Filtrate
-                    <span style="font-size: 0.7em; color: var(--neutral-mid);">
-                        (<span th:text="${#lists.size(transactions)}">0</span> risultati)
-                    </span>
-                </h2>
+            <h2 style="margin-bottom: 2rem;">Transazioni Filtrate
+                <span style="color: var(--neutral-mid);">
+                    (Risultati: <span th:text="${#lists.size(transactions)}">0</span>)
+                </span>
+            </h2>
 
-                <div class="features-grid">
-                    <div th:each="trans : ${transactions}" class="feature-card" style="position: relative;">
-
-                        <!-- Pulsanti Azione -->
-                        <div style="position: absolute; top: 0.5rem; right: 0.5rem; display: flex; gap: 0.5rem;">
-                            <a th:href="@{'/' + ${username} + '/account/' + ${account.id} + '/edit-transaction/' + ${trans.id}}"
-                                class="btn btn-sm btn-outline-primary" title="Modifica">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form
-                                th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/delete-transaction/' + ${trans.id}}"
-                                method="post" onsubmit="return confirm('Eliminare questa transazione?');">
-                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Elimina">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Badge per tipo ricorrenza -->
-                        <div th:unless="${trans.recurrence.name() == 'UNA_TANTUM'}"
-                            style="position: absolute; top: 0.5rem; left: 0.5rem;">
-                            <span
-                                style="background: var(--accent); color: white; padding: 0.2rem 0.5rem; border-radius: 1rem; font-size: 0.7rem;">
-                                <i class="fas fa-sync-alt"></i> <span th:text="${trans.recurrence}">Ricorrente</span>
-                            </span>
-                        </div>
-
-                        <!-- Importo -->
-                        <h3 style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem; margin-top: 2rem;"
-                            th:style="${trans.amount >= 0} ? 'color: var(--accent);' : 'color: var(--warning);'">
-                            <span
-                                th:text="${trans.amount < 0 ? '-€' + #numbers.formatDecimal(trans.amount.abs(), 1, 2) : '€' + #numbers.formatDecimal(trans.amount, 1, 2)}">
-                                €0.00
-                            </span>
-                        </h3>
-
-                        <!-- Descrizione -->
-                        <h4 th:text="${trans.description ?: 'Senza descrizione'}"
-                            style="margin-bottom: 0.5rem; color: var(--neutral-dark);">
-                            Transazione
-                        </h4>
-
-                        <!-- Merchant -->
-                        <p th:if="${trans.merchant != null}"
-                            style="margin-bottom: 0.5rem; font-style: italic; color: var(--neutral-mid);">
-                            <i class="fas fa-store"></i> <span th:text="${trans.merchant.name}">Merchant</span>
-                        </p>
-
-                        <!-- Data -->
-                        <p style="margin-bottom: 0.25rem; color: var(--neutral-dark);">
-                            <i class="fas fa-calendar"></i>
-                            <span th:text="${#temporals.format(trans.date, 'dd/MM/yyyy')}">01/01/2025</span>
-                        </p>
-
-                        <!-- ID Transazione (per debug/riferimento) -->
-                        <p style="font-size: 0.75rem; color: var(--neutral-light); margin-top: 1rem;">
-                            ID: <span th:text="${trans.id}">123</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <div th:replace="~{fragments.html :: allTransactionsList(${transactions})}"></div>
+            <br>
         </section>
     </main>
 

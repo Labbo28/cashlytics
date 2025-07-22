@@ -476,13 +476,20 @@ nav a:hover {
 }
 
 .feature-card {
+  position: relative;
+  /* importante per posizionamento figli assoluti */
   background-color: var(--white);
   border-radius: var(--radius-md);
-  padding: var(--spacing-xl);
+  padding: var(--spacing-lg);
   text-align: center;
   box-shadow: var(--shadow-sm);
   transition: var(--transition-normal);
   border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Aggiungi padding-top extra per lasciare spazio in alto */
+.feature-card>div:first-child {
+  margin-top: 1.5rem;
 }
 
 .feature-card:hover {
