@@ -283,6 +283,19 @@
                             </select>
                         </div>
 
+                        <!-- Categoria (obbligatoria) -->
+                        <div class="form-group">
+                            <label for="categoryId">Categoria <span style="color: red;">*</span></label>
+                            <select id="categoryId" th:field="*{categoryId}"
+                                style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;"
+                                required>
+                                <option value="">Seleziona categoria</option>
+                                <option th:each="category : ${categories}" th:value="${category.id}"
+                                    th:text="${category.name}"></option>
+                            </select>
+                            <span class="error" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></span>
+                        </div>
+
                         <!-- Descrizione -->
                         <div class="form-group">
                             <label for="description">Descrizione (facoltativa)</label>
@@ -319,6 +332,12 @@
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </form>
+                    </div>
+
+                    <!-- Categoria badge -->
+                    <div th:if="${b.category != null}" class="category-badge" th:title="${b.category.name}"
+                        th:style="'background-color: ' + ${b.category.color} + '; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.9rem; margin-right: 0.7rem; width: 2.2rem; height: 2.2rem; border-radius: 50%;'">
+                        <i th:class="${b.category.icon}" style="font-size: 1.2rem;"></i>
                     </div>
 
                     <h3 style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem;"

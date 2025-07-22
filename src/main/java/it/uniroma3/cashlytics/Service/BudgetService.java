@@ -42,6 +42,13 @@ public class BudgetService {
                 ? budgetDTO.getDate().atStartOfDay()
                 : LocalDateTime.now();
 
+        // Enforce category presence
+        if (budgetDTO.getCategoryId() == null) {
+            throw new IllegalArgumentException("Budget must have a category");
+        }
+        Category category = categoryService.findById(budgetDTO.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid category for budget"));
+
         // Costruisci budget
         Budget newBudget = new Budget();
         newBudget.setAmount(budgetDTO.getAmount());
@@ -49,11 +56,11 @@ public class BudgetService {
         newBudget.setDate(dateTime);
         newBudget.setRecurrence(recurrence);
         newBudget.setFinancialAccount(account);
+        newBudget.setCategory(category);
 
         // Aggiorna lista budget account
         account.getBudgets().add(newBudget);
-        // Aggiorna saldo (sottrai)
-        account.setBalance(account.getBalance().subtract(budgetDTO.getAmount()));
+        // (No longer subtract from account balance)
 
         return budgetRepository.save(newBudget);
     }
