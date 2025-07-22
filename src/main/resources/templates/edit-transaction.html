@@ -1,4 +1,4 @@
-<!-- edit-transaction.html - Aggiornato con campo Merchant -->
+<!-- edit-transaction.html - Aggiornato con supporto nuovo Merchant e Categoria -->
 <!DOCTYPE html>
 <html lang="it" xmlns:th="http://www.thymeleaf.org">
 
@@ -26,7 +26,6 @@
             th:href="@{'/' + ${username} + '/account/' + ${account.id}}">
             <i class="fas fa-arrow-left"></i> Torna indietro</a>
         <h1 style="margin-bottom: 2rem;">Modifica Transazione</h1>
-        </div>
 
         <div id="addTransactionForm" style="margin-bottom: 2rem;">
             <div class="auth-container" style="margin: 0; max-width: 100%;">
@@ -35,6 +34,7 @@
 
                     <!-- CSRF Token -->
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
                     <!-- Importo: positivo o negativo -->
                     <div class="form-group">
                         <label for="amount">Importo (positivo o negativo)</label>
@@ -49,7 +49,7 @@
                         <span class="error" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></span>
                     </div>
 
-                    <!-- Recurrence pattern -->
+                    <!-- Ricorrenza -->
                     <div class="form-group">
                         <label for="recurrencePattern">Ricorrenza (facoltativa)</label>
                         <select id="recurrencePattern" th:field="*{recurrencePattern}"
@@ -65,62 +65,64 @@
                         <label for="merchantId">Esercente (facoltativo)</label>
                         <select id="merchantId" th:field="*{merchantId}"
                             style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;"
-                            onchange="handleMerchantSelection(this.value)">
+                            onchange="handleMerchantSelection(this)">
                             <option value="">Seleziona esercente</option>
-                            <option th:each="merchant : ${merchants}" th:value="${merchant.id}"
-                                th:text="${merchant.name}"></option>
-                            <option value="add_new">+ Aggiungi nuovo esercente</option>
+                            <option th:each="merchant : ${merchants}" th:value="${merchant.id}" th:text="${merchant.name}"></option>
+                            <option data-add-new="true" value="">+ Aggiungi nuovo esercente</option>
                         </select>
-                        <!--span class="error" th:if="${#fields.hasErrors('merchantId')}" th:errors="*{merchantId}"></span-->
                     </div>
 
                     <!-- Form per nuovo merchant (nascosto di default) -->
-                    <div th:replace="~{fragments.html :: newMerchantForm}"></div>
+                    <div id="newMerchantForm" th:replace="~{fragments.html :: newMerchantForm}" style="display:none;"></div>
 
                     <!-- Categoria -->
                     <div class="form-group">
                         <label for="categoryId">Categoria (facoltativa)</label>
                         <select id="categoryId" th:field="*{categoryId}"
                             style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;"
-                            onchange="handleCategorySelection(this.value)">
+                            onchange="handleCategorySelection(this)">
                             <option value="">Seleziona categoria</option>
-                            <option th:each="category : ${categories}" th:value="${category.id}"
-                                th:text="${category.name}"></option>
-                            <option value="add_new">+ Aggiungi nuova categoria</option>
+                            <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                            <option data-add-new="true" value="">+ Aggiungi nuova categoria</option>
                         </select>
                     </div>
 
                     <!-- Form per nuova categoria (nascosto di default) -->
-                    <div th:replace="~{fragments.html :: newCategoryForm}"></div>
+                    <div id="newCategoryForm" th:replace="~{fragments.html :: newCategoryForm}" style="display:none;"></div>
 
                     <!-- Descrizione -->
                     <div class="form-group">
                         <label for="description">Descrizione (facoltativa)</label>
                         <input type="text" id="description" th:field="*{description}" />
-                        <span class="error" th:if="${#fields.hasErrors('description')}"
-                            th:errors="*{description}"></span>
+                        <span class="error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
                     </div>
 
                     <!-- Pulsanti -->
                     <div style="display: flex; gap: 1rem;">
                         <button type="submit" class="btn btn-primary">Modifica Transazione</button>
-                        <!--button type="button" class="btn btn-secondary" onclick="toggleTransactionForm()">Annulla</button-->
                     </div>
                 </form>
             </div>
         </div>
     </main>
 
-
     <div th:replace="~{fragments.html :: siteFooter}"></div>
     <script th:src="@{/js/main.js}"></script>
-    <script th:if="${openAllForms}" defer>
+
+    <!-- Script inline per mostrare/nascondere form addizionali -->
+    <script>
+        function handleMerchantSelection(selectElement) {
+            const opt = selectElement.options[selectElement.selectedIndex];
+            document.getElementById('newMerchantForm').style.display = opt.getAttribute('data-add-new') === 'true' ? 'block' : 'none';
+        }
+        function handleCategorySelection(selectElement) {
+            const opt = selectElement.options[selectElement.selectedIndex];
+            document.getElementById('newCategoryForm').style.display = opt.getAttribute('data-add-new') === 'true' ? 'block' : 'none';
+        }
         document.addEventListener('DOMContentLoaded', function () {
-            toggleTransactionForm();
-            handleCategorySelection('add_new');
-            handleMerchantSelection('add_new');
+            handleMerchantSelection(document.getElementById('merchantId'));
+            handleCategorySelection(document.getElementById('categoryId'));
         });
-        document.getElementById('addTransactionForm').scrollIntoView({ behavior: 'smooth' });
     </script>
 </body>
 
