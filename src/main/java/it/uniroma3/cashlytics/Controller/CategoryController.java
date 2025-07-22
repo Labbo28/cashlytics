@@ -2,6 +2,7 @@ package it.uniroma3.cashlytics.Controller;
 
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,14 +15,13 @@ import it.uniroma3.cashlytics.DTO.CategoryDTO;
 import it.uniroma3.cashlytics.Model.Category;
 import it.uniroma3.cashlytics.Model.User;
 import it.uniroma3.cashlytics.Service.CategoryService;
-import it.uniroma3.cashlytics.Service.TransactionService;
 import it.uniroma3.cashlytics.Service.UserService;
 import jakarta.validation.Valid;
 
+@Controller
 public class CategoryController {
 
-	@Autowired
-	private TransactionService transactionService;
+	
 	@Autowired
 	private UserService userService;
 	@Autowired
@@ -40,42 +40,41 @@ public class CategoryController {
 		if (!model.containsAttribute("categoryDTO")) {
 			model.addAttribute("categoryDTO", new CategoryDTO());
 		}
-		return "categories";
+		return "categories.html";
 	}
 
-	/*
-	 * POST: Aggiungi nuova categoria
-	 * 
-	 * @PostMapping("/{username}/categories/add")
-	 * 
-	 * @Transactional
-	 * public String addCategory(@PathVariable String username,
-	 * 
-	 * @Valid CategoryDTO categoryDTO,
-	 * BindingResult bindingResult,
-	 * RedirectAttributes redirectAttributes) {
-	 * if (bindingResult.hasErrors()) {
-	 * redirectAttributes.addFlashAttribute(
-	 * "org.springframework.validation.BindingResult.categoryDTO",
-	 * bindingResult);
-	 * redirectAttributes.addFlashAttribute("categoryDTO", categoryDTO);
-	 * return "redirect:/" + username + "/categories";
-	 * }
-	 * User currentUser = userService.getUserByUsername(username);
-	 * Category newCategory = categoryService.createCategory(categoryDTO,
-	 * currentUser, bindingResult);
-	 * 
-	 * if (newCategory == null) {
-	 * redirectAttributes.addFlashAttribute("errorMessage",
-	 * "Non è stato possibile creare la categoria.");
-	 * return "redirect:/" + username + "/categories";
-	 * }
-	 * redirectAttributes.addFlashAttribute("successMessage",
-	 * "Categoria creata con successo!");
-	 * 
-	 * return "redirect:/" + username + "/categories";
-	 * }
-	 */
+
+	 
+	  @PostMapping("/{username}/categories/add")
+	  
+	  @Transactional
+	  public String addCategory(@PathVariable String username,
+	  
+	  @Valid CategoryDTO categoryDTO,
+	  BindingResult bindingResult,
+	  RedirectAttributes redirectAttributes) {
+	  if (bindingResult.hasErrors()) {
+	  redirectAttributes.addFlashAttribute(
+	  "org.springframework.validation.BindingResult.categoryDTO",
+	  bindingResult);
+	  redirectAttributes.addFlashAttribute("categoryDTO", categoryDTO);
+	  return "redirect:/" + username + "/categories";
+	  }
+	  User currentUser = userService.getUserByUsername(username);
+	  Category newCategory = categoryService.createCategory(categoryDTO,
+	  currentUser, bindingResult);
+	  
+	  if (newCategory == null) {
+	  redirectAttributes.addFlashAttribute("errorMessage",
+	  "Non è stato possibile creare la categoria.");
+	  return "redirect:/" + username + "/categories";
+	  }
+	  redirectAttributes.addFlashAttribute("successMessage",
+	  "Categoria creata con successo!");
+	  
+	  return "redirect:/" + username + "/categories";
+	  }
+	 
 
 	/*
 	 * POST: Cancella categoria esistente

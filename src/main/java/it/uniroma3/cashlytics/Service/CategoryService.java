@@ -59,40 +59,33 @@ public class CategoryService {
         return categoryRepository.save(newCat);
     }
 
-    /**
-     * Crea una nuova categoria da DTO.
-     * public Category createCategory(CategoryDTO categoryDTO, User user,
-     * BindingResult bindingResult) {
-     * // Verifica se esiste già una categoria con lo stesso nome
-     * Optional<Category> existingCategory =
-     * findByNameAndUser(categoryDTO.getName(), user);
-     * if (existingCategory.isPresent()) {
-     * bindingResult.rejectValue("name", "error.categoryDTO", "Una categoria con
-     * questo nome esiste già.");
-     * return null;
-     * }
-     * 
-     * Category category = new Category();
-     * category.setName(categoryDTO.getName());
-     * category.setIcon(categoryDTO.getIcon());
-     * category.setColor(categoryDTO.getColor());
-     * category.setUser(user);
-     * 
-     * // Gestione categoria padre se specificata
-     * if (categoryDTO.getParentCategoryId() != null) {
-     * Optional<Category> parentOpt =
-     * findByIdAndUser(categoryDTO.getParentCategoryId(), user);
-     * if (parentOpt.isPresent()) {
-     * category.setParentCategory(parentOpt.get());
-     * } else {
-     * bindingResult.rejectValue("parentCategoryId", "error.categoryDTO", "Categoria
-     * padre non valida.");
-     * return null;
-     * }
-     * }
-     * return save(category);
-     * }
-     */
+  public Category createCategory(CategoryDTO categoryDTO, User user, BindingResult bindingResult) {
+    // Verifica se esiste già una categoria con lo stesso nome
+    Optional<Category> existingCategory = findByNameAndUser(categoryDTO.getName(), user);
+    if (existingCategory.isPresent()) {
+        bindingResult.rejectValue("name", "error.categoryDTO", "Una categoria con questo nome esiste già.");
+        return null;
+    }
+
+    Category category = new Category();
+    category.setName(categoryDTO.getName());
+    category.setIcon(categoryDTO.getIcon());
+    category.setColor(categoryDTO.getColor());
+    category.setUser(user);
+
+    // Gestione categoria padre se specificata
+    if (categoryDTO.getParentCategoryId() != null) {
+        Optional<Category> parentOpt = findByIdAndUser(categoryDTO.getParentCategoryId(), user);
+        if (parentOpt.isPresent()) {
+            category.setParentCategory(parentOpt.get());
+        } else {
+            bindingResult.rejectValue("parentCategoryId", "error.categoryDTO", "Categoria padre non valida.");
+            return null;
+        }
+    }
+
+    return save(category);
+}
 
     /**
      * Aggiorna una categoria esistente.
@@ -141,7 +134,7 @@ public class CategoryService {
             Category category = categoryOpt.get();
 
             // Rimuovi i riferimenti dalle transazioni
-            if (category.getTransactions() != null) {
+            if (category.getTransactions() != null && category.getTransactions().size()>0) {
                 category.getTransactions().forEach(transaction -> transaction.setCategory(null));
             }
 
