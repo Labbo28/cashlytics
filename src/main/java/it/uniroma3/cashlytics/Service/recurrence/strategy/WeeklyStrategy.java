@@ -5,7 +5,7 @@ import java.time.LocalDate;
 public class WeeklyStrategy implements RecurrenceStrategy {
 
     @Override
-    public LocalDate nexDate(LocalDate date) {
+    public LocalDate nextDate(LocalDate date) {
         return date.plusWeeks(1);
     }
 

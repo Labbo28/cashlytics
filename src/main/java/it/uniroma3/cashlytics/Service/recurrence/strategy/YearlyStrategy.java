@@ -2,10 +2,10 @@ package it.uniroma3.cashlytics.Service.recurrence.strategy;
 
 import java.time.LocalDate;
 
-public class YearlyStrategy implements RecurrenceStrategy{
+public class YearlyStrategy implements RecurrenceStrategy {
 
     @Override
-    public LocalDate nexDate(LocalDate date) {
+    public LocalDate nextDate(LocalDate date) {
         return date.plusYears(1);
     }
 

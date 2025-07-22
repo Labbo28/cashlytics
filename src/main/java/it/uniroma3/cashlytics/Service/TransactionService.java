@@ -1,8 +1,12 @@
 package it.uniroma3.cashlytics.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -16,6 +20,11 @@ import it.uniroma3.cashlytics.Model.User;
 import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
 import it.uniroma3.cashlytics.Model.Enums.TransactionType;
 import it.uniroma3.cashlytics.Repository.TransactionRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 @Service
 public class TransactionService {
@@ -26,6 +35,8 @@ public class TransactionService {
     private MerchantService merchantService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private EntityManager entityManager;
 
     public Optional<Transaction> findById(Long transactionId) {
         return transactionRepository.findById(transactionId);
@@ -120,4 +131,54 @@ public class TransactionService {
         transactionRepository.save(transaction);
     }
 
+    public List<Transaction> filterTransactions(
+            Long accountId,
+            BigDecimal minAmount,
+            BigDecimal maxAmount,
+            String transactionType,
+            LocalDate startDate,
+            LocalDate endDate,
+            String merchantId,
+            String description,
+            boolean onlyRecurring) {
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Transaction> cq = cb.createQuery(Transaction.class);
+        Root<Transaction> root = cq.from(Transaction.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        // Filtro per account
+        predicates.add(cb.equal(root.get("financialAccount").get("id"), accountId));
+
+        if (minAmount != null) {
+            predicates.add(cb.ge(root.get("amount"), minAmount));
+        }
+        if (maxAmount != null) {
+            predicates.add(cb.le(root.get("amount"), maxAmount));
+        }
+        if (transactionType != null && !transactionType.isEmpty()) {
+            predicates.add(cb.equal(root.get("transactionType"), TransactionType.valueOf(transactionType)));
+        }
+        if (startDate != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("date"), startDate));
+        }
+        if (endDate != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("date"), endDate));
+        }
+        if (merchantId != null && !merchantId.isEmpty()) {
+            predicates.add(cb.equal(root.get("merchant").get("id"), Long.parseLong(merchantId)));
+        }
+        if (description != null && !description.isEmpty()) {
+            predicates.add(cb.like(cb.lower(root.get("description")), "%" + description.toLowerCase() + "%"));
+        }
+        if (onlyRecurring) {
+            predicates.add(cb.notEqual(root.get("recurrence"), RecurrencePattern.UNA_TANTUM));
+        }
+
+        cq.where(cb.and(predicates.toArray(new Predicate[0])));
+        cq.orderBy(cb.desc(root.get("date"))); // Ordine decrescente per data
+
+        return entityManager.createQuery(cq).getResultList();
+    }
 }

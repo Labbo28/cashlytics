@@ -1,6 +1,5 @@
 package it.uniroma3.cashlytics.Service.recurrence;
 
-
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,21 +26,22 @@ public class RecurrenceService {
      * fino a `to` (incluso).
      */
     public List<LocalDate> generateDates(Transaction tx, LocalDate to) {
-        if (!tx.isRecurring()) return List.of();
+        if (!tx.isRecurring())
+            return List.of();
 
         LocalDate cursor = Optional.ofNullable(tx.getLastGenerated())
-                                   .orElse(tx.getStartDate());
+                .orElse(tx.getStartDate());
         RecurrenceStrategy strategy = RecurrenceStrategyFactory.of(tx.getRecurrence());
 
         List<LocalDate> dates = new ArrayList<>();
-        LocalDate next = strategy.nexDate(cursor);
+        LocalDate next = strategy.nextDate(cursor);
 
         while (next != null
-               && !next.isAfter(to)
-               && (tx.getEndDate() == null || !next.isAfter(tx.getEndDate()))) {
+                && !next.isAfter(to)
+                && (tx.getEndDate() == null || !next.isAfter(tx.getEndDate()))) {
             dates.add(next);
             cursor = next;
-            next = strategy.nexDate(cursor);
+            next = strategy.nextDate(cursor);
         }
         return dates;
     }

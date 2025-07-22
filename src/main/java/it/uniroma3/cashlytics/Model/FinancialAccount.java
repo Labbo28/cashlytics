@@ -22,28 +22,25 @@ public class FinancialAccount {
     private Long id;
     private String name;
     private AccountType type;
-    // private String institution;
     private BigDecimal balance;
-
+    // private String institution;
     @ManyToOne
     private User user;
+
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "financialAccount", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Transaction> transactions = new HashSet<>();
-    
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "financialAccount", cascade = CascadeType.ALL)
     private Set<Budget> budgets = new HashSet<>();
 
     @Override
-public String toString() {
-    return "FinancialAccount{" +
-           "id=" + id +
-           ", name='" + name + '\'' +
-           ", balance=" + balance +
-           ", userId=" + (user != null ? user.getId() : null) +
-           // Don't include transactions collection or full user object
-           '}';
-}
+    public String toString() {
+        return "FinancialAccount{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", balance=" + balance +
+                ", userId=" + (user != null ? user.getId() : null) + '}';
+    }
 
 }

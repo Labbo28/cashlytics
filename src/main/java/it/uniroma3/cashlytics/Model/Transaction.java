@@ -23,19 +23,21 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "amount",nullable = false)
+    @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    @Column(name = "date",nullable = false)
+    @Column(name = "date", nullable = false)
     private LocalDateTime date;
 
     @Column(name = "description")
     private String description;
 
-    @ManyToOne @EqualsAndHashCode.Exclude @JoinColumn(name = "financial_account_id")
+    @ManyToOne
+    @EqualsAndHashCode.Exclude
+    @JoinColumn(name = "financial_account_id")
     private FinancialAccount financialAccount;
 
-    @Column(name = "is_recurring",nullable = false)
+    @Column(name = "is_recurring", nullable = false)
     private boolean isRecurring;
 
     @Enumerated(EnumType.STRING)
@@ -43,10 +45,9 @@ public class Transaction {
     private RecurrencePattern recurrence;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "transaction_type",nullable = false)
+    @Column(name = "transaction_type", nullable = false)
     private TransactionType transactionType;
 
-   
     @EqualsAndHashCode.Exclude
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -56,14 +57,13 @@ public class Transaction {
     @JoinColumn(name = "merchant_id")
     private Merchant merchant;
 
-
-    private LocalDate startDate;       
-    private LocalDate lastGenerated;    
-    private LocalDate endDate;         
+    private LocalDate startDate;
+    private LocalDate lastGenerated;
+    private LocalDate endDate;
 
     public Transaction cloneForDate(LocalDate date) {
         Transaction tx = new Transaction();
-        tx.setStartDate(this.startDate);  
+        tx.setStartDate(this.startDate);
         tx.setLastGenerated(null);
         tx.setEndDate(this.endDate);
         tx.setRecurring(false);

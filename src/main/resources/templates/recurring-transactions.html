@@ -18,19 +18,16 @@
     <main class="container" style="padding: 2rem;">
         <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
         <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+        <a th:href="@{'/' + ${username} + '/account/' + ${account.id}}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Torna all'Account
+        </a>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h1>
-                <i class="fas fa-filter"></i> Filtra Transazioni
-                <span th:if="${account}" style="font-size: 0.8em; color: var(--neutral-mid);">
-                    - <span
-                        th:text="${#strings.isEmpty(account.name) ? account.type.name : account.name}">Account</span>
-                </span>
-            </h1>
-            <a th:href="@{'/' + ${username} + '/account/' + ${account.id}}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Torna all'Account
-            </a>
-        </div>
+        <h1>
+            <i class="fas fa-filter"></i> Filtra Transazioni
+            <span th:if="${account}" style="font-size: 0.8em; color: var(--neutral-mid);">
+                - <span th:text="${#strings.isEmpty(account.name) ? account.type.name : account.name}">Account</span>
+            </span>
+        </h1>
 
         <!-- Pannello Filtri -->
         <section style="margin-bottom: 2rem;">
@@ -92,7 +89,7 @@
                         <!-- Filtro per Ricorrenza -->
                         <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
                             <input type="checkbox" name="onlyRecurring" id="onlyRecurring"
-                                th:checked="${param.onlyRecurring == 'true'}" />
+                                th:checked="${param.onlyRecurring}" />
                             <label for="onlyRecurring" style="margin: 0;">
                                 <i class="fas fa-sync-alt"></i> Mostra solo transazioni ricorrenti
                             </label>
@@ -132,78 +129,13 @@
                             style="padding: 0.75rem 2rem;">
                             <i class="fas fa-eraser"></i> Cancella Filtri
                         </button>
-                        <button type="button" onclick="toggleAdvanced()" class="btn btn-outline-primary"
-                            style="padding: 0.75rem 2rem;">
-                            <i class="fas fa-cog"></i> Opzioni Avanzate
-                        </button>
                     </div>
                 </form>
             </div>
         </section>
 
-        <!-- Opzioni Avanzate (nascoste inizialmente) -->
-        <section id="advancedOptions" style="display: none; margin-bottom: 2rem;">
-            <div class="auth-container" style="margin: 0; max-width: 100%; background: var(--accent); color: white;">
-                <h4 style="text-align: center; margin-bottom: 1.5rem;">
-                    <i class="fas fa-tools"></i> Opzioni Avanzate
-                </h4>
-                <form th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/filter'}" method="get">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-
-                        <!-- Ordinamento -->
-                        <div class="form-group">
-                            <label style="color: white;">
-                                <i class="fas fa-sort"></i> Ordina per
-                            </label>
-                            <select name="sortBy"
-                                style="width: 100%; padding: 0.75rem; border: none; border-radius: var(--radius-md); font-size: 0.9rem;">
-                                <option value="date" th:selected="${param.sortBy == 'date'}">Data</option>
-                                <option value="amount" th:selected="${param.sortBy == 'amount'}">Importo</option>
-                                <option value="description" th:selected="${param.sortBy == 'description'}">Descrizione
-                                </option>
-                                <option value="merchant" th:selected="${param.sortBy == 'merchant'}">Merchant</option>
-                            </select>
-                        </div>
-
-                        <!-- Direzione ordinamento -->
-                        <div class="form-group">
-                            <label style="color: white;">
-                                <i class="fas fa-sort-amount-up"></i> Direzione
-                            </label>
-                            <select name="sortDirection"
-                                style="width: 100%; padding: 0.75rem; border: none; border-radius: var(--radius-md); font-size: 0.9rem;">
-                                <option value="desc" th:selected="${param.sortDirection == 'desc'}">Decrescente</option>
-                                <option value="asc" th:selected="${param.sortDirection == 'asc'}">Crescente</option>
-                            </select>
-                        </div>
-
-                        <!-- Limite risultati -->
-                        <div class="form-group">
-                            <label style="color: white;">
-                                <i class="fas fa-list-ol"></i> Max Risultati
-                            </label>
-                            <select name="limit"
-                                style="width: 100%; padding: 0.75rem; border: none; border-radius: var(--radius-md); font-size: 0.9rem;">
-                                <option value="">Tutti</option>
-                                <option value="10" th:selected="${param.limit == '10'}">10</option>
-                                <option value="25" th:selected="${param.limit == '25'}">25</option>
-                                <option value="50" th:selected="${param.limit == '50'}">50</option>
-                                <option value="100" th:selected="${param.limit == '100'}">100</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div style="text-align: center; margin-top: 1.5rem;">
-                        <button type="submit" class="btn"
-                            style="background: white; color: var(--accent); padding: 0.75rem 2rem;">
-                            <i class="fas fa-filter"></i> Applica Filtri Avanzati
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </section>
-
-        <!-- Statistiche Rapide -->
-        <section th:if="${transactions and not #lists.isEmpty(transactions)}" style="margin-bottom: 2rem;">
+        <!-- Statistiche Rapide
+        <section th:if="${transactions != null and !#lists.isEmpty(transactions)}" style="margin-bottom: 2rem;">
             <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
                 <div class="feature-card" style="text-align: center;">
                     <div class="feature-icon">
@@ -230,7 +162,7 @@
                     <h4>Totale Uscite</h4>
                     <p style="font-size: 1.3rem; font-weight: 600; color: var(--warning);">
                         €<span
-                            th:text="${#numbers.formatDecimal(totalExpenses ? totalExpenses.abs() : 0, 1, 2)}">0.00</span>
+                        th:text="${#numbers.formatDecimal(totalExpenses ? totalExpenses.abs() : 0, 1, 2)}">0.00</span>
                     </p>
                 </div>
                 <div class="feature-card" style="text-align: center;">
@@ -239,13 +171,14 @@
                     </div>
                     <h4>Bilancio Filtrato</h4>
                     <p
-                        th:style="|font-size: 1.3rem; font-weight: 600; color: ${
+                    th:style="|font-size: 1.3rem; font-weight: 600; color: ${
                         (netBalance != null and netBalance.compareTo(T(java.math.BigDecimal).ZERO) < 0) ? 'var(--warning)' : 'var(--accent)'}|">
                         €<span th:text="${#numbers.formatDecimal(netBalance ?: 0, 1, 2)}">0.00</span>
                     </p>
                 </div>
             </div>
         </section>
+            -->
 
         <!-- Risultati -->
         <section>

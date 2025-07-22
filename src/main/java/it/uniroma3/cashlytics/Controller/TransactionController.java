@@ -1,11 +1,13 @@
 package it.uniroma3.cashlytics.Controller;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -21,7 +23,6 @@ import it.uniroma3.cashlytics.DTO.TransactionDTO;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.Transaction;
 import it.uniroma3.cashlytics.Model.User;
-import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
 import it.uniroma3.cashlytics.Service.CategoryService;
 import it.uniroma3.cashlytics.Service.FinancialAccountService;
 import it.uniroma3.cashlytics.Service.MerchantService;
@@ -80,46 +81,63 @@ public class TransactionController {
 	/*
 	 * GET: Filtra transazioni in base a parametri come ricorrenza, categoria, etc.
 	 */
-	@GetMapping("/{username}/account/{accountId}/recurring")
-	public String showRecurringTransactions(@PathVariable String username,
-			@PathVariable Long accountId,
-			Model model) {
-		FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
-		Set<Transaction> all = account.getTransactions();
-		List<Transaction> recurring = all.stream()
-				.filter(tx -> tx.getRecurrence() != RecurrencePattern.UNA_TANTUM)
-				.toList();
-
-		model.addAttribute("account", account);
-		model.addAttribute("transactions", all);
-		model.addAttribute("recurring-transactions", recurring);
-		model.addAttribute("username", username);
-
-		return "recurring-transactions";
-	}
-
 	@GetMapping("/{username}/account/{accountId}/filter")
-	public String filterTransactions(@PathVariable String username,
+	public String filterTransactions(
+			@PathVariable String username,
 			@PathVariable Long accountId,
-			@RequestParam(required = false) Boolean onlyRecurring,
+			@RequestParam(required = false) BigDecimal minAmount,
+			@RequestParam(required = false) BigDecimal maxAmount,
+			@RequestParam(required = false) String transactionType,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+			@RequestParam(required = false) String merchantId,
+			@RequestParam(required = false) String description,
+			@RequestParam(required = false, defaultValue = "false") boolean onlyRecurring,
 			Model model) {
 		FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
-		Set<Transaction> allTransactions = account.getTransactions();
+		User user = userService.getUserByUsername(username);
 
-		// Filtraggio opzionale
-		List<Transaction> filtered = allTransactions.stream()
-				.filter(tx -> onlyRecurring == null || !onlyRecurring
-						|| tx.getRecurrence() != RecurrencePattern.UNA_TANTUM)
-				.toList();
+		// Filtro delle transazioni in base ai parametri
+		List<Transaction> transactions = transactionService.filterTransactions(
+				accountId, minAmount, maxAmount, transactionType,
+				startDate, endDate, merchantId, description, onlyRecurring);
 
-		model.addAttribute("account", account);
-		model.addAttribute("transactions", filtered);
+		BigDecimal totalIncome = transactions.stream()
+				.filter(t -> t.getAmount().compareTo(BigDecimal.ZERO) > 0)
+				.map(Transaction::getAmount)
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		BigDecimal totalExpenses = transactions.stream()
+				.filter(t -> t.getAmount().compareTo(BigDecimal.ZERO) < 0)
+				.map(Transaction::getAmount)
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		BigDecimal netBalance = totalIncome.add(totalExpenses); // expenses are negative
+
 		model.addAttribute("username", username);
-		model.addAttribute("param", Map.of("onlyRecurring", onlyRecurring != null && onlyRecurring));
+		model.addAttribute("transactions", transactions);
+		model.addAttribute("totalIncome", totalIncome);
+		model.addAttribute("totalExpenses", totalExpenses);
+		model.addAttribute("netBalance", netBalance);
 
-		// eventuali calcoli su totalIncome, totalExpenses, netBalance...
+		// Parametri da reinserire nel form
+		Map<String, Object> paramMap = new java.util.HashMap<>();
+		paramMap.put("minAmount", minAmount);
+		paramMap.put("maxAmount", maxAmount);
+		paramMap.put("transactionType", transactionType);
+		paramMap.put("startDate", startDate);
+		paramMap.put("endDate", endDate);
+		paramMap.put("merchantId", merchantId);
+		paramMap.put("description", description);
+		paramMap.put("onlyRecurring", onlyRecurring);
 
-		return "recurring-transactions"; // oppure altra view di filtro
+		model.addAttribute("param", paramMap);
+		model.addAttribute("account", account);
+		// Merchant e Category per la select
+		model.addAttribute("merchants", merchantService.findAllByUser(user));
+		model.addAttribute("categories", categoryService.findAllByUser(user));
+
+		return "recurring-transactions"; // oppure filter-transactions.html
 	}
 
 	/*

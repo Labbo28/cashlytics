@@ -1,6 +1,7 @@
 package it.uniroma3.cashlytics.Model;
 
 import java.util.Set;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,11 +24,14 @@ public class Category {
     private String color; // as Hex
 
     @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "category")
-    private Set<Transaction> transactions;
-    @EqualsAndHashCode.Exclude
     @ManyToOne
     private User user;
+    @EqualsAndHashCode.Exclude
+    @OneToMany(mappedBy = "category")
+    private Set<Budget> budgets;
+    @EqualsAndHashCode.Exclude
+    @OneToMany(mappedBy = "category")
+    private Set<Transaction> transactions;
 
     // Relazione auto-referenziale
     @ToString.Exclude
