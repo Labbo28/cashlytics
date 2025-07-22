@@ -13,7 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class BudgetDTO {
+public class BudgetDTO implements CategorizableDTO{
 
     @NotNull
     private BigDecimal amount;
@@ -25,10 +25,13 @@ public class BudgetDTO {
     private TransactionType transactionType;
     @Enumerated(EnumType.STRING)
     private RecurrencePattern recurrencePattern;
-    /*
-     * private Long categoryId;
-     * private String categoryName;
-     * private Long merchantId;
-     * private String merchantName;
-     */
+    // ID della categoria selezionata (se esistente)
+    private Long categoryId;
+
+    // Nome della nuova categoria (se inserita)
+    private String categoryName;
+
+    // Icona e colore solo per nuova categoria
+    private String categoryIcon;
+    private String categoryColor;
 }

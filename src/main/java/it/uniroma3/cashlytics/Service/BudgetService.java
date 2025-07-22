@@ -30,7 +30,9 @@ public class BudgetService {
         return budgetRepository.findById(budgetId);
     }
 
-    public Budget createBudget(BudgetDTO budgetDTO, FinancialAccount account, User user) {
+    public Budget createBudget(BudgetDTO budgetDTO, FinancialAccount account, User user,BindingResult bindingResult) {
+
+        Category category = categoryService.resolveOrCreateCategory(budgetDTO, user, bindingResult);
         // Gestione ricorrenza
         RecurrencePattern recurrence = budgetDTO.getRecurrencePattern();
         if (recurrence == null) {
@@ -49,6 +51,7 @@ public class BudgetService {
         newBudget.setDate(dateTime);
         newBudget.setRecurrence(recurrence);
         newBudget.setFinancialAccount(account);
+        newBudget.setCategory(category);
 
         // Aggiorna lista budget account
         account.getBudgets().add(newBudget);

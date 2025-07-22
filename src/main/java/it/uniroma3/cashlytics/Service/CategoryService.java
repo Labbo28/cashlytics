@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
+import it.uniroma3.cashlytics.DTO.CategorizableDTO;
 import it.uniroma3.cashlytics.DTO.CategoryDTO;
 import it.uniroma3.cashlytics.DTO.TransactionDTO;
 import it.uniroma3.cashlytics.Model.Category;
@@ -152,7 +153,7 @@ public class CategoryService {
     /**
      * Risolve o crea una categoria basata sui dati del DTO per le transazioni.
      */
-    public Category resolveOrCreateCategory(TransactionDTO dto, User user, BindingResult bindingResult) {
+    public Category resolveOrCreateCategory(CategorizableDTO dto, User user, BindingResult bindingResult) {
         // Caso 1: ID categoria fornito → cerco quella categoria
         Long categoryId = dto.getCategoryId();
         if (categoryId != null) {

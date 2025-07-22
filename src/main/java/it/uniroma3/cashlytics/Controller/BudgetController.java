@@ -52,7 +52,7 @@ public class BudgetController {
 
 		FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
 		User user = userService.getUserByUsername(username);
-		Budget newBudget = budgetService.createBudget(budgetDTO, account, user);
+		Budget newBudget = budgetService.createBudget(budgetDTO, account, user, bindingResult);
 
 		if (newBudget == null) {
 			redirectAttributes.addFlashAttribute("errorMessage", "Non è stato possibile creare il budget.");

@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class TransactionDTO {
+public class TransactionDTO implements CategorizableDTO {
 
     // Importo della transazione (positivo o negativo)
     @NotNull(message = "Inserisci un importo.")
