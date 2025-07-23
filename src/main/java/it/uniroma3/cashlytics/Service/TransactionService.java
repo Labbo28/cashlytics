@@ -6,12 +6,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
 import it.uniroma3.cashlytics.DTO.TransactionDTO;
+import it.uniroma3.cashlytics.Model.Budget;
 import it.uniroma3.cashlytics.Model.Category;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.Merchant;
@@ -19,9 +21,8 @@ import it.uniroma3.cashlytics.Model.Transaction;
 import it.uniroma3.cashlytics.Model.User;
 import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
 import it.uniroma3.cashlytics.Model.Enums.TransactionType;
-import it.uniroma3.cashlytics.Repository.TransactionRepository;
 import it.uniroma3.cashlytics.Repository.BudgetRepository;
-import it.uniroma3.cashlytics.Model.Budget;
+import it.uniroma3.cashlytics.Repository.TransactionRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -47,7 +48,7 @@ public class TransactionService {
     }
 
     public Transaction createTransaction(TransactionDTO transactionDTO,
-            FinancialAccount account, User user, BindingResult bindingResult) {
+            FinancialAccount account, User user, BindingResult bindingResult, AtomicBoolean budgetUpdated) {
         // Risolvi merchant e category (possono essere null)
         Merchant merchant = merchantService.resolveOrCreateMerchant(transactionDTO, user, bindingResult);
         Category category = categoryService.resolveOrCreateCategory(transactionDTO, user, bindingResult);
@@ -85,15 +86,16 @@ public class TransactionService {
         account.setBalance(account.getBalance().add(transactionDTO.getAmount()));
 
         // If expense and has category, subtract from matching budget
-      if (!isIncome && category != null) {
-        Budget budget = budgetRepository.findByFinancialAccountAndCategory(account, category);
-        if (budget != null) {
-        // Per le spese (amount negativo), sottrai l'importo assoluto dal budget
-        BigDecimal expenseAmount = transactionDTO.getAmount().abs();
-        budget.setAmount(budget.getAmount().subtract(expenseAmount));
-        budgetRepository.save(budget);
-    }
-}
+        if (!isIncome && category != null) {
+            Budget budget = budgetRepository.findByFinancialAccountAndCategory(account, category);
+            if (budget != null) {
+                // Per le spese (amount negativo), sottrai l'importo assoluto dal budget
+                BigDecimal expenseAmount = transactionDTO.getAmount().abs();
+                budget.setAmount(budget.getAmount().subtract(expenseAmount));
+                budgetRepository.save(budget);
+                budgetUpdated.set(true); // Indica che è stato aggiornato un budget
+            }
+        }
 
         return transactionRepository.save(newTransaction);
     }
@@ -144,24 +146,25 @@ public class TransactionService {
         account.setBalance(account.getBalance().subtract(oldAmount).add(transactionDTO.getAmount()));
         Category oldCategory = transaction.getCategory();
 
-// 1. Se la vecchia transazione era una spesa con categoria, ripristina il budget
-if (oldAmount.signum() < 0 && oldCategory != null) {
-    Budget oldBudget = budgetRepository.findByFinancialAccountAndCategory(account, oldCategory);
-    if (oldBudget != null) {
-        oldBudget.setAmount(oldBudget.getAmount().add(oldAmount.abs()));
-        budgetRepository.save(oldBudget);
-    }
-}
+        // 1. Se la vecchia transazione era una spesa con categoria, ripristina il
+        // budget
+        if (oldAmount.signum() < 0 && oldCategory != null) {
+            Budget oldBudget = budgetRepository.findByFinancialAccountAndCategory(account, oldCategory);
+            if (oldBudget != null) {
+                oldBudget.setAmount(oldBudget.getAmount().add(oldAmount.abs()));
+                budgetRepository.save(oldBudget);
+            }
+        }
 
-// 2. Se la nuova transazione è una spesa con categoria, sottrai dal budget
-if (!isIncome && category != null) {
-    Budget newBudget = budgetRepository.findByFinancialAccountAndCategory(account, category);
-    if (newBudget != null) {
-        BigDecimal expenseAmount = transactionDTO.getAmount().abs();
-        newBudget.setAmount(newBudget.getAmount().subtract(expenseAmount));
-        budgetRepository.save(newBudget);
-    }
-}
+        // 2. Se la nuova transazione è una spesa con categoria, sottrai dal budget
+        if (!isIncome && category != null) {
+            Budget newBudget = budgetRepository.findByFinancialAccountAndCategory(account, category);
+            if (newBudget != null) {
+                BigDecimal expenseAmount = transactionDTO.getAmount().abs();
+                newBudget.setAmount(newBudget.getAmount().subtract(expenseAmount));
+                budgetRepository.save(newBudget);
+            }
+        }
         transactionRepository.save(transaction);
     }
 

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -62,7 +63,10 @@ public class TransactionController {
 		}
 		FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
 		User user = userService.getUserByUsername(username);
-		Transaction newTransaction = transactionService.createTransaction(transactionDTO, account, user, bindingResult);
+
+		AtomicBoolean budgetUpdated = new AtomicBoolean(false);
+		Transaction newTransaction = transactionService.createTransaction(transactionDTO, account, user, bindingResult,
+				budgetUpdated);
 
 		if (newTransaction == null) {
 			// Se ci sono errori di validazione (es. categoria/merchant non validi),
@@ -73,7 +77,10 @@ public class TransactionController {
 			redirectAttributes.addFlashAttribute("openAllForms", true);
 			return "redirect:/" + username + "/account/" + accountId;
 		}
-		redirectAttributes.addFlashAttribute("successMessage", "Transazione aggiunta con successo!");
+
+		redirectAttributes.addFlashAttribute("successMessage",
+				"Transazione aggiunta con successo!"
+						+ (budgetUpdated.get() ? "\nÈ stato decrementato un budget." : ""));
 
 		return "redirect:/" + username + "/account/" + accountId;
 	}
