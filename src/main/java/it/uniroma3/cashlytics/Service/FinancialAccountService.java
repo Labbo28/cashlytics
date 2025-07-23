@@ -23,7 +23,7 @@ public class FinancialAccountService {
     UserService userService;
 
     public List<FinancialAccount> getAllFinancialAccountByUsername(String username) {
-        return financialAccountRepository.findByUser_Credentials_Username(username);
+        return financialAccountRepository.findByUser_Username(username);
     }
 
     public FinancialAccount createFinancialAccount(FinancialAccountDTO financialAccountDTO, User user)

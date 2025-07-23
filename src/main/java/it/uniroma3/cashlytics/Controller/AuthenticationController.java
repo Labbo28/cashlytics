@@ -13,26 +13,21 @@ import it.uniroma3.cashlytics.DTO.UserLoginDTO;
 import it.uniroma3.cashlytics.DTO.UserRegistrationDTO;
 import it.uniroma3.cashlytics.Exceptions.EmailAlreadyExistsException;
 import it.uniroma3.cashlytics.Exceptions.UserAlreadyExistsException;
-import it.uniroma3.cashlytics.Service.AutenticationService;
+import it.uniroma3.cashlytics.Service.AuthenticationService;
 import jakarta.validation.Valid;
 
 /**
  * Controller handling authentication-related requests including user
- * registration and login.
- * Maps HTTP requests to their respective view templates and services.
+ * registration and login (both form and OAuth2).
  */
 @Controller
-public class AutententicationController {
+public class AuthenticationController {
 
     @Autowired
-    private AutenticationService autenticationService;
+    private AuthenticationService authenticationService;
 
     /**
      * Displays the registration page.
-     * Adds an empty userRegistrationDTO to the model if not already present.
-     *
-     * @param model The Spring MVC model
-     * @return The name of the register template
      */
     @GetMapping("/register")
     public String getRegisterPage(Model model) {
@@ -44,22 +39,13 @@ public class AutententicationController {
 
     /**
      * Handles the user registration form submission.
-     * Validates input data, attempts to register the user, and handles possible
-     * errors.
-     *
-     * @param userRegistrationDTO The DTO with registration information from the
-     *                            form
-     * @param bindingResult       Object containing validation results
-     * @param redirectAttributes  Object for passing attributes through a redirect
-     * @param model               The Spring MVC model
-     * @return The view name to render (either back to register page or redirect to
-     *         login)
      */
     @PostMapping("/register")
     public String registerUser(@Valid UserRegistrationDTO userRegistrationDTO,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes,
             Model model) {
+        
         // Check for validation errors from form inputs
         if (bindingResult.hasErrors()) {
             return "register";
@@ -67,13 +53,13 @@ public class AutententicationController {
 
         try {
             // Attempt to register the user
-            autenticationService.registerUser(userRegistrationDTO);
+            authenticationService.registerUser(userRegistrationDTO);
 
             // Add success message that will appear on the login page
             redirectAttributes.addFlashAttribute("successMessage",
                     "Registration successful! You can now login.");
 
-            return "redirect:/";
+            return "redirect:/login";
         } catch (UserAlreadyExistsException e) {
             // Handle username already taken scenario
             bindingResult.rejectValue("username", "error.username", e.getMessage());
@@ -93,15 +79,25 @@ public class AutententicationController {
     }
 
     @GetMapping("/login")
-    public String GetLoginPage(Model model,
+    public String getLoginPage(Model model,
             @RequestParam(required = false) String error) {
+        
         if (!model.containsAttribute("userLoginDTO")) {
             model.addAttribute("userLoginDTO", new UserLoginDTO());
         }
+        
         if (error != null) {
-            model.addAttribute("errorMessage", "Invalid username or password.");
+            switch (error) {
+                case "oauth2":
+                    model.addAttribute("errorMessage", "OAuth2 authentication failed. Please try again.");
+                    break;
+                case "true":
+                default:
+                    model.addAttribute("errorMessage", "Invalid email or password.");
+                    break;
+            }
         }
+        
         return "login";
     }
-
 }

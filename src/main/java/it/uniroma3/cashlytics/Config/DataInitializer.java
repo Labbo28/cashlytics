@@ -6,17 +6,13 @@ import java.util.HashSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import it.uniroma3.cashlytics.Model.Credentials;
 import it.uniroma3.cashlytics.Model.FinancialAccount;
 import it.uniroma3.cashlytics.Model.Transaction;
 import it.uniroma3.cashlytics.Model.User;
 import it.uniroma3.cashlytics.Model.Enums.AccountType;
 import it.uniroma3.cashlytics.Model.Enums.RecurrencePattern;
 import it.uniroma3.cashlytics.Model.Enums.TransactionType;
-import it.uniroma3.cashlytics.Repository.CredentialsRepository;
 import it.uniroma3.cashlytics.Repository.UserRepository;
 
 @Component
@@ -25,40 +21,19 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private CredentialsRepository credentialsRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {
         System.out.println("Running DataInitializer...");
-        if (userRepository.findByCredentials_Username("admin").isEmpty()) {
-            User admin = new User("admin@cashlytics.com", "Admin", "Admin", "1234567890");
-            admin.setFinancialAccounts(new HashSet<>()); // Importante!
-
-            Credentials adminCreds = new Credentials("admin", passwordEncoder.encode("Password123"));
-            adminCreds.setUser(admin);
-            admin.setCredentials(adminCreds);
-
-            userRepository.save(admin);
-            credentialsRepository.save(adminCreds);
-        }
-
         User user;
-        if (userRepository.findByCredentials_Username("user").isEmpty()) {
-            user = new User("user@cashlytics.com", "User", "User", "1234567891");
+        if (userRepository.findByUsername("user").isEmpty()) {
+            user = new User("user@cashlytics.com", "user",
+            "Password123", "User", "User", "1234567890");
             user.setFinancialAccounts(new HashSet<>()); // Importante!
-
-            Credentials userCreds = new Credentials("user", passwordEncoder.encode("Password123"));
-            userCreds.setUser(user);
-            user.setCredentials(userCreds);
-
             userRepository.save(user);
-            credentialsRepository.save(userCreds);
+            
         } else {
-            user = userRepository.findByCredentials_Username("user").orElseThrow();
+            user = userRepository.findByUsername("user").orElseThrow();
             if (user.getFinancialAccounts() == null) {
                 user.setFinancialAccounts(new HashSet<>()); // fallback
             }
@@ -70,10 +45,6 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
-    private void resetAccounts(User user) {
-        user.getFinancialAccounts().clear();
-        userRepository.save(user);
-    }
 
     private void initUserData(User user) {
         // Crea account

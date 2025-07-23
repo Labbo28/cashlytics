@@ -14,7 +14,6 @@ public interface FinancialAccountRepository extends JpaRepository<FinancialAccou
     /**
      * Trova tutti gli account finanziari di un utente tramite username
      */
-    List<FinancialAccount> findByUser_Credentials_Username(String username);
 
     /**
      * Trova tutti gli account finanziari di un utente tramite user ID
@@ -24,19 +23,21 @@ public interface FinancialAccountRepository extends JpaRepository<FinancialAccou
     /**
      * Calcola il bilancio totale di un utente
      */
-    @Query("SELECT COALESCE(SUM(fa.balance), 0) FROM FinancialAccount fa WHERE fa.user.credentials.username = :username")
+    @Query("SELECT COALESCE(SUM(fa.balance), 0) FROM FinancialAccount fa WHERE fa.user.username = :username")
     BigDecimal getTotalBalanceByUsername(@Param("username") String username);
 
     /**
      * Trova gli account per tipo
      */
-    List<FinancialAccount> findByUser_Credentials_UsernameAndType(String username,
+    List<FinancialAccount> findByUser_UsernameAndType(String username,
             it.uniroma3.cashlytics.Model.Enums.AccountType accountType);
 
     /**
      * Conta il numero di account di un utente
      */
-    @Query("SELECT COUNT(fa) FROM FinancialAccount fa WHERE fa.user.credentials.username = :username")
+    @Query("SELECT COUNT(fa) FROM FinancialAccount fa WHERE fa.user.username = :username")
     long countByUsername(@Param("username") String username);
+
+    List<FinancialAccount> findByUser_Username(String username);
 
 }
