@@ -147,14 +147,15 @@
                                 <option value="">Seleziona categoria</option>
 
                                 <!-- Itera attraverso tutte le categorie principali -->
-                                <optgroup th:each="category : ${categories}" th:if="${category.parentCategory == null}"
-                                    th:label="${category.name}">
-                                    <!-- Categoria principale -->
-                                    <option th:value="${category.id}" th:text="${category.name}"></option>
-                                    <!-- Sottocategorie se presenti -->
-                                    <option th:each="subcat : ${category.subCategories}" th:value="${subcat.id}"
-                                        th:text="${'  └─ ' + subcat.name}"></option>
-                                </optgroup>
+                                < Itera attraverso tutte le categorie principali -->
+                                    <optgroup th:each="category : ${categories}"
+                                        th:if="${category.parentCategory == null}" th:label="${category.name}">
+                                        <!-- Categoria principale -->
+                                        <option th:value="${category.id}" th:text="${category.name}"></option>
+                                        <!-- Sottocategorie se presenti -->
+                                        <option th:each="subcat : ${category.subCategories}" th:value="${subcat.id}"
+                                            th:text="${'  └─ ' + subcat.name}"></option>
+                                    </optgroup>
                             </select>
                             <span class="error" th:if="${#fields.hasErrors('categoryId')}"
                                 th:errors="*{categoryId}"></span>
