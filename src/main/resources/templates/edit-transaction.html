@@ -66,7 +66,7 @@
                         <select id="merchantId" th:field="*{merchantId}"
                             style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;"
                             onchange="handleMerchantSelection(this)">
-                            <option value="">Seleziona esercente</option>
+                            <option value="">Rimuovi esercente</option>
                             <option th:each="merchant : ${merchants}" th:value="${merchant.id}"
                                 th:text="${merchant.name}"></option>
                             <option data-add-new="true" value="">+ Aggiungi nuovo esercente</option>
@@ -79,16 +79,25 @@
 
                     <!-- Categoria -->
                     <div class="form-group">
-                        <label for="categoryId">Categoria (facoltativa)</label>
+                        <label for="categoryId">Categoria (viene usata per aggiornare il
+                            budget)<!--span style="color: red;">*</span-->
+                        </label>
                         <select id="categoryId" th:field="*{categoryId}"
                             style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;"
-                            onchange="handleCategorySelection(this)">
+                            required>
                             <option value="">Seleziona categoria</option>
-                            <option th:each="category : ${categories}" th:value="${category.id}"
-                                th:text="${category.name}"></option>
-                            <!--option data-add-new="true" value="">+ Aggiungi nuova categoria</option-->
-                        </select>
 
+                            <!-- Itera attraverso tutte le categorie principali -->
+                            <optgroup th:each="category : ${categories}" th:if="${category.parentCategory == null}"
+                                th:label="${category.name}">
+                                <!-- Categoria principale -->
+                                <option th:value="${category.id}" th:text="${category.name}"></option>
+                                <!-- Sottocategorie se presenti -->
+                                <option th:each="subcat : ${category.subCategories}" th:value="${subcat.id}"
+                                    th:text="${'  └─ ' + subcat.name}"></option>
+                            </optgroup>
+                        </select>
+                        <span class="error" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></span>
                         <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--neutral-dark);">
                             <i class="fas fa-info-circle"></i>
                             <a th:href="@{'/' + ${username} + '/categories'}"
@@ -96,12 +105,10 @@
                                 Gestisci le tue categorie
                             </a>
                         </p>
-
                     </div>
 
-                    <!-- Form per nuova categoria (nascosto di default)
+                    <!-- Form per nuova categoria
                     <div id="newCategoryForm" th:replace="~{fragments.html :: newCategoryForm}" style="display:none;"></div-->
-
                     <!-- Descrizione -->
                     <div class="form-group">
                         <label for="description">Descrizione (facoltativa)</label>
