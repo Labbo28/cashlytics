@@ -26,8 +26,8 @@
         <!-- Header con breadcrumb -->
         <div style="margin-bottom: 2rem;">
             <nav style="margin-bottom: 2rem;">
-                <a th:href="@{'/' + ${username} + '/dashboard'}" style="color: var(--primary); text-decoration: none;">
-                    <i class="fas fa-arrow-left"></i> Torna alla dashboard
+                <a href="#" onclick="window.history.back(); return false;" style="color: var(--primary); text-decoration: none;">
+                    <i class="fas fa-arrow-left"></i> Torna alla pagina precedente
                 </a>
             </nav>
         </div>
