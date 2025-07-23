@@ -369,25 +369,6 @@
 						</form>
 					</div>
 				</div>
-
-				<!-- Categoria badge -->
-				<div th:if="${b.category != null}" class="category-badge" th:title="${b.category.name}"
-					th:style="'background-color: ' + ${b.category.color} + '; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.9rem; margin-right: 0.7rem; width: 2.2rem; height: 2.2rem; border-radius: 50%;'">
-					<i th:class="${b.category.icon}"></i>
-				</div>
-
-				<!-- Importo -->
-				<h3 style="font-size: 1.3rem; font-weight: 600;"
-					th:style="${b.amount >= 0} ? 'color: var(--accent);' : 'color: var(--warning);'">
-					<span
-						th:text="${b.amount < 0 ? '-€' + #numbers.formatDecimal(b.amount.abs(),1,2) : '€' + #numbers.formatDecimal(b.amount,1,2)}">
-						€0.00
-					</span>
-				</h3>
-				<!-- Descrizione -->
-				<h3 th:text="${b.description}" style="margin-bottom: 0.25rem;">Budget</h3>
-				<!-- Data -->
-				<p><span th:text="${#temporals.format(b.date,'dd/MM/yyyy')}">01/01/2025</span></p>
 			</div>
 		</div>
 	</div>
