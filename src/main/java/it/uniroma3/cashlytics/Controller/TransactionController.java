@@ -93,6 +93,7 @@ public class TransactionController {
 			@RequestParam(required = false) String merchantId,
 			@RequestParam(required = false) String description,
 			@RequestParam(required = false, defaultValue = "false") boolean onlyRecurring,
+			@RequestParam(required = false) Long categoryId,
 			Model model) {
 		FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
 		User user = userService.getUserByUsername(username);
@@ -100,7 +101,7 @@ public class TransactionController {
 		// Filtro delle transazioni in base ai parametri
 		List<Transaction> transactions = transactionService.filterTransactions(
 				accountId, minAmount, maxAmount, transactionType,
-				startDate, endDate, merchantId, description, onlyRecurring);
+				startDate, endDate, merchantId, description, onlyRecurring, categoryId);
 
 		BigDecimal totalIncome = transactions.stream()
 				.filter(t -> t.getAmount().compareTo(BigDecimal.ZERO) > 0)
@@ -130,6 +131,7 @@ public class TransactionController {
 		paramMap.put("merchantId", merchantId);
 		paramMap.put("description", description);
 		paramMap.put("onlyRecurring", onlyRecurring);
+		paramMap.put("categoryId", categoryId);
 
 		model.addAttribute("param", paramMap);
 		model.addAttribute("account", account);

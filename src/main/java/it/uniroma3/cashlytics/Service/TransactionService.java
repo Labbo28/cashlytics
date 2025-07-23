@@ -174,7 +174,8 @@ if (!isIncome && category != null) {
             LocalDate endDate,
             String merchantId,
             String description,
-            boolean onlyRecurring) {
+            boolean onlyRecurring,
+            Long categoryId) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Transaction> cq = cb.createQuery(Transaction.class);
@@ -208,6 +209,9 @@ if (!isIncome && category != null) {
         }
         if (onlyRecurring) {
             predicates.add(cb.notEqual(root.get("recurrence"), RecurrencePattern.UNA_TANTUM));
+        }
+        if (categoryId != null) {
+            predicates.add(cb.equal(root.get("category").get("id"), categoryId));
         }
 
         cq.where(cb.and(predicates.toArray(new Predicate[0])));

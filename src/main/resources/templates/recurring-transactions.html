@@ -110,6 +110,25 @@
                             </select>
                         </div>
 
+                        <!-- Filtro per Categoria -->
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-tags"></i> Categoria
+                            </label>
+                            <select name="categoryId"
+                                style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;">
+                                <option value="">Tutte le categorie</option>
+                                <optgroup th:each="category : ${categories}" th:if="${category.parentCategory == null}"
+                                    th:label="${category.name}">
+                                    <option th:value="${category.id}" th:text="${category.name}"
+                                        th:selected="${param.categoryId != null and param.categoryId == category.id}"></option>
+                                    <option th:each="subcat : ${category.subCategories}" th:value="${subcat.id}"
+                                        th:text="${'  └─ ' + subcat.name}"
+                                        th:selected="${param.categoryId != null and param.categoryId == subcat.id}"></option>
+                                </optgroup>
+                            </select>
+                        </div>
+
                         <!-- Filtro per Descrizione -->
                         <div class="form-group">
                             <label>
