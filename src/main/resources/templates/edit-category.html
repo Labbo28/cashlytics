@@ -1,21 +1,4 @@
-function selectIcon(iconClass, iconName) {
-            const iconInput = document.getElementById('icon');
-            const iconPreview = document.getElementById('iconPreview');
-            const previewIcon = document.getElementById('previewIcon');
-            const iconSelectedText = document.getElementById('iconSelectedText');
-            
-            iconInput.value = iconClass;
-            iconPreview.innerHTML = `<i class="${iconClass}" style="font-size: 1.5rem; color: var(--primary);"></i>`;
-            iconSelectedText.textContent = iconName || 'Icona selezionata';
-            
-            if (previewIcon) {
-                previewIcon.className = iconClass;
-            }
-            
-            // Reset tutti i bordi delle icone
-            document.querySelectorAll('.icon-selector').forEach(btn => {
-                btn.style.borderColor = 'var(--neutral-mid)';
-                btn.style<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -39,18 +22,18 @@ function selectIcon(iconClass, iconName) {
     <main class="container" style="padding: 2rem;">
         <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
         <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-        
+
         <!-- Header con breadcrumb -->
         <div style="margin-bottom: 2rem;">
-            <nav style="margin-bottom: 1rem;">
+            <nav style="margin-bottom: 2rem;">
                 <a th:href="@{'/' + ${username} + '/categories'}" style="color: var(--primary); text-decoration: none;">
-                    <i class="fas fa-arrow-left"></i> Torna alle Categorie
+                    <i class="fas fa-arrow-left"></i> Torna alle categorie
                 </a>
             </nav>
             <h1>Modifica Categoria</h1>
-            <p style="color: var(--neutral-dark); margin-top: 0.5rem;">
+            <!--p style="color: var(--neutral-dark); margin-top: 0.5rem;">
                 Modifica i dettagli della categoria "<span th:text="${category.name}">Nome Categoria</span>"
-            </p>
+            </p-->
         </div>
 
         <!-- Anteprima categoria attuale -->
@@ -59,14 +42,16 @@ function selectIcon(iconClass, iconName) {
                 <i class="fas fa-eye"></i> Anteprima Attuale
             </h3>
             <div style="display: flex; align-items: center; gap: 1rem;">
-                <div class="category-badge" 
-                     th:style="'background-color: ' + ${category.color} + '; width: 3rem; height: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;'">
+                <div class="category-badge"
+                    th:style="'background-color: ' + ${category.color} + '; width: 3rem; height: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;'">
                     <i th:class="${category.icon}" style="font-size: 1.5rem; color: white;"></i>
                 </div>
                 <div>
                     <h4 th:text="${category.name}" style="margin: 0; font-size: 1.2rem;">Nome Categoria</h4>
                     <p style="margin: 0; color: var(--neutral-dark); font-size: 0.9rem;">
-                        <span th:if="${category.parentCategory}" th:text="'Sottocategoria di: ' + ${category.parentCategory.name}">Categoria principale</span>
+                        <span th:if="${category.parentCategory}"
+                            th:text="'Sottocategoria di: ' + ${category.parentCategory.name}">Categoria
+                            principale</span>
                         <span th:unless="${category.parentCategory}">Categoria principale</span>
                     </p>
                 </div>
@@ -80,12 +65,12 @@ function selectIcon(iconClass, iconName) {
 
                 <!-- CSRF Token -->
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                
+
                 <!-- Nome categoria -->
                 <div class="form-group">
                     <label for="name">Nome Categoria <span style="color: red;">*</span></label>
-                    <input type="text" id="name" th:field="*{name}" 
-                           placeholder="Es. Alimentari, Trasporti, Intrattenimento..." required />
+                    <input type="text" id="name" th:field="*{name}"
+                        placeholder="Es. Alimentari, Trasporti, Intrattenimento..." required />
                     <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
                 </div>
 
@@ -95,14 +80,13 @@ function selectIcon(iconClass, iconName) {
                     <select id="parentCategoryId" th:field="*{parentCategoryId}"
                         style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;">
                         <option value="">Categoria principale</option>
-                        <option th:each="cat : ${categories}" 
-                                th:if="${cat.id != category.id}"
-                                th:value="${cat.id}" 
-                                th:text="${cat.name}">Categoria</option>
+                        <option th:each="cat : ${categories}" th:if="${cat.id != category.id}" th:value="${cat.id}"
+                            th:text="${cat.name}">Categoria</option>
                     </select>
                     <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--neutral-dark);">
-                        <i class="fas fa-info-circle"></i> 
-                        Seleziona una categoria esistente per creare una sottocategoria. Non puoi selezionare la categoria stessa.
+                        <i class="fas fa-info-circle"></i>
+                        Seleziona una categoria esistente per creare una sottocategoria. Non puoi selezionare la
+                        categoria stessa.
                     </p>
                 </div>
 
@@ -111,73 +95,113 @@ function selectIcon(iconClass, iconName) {
                     <label for="icon">Icona <span style="color: red;">*</span></label>
                     <!-- Campo nascosto per l'icona -->
                     <input type="hidden" id="icon" th:field="*{icon}" />
-                    
+
                     <!-- Anteprima icona selezionata -->
                     <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
-                        <div id="iconPreview" style="width: 3rem; height: 3rem; display: flex; align-items: center; justify-content: center; border: 2px solid var(--primary); border-radius: var(--radius-md); background-color: var(--neutral-light);">
+                        <div id="iconPreview"
+                            style="width: 3rem; height: 3rem; display: flex; align-items: center; justify-content: center; border: 2px solid var(--primary); border-radius: var(--radius-md); background-color: var(--neutral-light);">
                             <i th:class="${categoryDTO.icon}" style="font-size: 1.5rem; color: var(--primary);"></i>
                         </div>
-                        <span id="iconSelectedText" style="font-weight: 500; color: var(--primary);">Icona selezionata</span>
+                        <span id="iconSelectedText" style="font-weight: 500; color: var(--primary);">Icona
+                            selezionata</span>
                     </div>
-                    
+
                     <span class="error" th:if="${#fields.hasErrors('icon')}" th:errors="*{icon}"></span>
-                    
+
                     <!-- Griglia icone selezionabili -->
                     <div style="margin-top: 1rem;">
                         <p style="margin-bottom: 1rem; font-weight: 500;">Scegli un'icona:</p>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(3.5rem, 1fr)); gap: 0.75rem; max-width: 35rem; border: 1px solid var(--neutral-light); border-radius: var(--radius-md); padding: 1rem;">
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-shopping-cart', 'Spesa')" data-icon="fas fa-shopping-cart" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(3.5rem, 1fr)); gap: 0.75rem; max-width: 35rem; border: 1px solid var(--neutral-light); border-radius: var(--radius-md); padding: 1rem;">
+                            <button type="button" class="icon-selector"
+                                onclick="selectIcon('fas fa-shopping-cart', 'Spesa')" data-icon="fas fa-shopping-cart"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-shopping-cart" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-car', 'Trasporti')" data-icon="fas fa-car" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-car', 'Trasporti')"
+                                data-icon="fas fa-car"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-car" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-home', 'Casa')" data-icon="fas fa-home" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-home', 'Casa')"
+                                data-icon="fas fa-home"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-home" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-utensils', 'Ristoranti')" data-icon="fas fa-utensils" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector"
+                                onclick="selectIcon('fas fa-utensils', 'Ristoranti')" data-icon="fas fa-utensils"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-utensils" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-film', 'Intrattenimento')" data-icon="fas fa-film" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector"
+                                onclick="selectIcon('fas fa-film', 'Intrattenimento')" data-icon="fas fa-film"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-film" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-heartbeat', 'Salute')" data-icon="fas fa-heartbeat" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector"
+                                onclick="selectIcon('fas fa-heartbeat', 'Salute')" data-icon="fas fa-heartbeat"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-heartbeat" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-graduation-cap', 'Istruzione')" data-icon="fas fa-graduation-cap" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector"
+                                onclick="selectIcon('fas fa-graduation-cap', 'Istruzione')"
+                                data-icon="fas fa-graduation-cap"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-graduation-cap" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-gamepad', 'Giochi')" data-icon="fas fa-gamepad" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-gamepad', 'Giochi')"
+                                data-icon="fas fa-gamepad"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-gamepad" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-plane', 'Viaggi')" data-icon="fas fa-plane" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-plane', 'Viaggi')"
+                                data-icon="fas fa-plane"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-plane" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-dumbbell', 'Sport')" data-icon="fas fa-dumbbell" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-dumbbell', 'Sport')"
+                                data-icon="fas fa-dumbbell"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-dumbbell" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-book', 'Libri')" data-icon="fas fa-book" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-book', 'Libri')"
+                                data-icon="fas fa-book"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-book" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-gift', 'Regali')" data-icon="fas fa-gift" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-gift', 'Regali')"
+                                data-icon="fas fa-gift"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-gift" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-coffee', 'Caffè')" data-icon="fas fa-coffee" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-coffee', 'Caffè')"
+                                data-icon="fas fa-coffee"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-coffee" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-gas-pump', 'Benzina')" data-icon="fas fa-gas-pump" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector"
+                                onclick="selectIcon('fas fa-gas-pump', 'Benzina')" data-icon="fas fa-gas-pump"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-gas-pump" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-tools', 'Manutenzione')" data-icon="fas fa-tools" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector"
+                                onclick="selectIcon('fas fa-tools', 'Manutenzione')" data-icon="fas fa-tools"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-tools" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-tshirt', 'Abbigliamento')" data-icon="fas fa-tshirt" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector"
+                                onclick="selectIcon('fas fa-tshirt', 'Abbigliamento')" data-icon="fas fa-tshirt"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-tshirt" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-piggy-bank', 'Risparmi')" data-icon="fas fa-piggy-bank" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector"
+                                onclick="selectIcon('fas fa-piggy-bank', 'Risparmi')" data-icon="fas fa-piggy-bank"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-piggy-bank" style="font-size: 1.2rem;"></i>
                             </button>
-                            <button type="button" class="icon-selector" onclick="selectIcon('fas fa-euro-sign', 'Generale')" data-icon="fas fa-euro-sign" style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <button type="button" class="icon-selector"
+                                onclick="selectIcon('fas fa-euro-sign', 'Generale')" data-icon="fas fa-euro-sign"
+                                style="width: 3.5rem; height: 3.5rem; border: 2px solid var(--neutral-mid); border-radius: var(--radius-md); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                                 <i class="fas fa-euro-sign" style="font-size: 1.2rem;"></i>
                             </button>
                         </div>
@@ -189,32 +213,73 @@ function selectIcon(iconClass, iconName) {
                     <label for="color">Colore <span style="color: red;">*</span></label>
                     <!-- Campo nascosto per il colore -->
                     <input type="hidden" id="color" th:field="*{color}" />
-                    
+
                     <!-- Anteprima colore selezionato -->
                     <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
-                        <div id="colorPreview" th:style="'width: 3rem; height: 3rem; border-radius: 50%; border: 2px solid var(--primary); background-color: ' + ${categoryDTO.color}"></div>
-                        <span id="colorSelectedText" style="font-weight: 500; color: var(--primary);">Colore selezionato</span>
-                        <span id="colorHexDisplay" th:text="${categoryDTO.color}" style="font-family: monospace; color: var(--neutral-dark); font-size: 0.9rem;"></span>
+                        <div id="colorPreview"
+                            th:style="'width: 3rem; height: 3rem; border-radius: 50%; border: 2px solid var(--primary); background-color: ' + ${categoryDTO.color}">
+                        </div>
+                        <span id="colorSelectedText" style="font-weight: 500; color: var(--primary);">Colore
+                            selezionato</span>
+                        <span id="colorHexDisplay" th:text="${categoryDTO.color}"
+                            style="font-family: monospace; color: white; font-size: 0.9rem;"></span>
                     </div>
-                    
+
                     <span class="error" th:if="${#fields.hasErrors('color')}" th:errors="*{color}"></span>
-                    
+
                     <!-- Palette colori predefiniti -->
                     <div style="margin-top: 1rem;">
                         <p style="margin-bottom: 1rem; font-weight: 500;">Scegli un colore:</p>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr)); gap: 0.75rem; max-width: 30rem; border: 1px solid var(--neutral-light); border-radius: var(--radius-md); padding: 1rem;">
-                            <button type="button" class="color-selector" onclick="selectColor('#E53E3E', 'Rosso')" data-color="#E53E3E" style="width: 3rem; height: 3rem; background-color: #E53E3E; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;" title="Rosso"></button>
-                            <button type="button" class="color-selector" onclick="selectColor('#38A169', 'Verde')" data-color="#38A169" style="width: 3rem; height: 3rem; background-color: #38A169; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;" title="Verde"></button>
-                            <button type="button" class="color-selector" onclick="selectColor('#3182CE', 'Blu')" data-color="#3182CE" style="width: 3rem; height: 3rem; background-color: #3182CE; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;" title="Blu"></button>
-                            <button type="button" class="color-selector" onclick="selectColor('#D69E2E', 'Giallo')" data-color="#D69E2E" style="width: 3rem; height: 3rem; background-color: #D69E2E; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;" title="Giallo"></button>
-                            <button type="button" class="color-selector" onclick="selectColor('#9F7AEA', 'Violetto')" data-color="#9F7AEA" style="width: 3rem; height: 3rem; background-color: #9F7AEA; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;" title="Violetto"></button>
-                            <button type="button" class="color-selector" onclick="selectColor('#ED8936', 'Arancione')" data-color="#ED8936" style="width: 3rem; height: 3rem; background-color: #ED8936; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;" title="Arancione"></button>
-                            <button type="button" class="color-selector" onclick="selectColor('#38B2AC', 'Turchese')" data-color="#38B2AC" style="width: 3rem; height: 3rem; background-color: #38B2AC; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;" title="Turchese"></button>
-                            <button type="button" class="color-selector" onclick="selectColor('#E91E63', 'Rosa')" data-color="#E91E63" style="width: 3rem; height: 3rem; background-color: #E91E63; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;" title="Rosa"></button>
-                            <button type="button" class="color-selector" onclick="selectColor('#607D8B', 'Grigio Blu')" data-color="#607D8B" style="width: 3rem; height: 3rem; background-color: #607D8B; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;" title="Grigio Blu"></button>
-                            <button type="button" class="color-selector" onclick="selectColor('#795548', 'Marrone')" data-color="#795548" style="width: 3rem; height: 3rem; background-color: #795548; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;" title="Marrone"></button>
-                            <button type="button" class="color-selector" onclick="selectColor('#FF5722', 'Rosso Scuro')" data-color="#FF5722" style="width: 3rem; height: 3rem; background-color: #FF5722; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;" title="Rosso Scuro"></button>
-                            <button type="button" class="color-selector" onclick="selectColor('#4CAF50', 'Verde Chiaro')" data-color="#4CAF50" style="width: 3rem; height: 3rem; background-color: #4CAF50; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;" title="Verde Chiaro"></button>
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr)); gap: 0.75rem; max-width: 30rem; border: 1px solid var(--neutral-light); border-radius: var(--radius-md); padding: 1rem;">
+                            <button type="button" class="color-selector" onclick="selectColor('#E53E3E', 'Rosso')"
+                                data-color="#E53E3E"
+                                style="width: 3rem; height: 3rem; background-color: #E53E3E; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;"
+                                title="Rosso"></button>
+                            <button type="button" class="color-selector" onclick="selectColor('#38A169', 'Verde')"
+                                data-color="#38A169"
+                                style="width: 3rem; height: 3rem; background-color: #38A169; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;"
+                                title="Verde"></button>
+                            <button type="button" class="color-selector" onclick="selectColor('#3182CE', 'Blu')"
+                                data-color="#3182CE"
+                                style="width: 3rem; height: 3rem; background-color: #3182CE; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;"
+                                title="Blu"></button>
+                            <button type="button" class="color-selector" onclick="selectColor('#D69E2E', 'Giallo')"
+                                data-color="#D69E2E"
+                                style="width: 3rem; height: 3rem; background-color: #D69E2E; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;"
+                                title="Giallo"></button>
+                            <button type="button" class="color-selector" onclick="selectColor('#9F7AEA', 'Violetto')"
+                                data-color="#9F7AEA"
+                                style="width: 3rem; height: 3rem; background-color: #9F7AEA; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;"
+                                title="Violetto"></button>
+                            <button type="button" class="color-selector" onclick="selectColor('#ED8936', 'Arancione')"
+                                data-color="#ED8936"
+                                style="width: 3rem; height: 3rem; background-color: #ED8936; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;"
+                                title="Arancione"></button>
+                            <button type="button" class="color-selector" onclick="selectColor('#38B2AC', 'Turchese')"
+                                data-color="#38B2AC"
+                                style="width: 3rem; height: 3rem; background-color: #38B2AC; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;"
+                                title="Turchese"></button>
+                            <button type="button" class="color-selector" onclick="selectColor('#E91E91', 'Rosa')"
+                                data-color="#E91E91"
+                                style="width: 3rem; height: 3rem; background-color: #E91E91; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;"
+                                title="Rosa"></button>
+                            <button type="button" class="color-selector" onclick="selectColor('#607D8B', 'Grigio Blu')"
+                                data-color="#607D8B"
+                                style="width: 3rem; height: 3rem; background-color: #607D8B; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;"
+                                title="Grigio Blu"></button>
+                            <button type="button" class="color-selector" onclick="selectColor('#795548', 'Marrone')"
+                                data-color="#795548"
+                                style="width: 3rem; height: 3rem; background-color: #795548; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;"
+                                title="Marrone"></button>
+                            <button type="button" class="color-selector" onclick="selectColor('#FF5722', 'Rosso Scuro')"
+                                data-color="#FF5722"
+                                style="width: 3rem; height: 3rem; background-color: #FF5722; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;"
+                                title="Rosso Scuro"></button>
+                            <button type="button" class="color-selector"
+                                onclick="selectColor('#4CAF50', 'Verde Chiaro')" data-color="#4CAF50"
+                                style="width: 3rem; height: 3rem; background-color: #4CAF50; border: 2px solid var(--neutral-mid); border-radius: 50%; cursor: pointer; transition: all 0.2s;"
+                                title="Verde Chiaro"></button>
                         </div>
                     </div>
                 </div>
@@ -222,14 +287,17 @@ function selectIcon(iconClass, iconName) {
                 <!-- Anteprima modifiche -->
                 <div class="form-group">
                     <label>Anteprima Modifiche</label>
-                    <div class="feature-card" style="background-color: var(--neutral-light); border: 2px dashed var(--primary);">
+                    <div class="feature-card"
+                        style="background-color: var(--neutral-light); border: 2px dashed var(--primary);">
                         <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div id="previewBadge" class="category-badge" 
-                                 th:style="'background-color: ' + ${categoryDTO.color} + '; width: 3rem; height: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;'">
-                                <i id="previewIcon" th:class="${categoryDTO.icon}" style="font-size: 1.5rem; color: white;"></i>
+                            <div id="previewBadge" class="category-badge"
+                                th:style="'background-color: ' + ${categoryDTO.color} + '; width: 3rem; height: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;'">
+                                <i id="previewIcon" th:class="${categoryDTO.icon}"
+                                    style="font-size: 1.5rem; color: white;"></i>
                             </div>
                             <div>
-                                <h4 id="previewName" th:text="${categoryDTO.name}" style="margin: 0; font-size: 1.2rem;">Nome Categoria</h4>
+                                <h4 id="previewName" th:text="${categoryDTO.name}"
+                                    style="margin: 0; font-size: 1.2rem;">Nome Categoria</h4>
                                 <p id="previewParent" style="margin: 0; color: var(--neutral-dark); font-size: 0.9rem;">
                                     Categoria principale
                                 </p>
@@ -243,7 +311,8 @@ function selectIcon(iconClass, iconName) {
                     <button type="submit" class="btn btn-primary" style="flex: 1;">
                         <i class="fas fa-save"></i> Salva Modifiche
                     </button>
-                    <a th:href="@{'/' + ${username} + '/categories'}" class="btn btn-secondary" style="flex: 1; text-align: center;">
+                    <a th:href="@{'/' + ${username} + '/categories'}" class="btn btn-secondary"
+                        style="flex: 1; text-align: center;">
                         <i class="fas fa-times"></i> Annulla
                     </a>
                 </div>
@@ -252,12 +321,14 @@ function selectIcon(iconClass, iconName) {
 
         <!-- Sezione informazioni -->
         <div class="feature-card" style="margin-top: 2rem; background-color: #FFF3CD; border-left: 4px solid #D69E2E;">
-            <div style="display: flex; gap: 1rem;">
-                <i class="fas fa-exclamation-triangle" style="color: #D69E2E; font-size: 1.5rem; margin-top: 0.25rem;"></i>
+            <div style="display: flex; gap: 1rem; margin-top: 0rem;">
+                <i class="fas fa-exclamation-triangle"
+                    style="color: #D69E2E; font-size: 1.5rem; margin-top: 0.25rem;"></i>
                 <div>
                     <h4 style="margin: 0 0 0.5rem 0; color: #D69E2E;">Attenzione</h4>
                     <p style="margin: 0; color: #8B5A00; font-size: 0.9rem;">
-                        Le modifiche alla categoria verranno applicate a tutte le transazioni e budget esistenti che utilizzano questa categoria. 
+                        Le modifiche alla categoria verranno applicate a tutte le transazioni e budget esistenti che
+                        utilizzano questa categoria.
                         Se la categoria ha delle sottocategorie, anche quelle verranno aggiornate di conseguenza.
                     </p>
                 </div>
@@ -269,17 +340,17 @@ function selectIcon(iconClass, iconName) {
     <div th:replace="~{fragments.html :: siteFooter}"></div>
 
     <script th:src="@{/js/main.js}"></script>
-    
+
     <script>
         function selectIcon(iconClass) {
             const iconInput = document.getElementById('icon');
             const iconPreview = document.getElementById('iconPreview');
             const previewIcon = document.getElementById('previewIcon');
-            
+
             iconInput.value = iconClass;
             iconPreview.innerHTML = `<i class="${iconClass}" style="font-size: 1.5rem; color: var(--primary);"></i>`;
             previewIcon.className = iconClass;
-            
+
             // Evidenzia temporaneamente il bottone selezionato
             event.target.closest('button').style.borderColor = 'var(--primary)';
             setTimeout(() => {
@@ -291,11 +362,11 @@ function selectIcon(iconClass, iconName) {
             const colorPicker = document.getElementById('colorPicker');
             const colorText = document.getElementById('colorText');
             const previewBadge = document.getElementById('previewBadge');
-            
+
             colorPicker.value = colorHex;
             colorText.value = colorHex;
             previewBadge.style.backgroundColor = colorHex;
-            
+
             // Evidenzia temporaneamente il colore selezionato
             event.target.style.transform = 'scale(1.2)';
             setTimeout(() => {
@@ -306,7 +377,7 @@ function selectIcon(iconClass, iconName) {
         function updateColorPreview(colorValue) {
             const colorPicker = document.getElementById('colorPicker');
             const previewBadge = document.getElementById('previewBadge');
-            
+
             if (colorValue.match(/^#[0-9A-F]{6}$/i)) {
                 colorPicker.value = colorValue;
                 previewBadge.style.backgroundColor = colorValue;
@@ -318,17 +389,17 @@ function selectIcon(iconClass, iconName) {
             const parentSelect = document.getElementById('parentCategoryId');
             const previewName = document.getElementById('previewName');
             const previewParent = document.getElementById('previewParent');
-            
+
             previewName.textContent = nameInput.value || 'Nome Categoria';
-            
+
             const selectedOption = parentSelect.options[parentSelect.selectedIndex];
-            previewParent.textContent = selectedOption.value ? 
-                `Sottocategoria di: ${selectedOption.text}` : 
+            previewParent.textContent = selectedOption.value ?
+                `Sottocategoria di: ${selectedOption.text}` :
                 'Categoria principale';
         }
 
         // Event listeners per aggiornamento anteprima in tempo reale
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const nameInput = document.getElementById('name');
             const iconInput = document.getElementById('icon');
             const colorPicker = document.getElementById('colorPicker');
@@ -337,27 +408,27 @@ function selectIcon(iconClass, iconName) {
             const iconPreview = document.getElementById('iconPreview');
             const previewIcon = document.getElementById('previewIcon');
             const previewBadge = document.getElementById('previewBadge');
-            
+
             // Aggiorna anteprima nome
             nameInput.addEventListener('input', updatePreview);
-            
+
             // Aggiorna anteprima parent
             parentSelect.addEventListener('change', updatePreview);
-            
+
             // Aggiorna anteprima icona
-            iconInput.addEventListener('input', function() {
+            iconInput.addEventListener('input', function () {
                 const iconClass = this.value || 'fas fa-euro-sign';
                 iconPreview.innerHTML = `<i class="${iconClass}" style="font-size: 1.5rem; color: var(--primary);"></i>`;
                 previewIcon.className = iconClass;
             });
 
             // Sincronizza input colore
-            colorPicker.addEventListener('change', function() {
+            colorPicker.addEventListener('change', function () {
                 colorText.value = this.value;
                 previewBadge.style.backgroundColor = this.value;
             });
-            
-            colorText.addEventListener('input', function() {
+
+            colorText.addEventListener('input', function () {
                 if (this.value.match(/^#[0-9A-F]{6}$/i)) {
                     colorPicker.value = this.value;
                     previewBadge.style.backgroundColor = this.value;

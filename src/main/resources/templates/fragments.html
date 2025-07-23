@@ -232,13 +232,24 @@
 							th:text="${trans.amount < 0 ? '-€' + #numbers.formatDecimal(trans.amount.abs(), 1, 2) : '€' + #numbers.formatDecimal(trans.amount, 1, 2)}">
 							€0.00</span>
 					</h3>
-					<!-- Mostra category se presente -->
-					<div th:if="${trans.category != null}" class="category-badge" th:title="${trans.category.name}"
-						th:style="'background-color: ' + ${trans.category.color} + '; margin-bottom: 0.9rem;'">
-						<i th:class="${trans.category.icon}"></i>
-					</div>
-				</div>
 
+					<!-- Mostra category se presente -->
+					<div th:if="${trans.category != null}"
+						style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.95rem;">
+						<!-- Icona categoria principale (se la categoria corrente è una sottocategoria) -->
+						<div th:if="${trans.category.parentCategory != null}" class="category-badge"
+							th:title="${'Categoria principale: ' + trans.category.parentCategory.name}"
+							th:style="'background-color: ' + ${trans.category.parentCategory.color} + '; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; opacity: 0.8;'">
+							<i th:class="${trans.category.parentCategory.icon}"></i>
+						</div>
+						<!-- Icona categoria corrente (principale o sottocategoria) -->
+						<div class="category-badge" th:title="${trans.category.name}"
+							th:style="'background-color: ' + ${trans.category.color} + '; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; opacity: 0.8;'">
+							<i th:class="${trans.category.icon}"></i>
+						</div>
+					</div>
+
+				</div>
 				<h3 th:text="${trans.description}" style="margin-bottom: 0.25rem;">Transazione</h3>
 				<!-- Mostra merchant se presente -->
 				<p th:if="${trans.merchant != null}"
@@ -258,7 +269,7 @@
 				</div>
 
 				<!-- Menu a tendina per la transazione -->
-				<div class="menu-wrapper" style="position: absolute; top: 1rem; right: 1rem;">
+				<div class="menu-wrapper" style="position: absolute; top: 1.5rem; right: 1.25rem;">
 					<button class="menu-button" onclick="toggleMenu(this)"
 						style="background: none; border: none; cursor: pointer; min-width: 30px; min-height: 30px;">
 						<i class="fas fa-ellipsis-v" style="font-size: 1.25rem;"></i>
@@ -274,10 +285,9 @@
 							<i class="fas fa-edit"></i> Modifica
 						</a>
 						<!-- Elimina -->
-						<form
-							th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/delete-transaction/' + ${trans.id}}"
-							method="post" onsubmit="return confirm('Eliminare questa transazione?');"
-							style="margin: 0;">
+						<form method="post" style="margin: 0;"
+							onsubmit="return confirm('Eliminare questa transazione?');"
+							th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/delete-transaction/' + ${trans.id}}">
 							<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 							<button type="submit"
 								style="background: none; border: none; padding: 0.75rem 1rem; width: 100%; text-align: left; cursor: pointer; color: red;">
@@ -288,6 +298,70 @@
 				</div>
 			</div>
 		</div>
+	</div>
+
+	<div th:fragment="allBudgetsList(budgets)">
+		<!-- Lista Budget -->
+		<div th:unless="${#lists.isEmpty(account.budgets)}" class="features-grid" style="text-align: center;">
+			<div th:each="b : ${account.budgets}" class="feature-card" style="position: relative;">
+
+				<!-- Badge Ricorrenza -->
+				<div th:unless="${b.recurrence.name() == 'UNA_TANTUM'}"
+					style="position: absolute; top: 1rem; left: 1rem;">
+					<span
+						style="background: var(--primary); color: white; padding: 0.25rem 0.5rem; border-radius: 1rem; font-size: 0.8rem;">
+						<i class="fas fa-sync-alt"></i> <span th:text="${b.recurrence}">Ricorrente</span>
+					</span>
+				</div>
+
+				<!-- Menu a tendina -->
+				<div class="menu-wrapper" style="position: absolute; top: 1.5rem; right: 1.25rem;">
+					<button class="menu-button" onclick="toggleMenu(this)"
+						style="background: none; border: none; cursor: pointer; min-width: 30px; min-height: 30px;">
+						<i class="fas fa-ellipsis-v" style="font-size: 1.25rem;"></i>
+					</button>
+					<div class="menu-dropdown"
+						style="display: none; position: absolute; top: 2rem; right: 0; background: white; border: 1px solid var(--neutral-light); border-radius: 0.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); z-index: 10;">
+						<!-- Modifica -->
+						<a th:href="@{'/' + ${username} + '/account/' + ${account.id} + '/edit-budget/' + ${b.id}}"
+							class="menu-item"
+							style="display: block; padding: 0.75rem 1rem; text-decoration: none; color: var(--primary);">
+							<i class="fas fa-edit"></i> Modifica
+						</a>
+						<!-- Elimina -->
+						<form method="post" style="margin: 0;"
+							th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/delete-budget/' + ${b.id}}"
+							onsubmit="return confirm('Eliminare questo budget?');">
+							<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+							<button type="submit"
+								style="background: none; border: none; padding: 0.75rem 1rem; width: 100%; text-align: left; cursor: pointer; color: red;">
+								<i class="fas fa-trash-alt"></i> Elimina
+							</button>
+						</form>
+					</div>
+				</div>
+
+				<!-- Categoria badge -->
+				<div th:if="${b.category != null}" class="category-badge" th:title="${b.category.name}"
+					th:style="'background-color: ' + ${b.category.color} + '; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.9rem; margin-right: 0.7rem; width: 2.2rem; height: 2.2rem; border-radius: 50%;'">
+					<i th:class="${b.category.icon}"></i>
+				</div>
+
+				<!-- Importo -->
+				<h3 style="font-size: 1.3rem; font-weight: 600;"
+					th:style="${b.amount >= 0} ? 'color: var(--accent);' : 'color: var(--warning);'">
+					<span
+						th:text="${b.amount < 0 ? '-€' + #numbers.formatDecimal(b.amount.abs(),1,2) : '€' + #numbers.formatDecimal(b.amount,1,2)}">
+						€0.00
+					</span>
+				</h3>
+				<!-- Descrizione -->
+				<h3 th:text="${b.description}" style="margin-bottom: 0.25rem;">Budget</h3>
+				<!-- Data -->
+				<p><span th:text="${#temporals.format(b.date,'dd/MM/yyyy')}">01/01/2025</span></p>
+			</div>
+		</div>
+	</div>
 </body>
 
 </html>

@@ -67,13 +67,15 @@
                             style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;"
                             onchange="handleMerchantSelection(this)">
                             <option value="">Seleziona esercente</option>
-                            <option th:each="merchant : ${merchants}" th:value="${merchant.id}" th:text="${merchant.name}"></option>
+                            <option th:each="merchant : ${merchants}" th:value="${merchant.id}"
+                                th:text="${merchant.name}"></option>
                             <option data-add-new="true" value="">+ Aggiungi nuovo esercente</option>
                         </select>
                     </div>
 
                     <!-- Form per nuovo merchant (nascosto di default) -->
-                    <div id="newMerchantForm" th:replace="~{fragments.html :: newMerchantForm}" style="display:none;"></div>
+                    <div id="newMerchantForm" th:replace="~{fragments.html :: newMerchantForm}" style="display:none;">
+                    </div>
 
                     <!-- Categoria -->
                     <div class="form-group">
@@ -82,19 +84,30 @@
                             style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;"
                             onchange="handleCategorySelection(this)">
                             <option value="">Seleziona categoria</option>
-                            <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
-                            <option data-add-new="true" value="">+ Aggiungi nuova categoria</option>
+                            <option th:each="category : ${categories}" th:value="${category.id}"
+                                th:text="${category.name}"></option>
+                            <!--option data-add-new="true" value="">+ Aggiungi nuova categoria</option-->
                         </select>
+
+                        <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--neutral-dark);">
+                            <i class="fas fa-info-circle"></i>
+                            <a th:href="@{'/' + ${username} + '/categories'}"
+                                style="color: var(--primary); text-decoration: none;">
+                                Gestisci le tue categorie
+                            </a>
+                        </p>
+
                     </div>
 
-                    <!-- Form per nuova categoria (nascosto di default) -->
-                    <div id="newCategoryForm" th:replace="~{fragments.html :: newCategoryForm}" style="display:none;"></div>
+                    <!-- Form per nuova categoria (nascosto di default)
+                    <div id="newCategoryForm" th:replace="~{fragments.html :: newCategoryForm}" style="display:none;"></div-->
 
                     <!-- Descrizione -->
                     <div class="form-group">
                         <label for="description">Descrizione (facoltativa)</label>
                         <input type="text" id="description" th:field="*{description}" />
-                        <span class="error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
+                        <span class="error" th:if="${#fields.hasErrors('description')}"
+                            th:errors="*{description}"></span>
                     </div>
 
                     <!-- Pulsanti -->

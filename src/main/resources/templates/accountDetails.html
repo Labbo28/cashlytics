@@ -142,16 +142,17 @@
                             <select id="categoryId" th:field="*{categoryId}"
                                 style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;">
                                 <option value="">Seleziona categoria</option>
-                                <optgroup th:each="category : ${categories}" th:if="${category.parentCategory == null}"
+                                <!--optgroup th:each="category : ${categories}" th:if="${category.parentCategory == null}"
                                     th:label="${category.name}">
                                     <option th:value="${category.id}" th:text="${category.name}"></option>
                                     <option th:each="subcat : ${category.subCategories}" th:value="${subcat.id}"
                                         th:text="${'  └─ ' + subcat.name}"></option>
-                                </optgroup>
+                                </optgroup-->
                                 <option th:each="category : ${categories}"
                                     th:if="${category.parentCategory == null and #lists.isEmpty(category.subCategories)}"
                                     th:value="${category.id}" th:text="${category.name}"></option>
                             </select>
+
                             <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--neutral-dark);">
                                 <i class="fas fa-info-circle"></i>
                                 <a th:href="@{'/' + ${username} + '/categories'}"
@@ -218,34 +219,25 @@
                             <span class="error" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></span>
                         </div>
 
-                        <!-- Recurrence pattern -->
-                        <div class="form-group">
-                            <label for="recurrencePattern">Ricorrenza (facoltativa)</label>
-                            <select id="recurrencePattern" th:field="*{recurrencePattern}"
-                                style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;">
-                                <option value="">Seleziona la ricorrenza di aggiornamento</option>
-                                <option
-                                    th:each="p : ${T(it.uniroma3.cashlytics.Model.Enums.RecurrencePattern).values()}"
-                                    th:if="${p.name() != 'UNA_TANTUM'}" th:value="${p}" th:text="${p}"></option>
-                            </select>
-                        </div>
-
                         <!-- Categoria (obbligatoria) -->
                         <div class="form-group">
-                            <label for="categoryId">Categoria <span style="color: red;">*</span></label>
+                            <label for="categoryId">Categoria (viene usata per aggiornare il
+                                budget)<!--span style="color: red;">*</span-->
+                            </label>
                             <select id="categoryId" th:field="*{categoryId}"
                                 style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;"
                                 required>
                                 <option value="">Seleziona categoria</option>
+
+                                <!-- Itera attraverso tutte le categorie principali -->
                                 <optgroup th:each="category : ${categories}" th:if="${category.parentCategory == null}"
                                     th:label="${category.name}">
+                                    <!-- Categoria principale -->
                                     <option th:value="${category.id}" th:text="${category.name}"></option>
+                                    <!-- Sottocategorie se presenti -->
                                     <option th:each="subcat : ${category.subCategories}" th:value="${subcat.id}"
                                         th:text="${'  └─ ' + subcat.name}"></option>
                                 </optgroup>
-                                <option th:each="category : ${categories}"
-                                    th:if="${category.parentCategory == null and #lists.isEmpty(category.subCategories)}"
-                                    th:value="${category.id}" th:text="${category.name}"></option>
                             </select>
                             <span class="error" th:if="${#fields.hasErrors('categoryId')}"
                                 th:errors="*{categoryId}"></span>
@@ -256,6 +248,18 @@
                                     Gestisci le tue categorie
                                 </a>
                             </p>
+                        </div>
+
+                        <!-- Recurrence pattern -->
+                        <div class="form-group">
+                            <label for="recurrencePattern">Ricorrenza (facoltativa)</label>
+                            <select id="recurrencePattern" th:field="*{recurrencePattern}"
+                                style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;">
+                                <option value="">Seleziona la ricorrenza di aggiornamento</option>
+                                <option
+                                    th:each="p : ${T(it.uniroma3.cashlytics.Model.Enums.RecurrencePattern).values()}"
+                                    th:if="${p.name() != 'UNA_TANTUM'}" th:value="${p}" th:text="${p}"></option>
+                            </select>
                         </div>
 
                         <!-- Descrizione -->
@@ -277,49 +281,10 @@
             </div>
 
             <!-- Lista Budget -->
-            <div th:unless="${#lists.isEmpty(account.budgets)}" class="features-grid" style="text-align: center;">
-                <div th:each="b : ${account.budgets}" class="feature-card" style="position: relative;">
-
-                    <!-- Pulsanti Modifica & Elimina Budget -->
-                    <div style="position: absolute; top: 0.5rem; right: 0.5rem; display: flex; gap: 0.5rem;">
-                        <a th:href="@{'/' + ${username} + '/account/' + ${account.id} + '/edit-budget/' + ${b.id}}"
-                            class="btn btn-sm btn-outline-primary" title="Modifica Budget">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <form
-                            th:action="@{'/' + ${username} + '/account/' + ${account.id} + '/delete-budget/' + ${b.id}}"
-                            method="post" onsubmit="return confirm('Eliminare questo budget?');">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Elimina Budget">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Categoria badge -->
-                    <div th:if="${b.category != null}" class="category-badge" th:title="${b.category.name}"
-                        th:style="'background-color: ' + ${b.category.color} + '; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.9rem; margin-right: 0.7rem; width: 2.2rem; height: 2.2rem; border-radius: 50%;'">
-                        <i th:class="${b.category.icon}" style="font-size: 1.2rem;"></i>
-                    </div>
-
-                    <h3 style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem;"
-                        th:style="${b.amount >= 0} ? 'color: var(--accent);' : 'color: var(--warning);'">
-                        <span
-                            th:text="${b.amount < 0 ? '-€' + #numbers.formatDecimal(b.amount.abs(),1,2) : '€' + #numbers.formatDecimal(b.amount,1,2)}">
-                            €0.00
-                        </span>
-                    </h3>
-                    <p th:text="${b.description}" style="margin-bottom: 0.25rem;">Descrizione Budget</p>
-                    <p>
-                        <span th:text="${#temporals.format(b.date,'dd/MM/yyyy')}">01/01/2025</span>
-                        <span th:unless="${b.recurrence.name() == 'UNA_TANTUM'}" th:text="${b.recurrence}"
-                            style="margin-left: 1.25rem; font-style: italic;"></span>
-                    </p>
-                </div>
-            </div>
+            <div th:replace="~{fragments.html :: allBudgetsList(${account.budgets})}"></div>
         </section>
-
     </main>
+
     <div th:replace="~{fragments.html :: siteFooter}"></div>
     <script th:src="@{/js/main.js}"></script>
     <script th:if="${openAllForms}" defer>
