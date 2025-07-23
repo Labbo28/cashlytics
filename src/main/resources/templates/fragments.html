@@ -21,7 +21,8 @@
 			<!-- Sezione sinistra: logo/navigazione -->
 			<div class="container">
 				<nav class="main-nav">
-					<a th:href="@{/}" class="logo">CashLytics</a>
+					<a th:if="${userDetails}" th:href="@{'/' + ${userDetails.username} + '/dashboard'}" class="logo">CashLytics</a>
+					<a th:unless="${userDetails}" th:href="@{/}" class="logo">CashLytics</a>
 					<ul class="nav-links">
 
 						<!-- Sezione destra: se l'utente ha effettuato il login -->
