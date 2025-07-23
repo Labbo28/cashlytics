@@ -45,7 +45,7 @@ public class FinancialAccountController {
         model.addAttribute("transactions", account.getTransactions());
         model.addAttribute("budgets", account.getBudgets());
         model.addAttribute("merchants", merchantService.findAllByUser(account.getUser()));
-        model.addAttribute("categories", categoryService.findMainCategoriesByUser(account.getUser()));
+        model.addAttribute("categories", categoryService.findAllByUser(account.getUser()));
 
         if (!model.containsAttribute("transactionDTO")) {
             TransactionDTO transactionDTO = new TransactionDTO();

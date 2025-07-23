@@ -50,17 +50,23 @@ public class BudgetController {
 			return "redirect:/" + username + "/account/" + accountId;
 		}
 
-		FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
-		User user = userService.getUserByUsername(username);
-		Budget newBudget = budgetService.createBudget(budgetDTO, account, user);
+		try {
+			FinancialAccount account = financialAccountService.getFinancialAccountById(accountId);
+			User user = userService.getUserByUsername(username);
+			Budget newBudget = budgetService.createBudget(budgetDTO, account, user);
 
-		if (newBudget == null) {
-			redirectAttributes.addFlashAttribute("errorMessage", "Non è stato possibile creare il budget.");
+			if (newBudget == null) {
+				redirectAttributes.addFlashAttribute("errorMessage", "Non è stato possibile creare il budget.");
+				return "redirect:/" + username + "/account/" + accountId;
+			}
+
+			redirectAttributes.addFlashAttribute("successMessage", "Budget creato con successo!");
+			return "redirect:/" + username + "/account/" + accountId;
+		} catch (IllegalArgumentException e) {
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+			redirectAttributes.addFlashAttribute("budgetDTO", budgetDTO);
 			return "redirect:/" + username + "/account/" + accountId;
 		}
-
-		redirectAttributes.addFlashAttribute("successMessage", "Budget creato con successo!");
-		return "redirect:/" + username + "/account/" + accountId;
 	}
 
 	/*

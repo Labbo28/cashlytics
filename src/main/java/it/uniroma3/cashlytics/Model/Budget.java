@@ -8,10 +8,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Entity
+@Table(
+    uniqueConstraints = @UniqueConstraint(columnNames = {"financial_account_id", "category_id"})
+)
 @Data
 public class Budget {
     @Id

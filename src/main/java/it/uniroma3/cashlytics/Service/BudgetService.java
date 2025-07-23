@@ -46,6 +46,11 @@ public class BudgetService {
         Category category = categoryService.findById(budgetDTO.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid category for budget"));
 
+        // Check for existing budget with same account and category (including subcategories)
+        if (!budgetRepository.findAllByFinancialAccountAndCategory(account, category).isEmpty()) {
+            throw new IllegalArgumentException("Esiste già un budget per questa categoria o sottocategoria in questo account.");
+        }
+
         // Costruisci budget
         Budget newBudget = new Budget();
         newBudget.setAmount(budgetDTO.getAmount());
