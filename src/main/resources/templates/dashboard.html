@@ -70,7 +70,7 @@
                             <select th:field="*{accountType}" id="accountType"
                                 style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;">
                                 <option value="">Seleziona il tipo di account</option>
-                                <option th:each="type : ${accountTypes}" th:value="${type}" th:text="${type}"></option>
+                                <option th:each="type : ${accountTypes}" th:value="${type}" th:text="${#strings.replace(type.name(), '_', ' ')}"></option>
                             </select>
                         </div>
 
