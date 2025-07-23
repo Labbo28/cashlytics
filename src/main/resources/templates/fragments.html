@@ -306,7 +306,7 @@
 			<div th:each="b : ${account.budgets}" class="feature-card" style="position: relative;">
 
 				<!-- Badge Ricorrenza -->
-				<div th:unless="${b.recurrence.name() == 'UNA_TANTUM'}"
+				<div th:if="${b.recurrence != null and b.recurrence.name() != 'UNA_TANTUM'}"
 					style="position: absolute; top: 1rem; left: 1rem;">
 					<span
 						style="background: var(--primary); color: white; padding: 0.25rem 0.5rem; border-radius: 1rem; font-size: 0.8rem;">
@@ -341,10 +341,14 @@
 					</div>
 				</div>
 
-				<!-- Categoria badge -->
+				<!-- Categoria badge (null-safe) -->
 				<div th:if="${b.category != null}" class="category-badge" th:title="${b.category.name}"
-					th:style="'background-color: ' + ${b.category.color} + '; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.9rem; margin-right: 0.7rem; width: 2.2rem; height: 2.2rem; border-radius: 50%;'">
-					<i th:class="${b.category.icon}"></i>
+					th:style="'background-color: ' + (${b.category != null ? b.category.color : '#ccc'}) + '; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.9rem; margin-right: 0.7rem; width: 2.2rem; height: 2.2rem; border-radius: 50%;'">
+					<i th:if="${b.category != null}" th:class="${b.category.icon}"></i>
+				</div>
+				<div th:if="${b.category == null}" class="category-badge"
+					th:style="'background-color: #ccc; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.9rem; margin-right: 0.7rem; width: 2.2rem; height: 2.2rem; border-radius: 50%;'">
+					<i class="fas fa-question"></i>
 				</div>
 
 				<!-- Importo -->
@@ -358,7 +362,7 @@
 				<!-- Descrizione -->
 				<h3 th:text="${b.description}" style="margin-bottom: 0.25rem;">Budget</h3>
 				<!-- Data -->
-				<p><span th:text="${#temporals.format(b.date,'dd/MM/yyyy')}">01/01/2025</span></p>
+				<p><span th:text="${b.date != null ? #temporals.format(b.date,'dd/MM/yyyy') : 'Data mancante'}">01/01/2025</span></p>
 			</div>
 		</div>
 	</div>

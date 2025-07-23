@@ -62,15 +62,18 @@ public class BudgetService {
         return budgetRepository.save(newBudget);
     }
 
-    // SOSTITUISCI tutto il metodo:
-public void deleteBudget(Long budgetId, FinancialAccount account) {
-    Budget budget = budgetRepository.findById(budgetId)
-            .orElseThrow(() -> new RuntimeException("Budget not found with id: " + budgetId));
-    
-    // Rimuovi il budget dalla lista dell'account
-    account.getBudgets().remove(budget);
-    
-    // Elimina il budget (non modificare il saldo dell'account)
-    budgetRepository.delete(budget);
-}
+    public Budget save(Budget budget) {
+        return budgetRepository.save(budget);
+    }
+
+    public void deleteBudget(Long budgetId, FinancialAccount account) {
+        Budget budget = budgetRepository.findById(budgetId)
+                .orElseThrow(() -> new RuntimeException("Budget not found with id: " + budgetId));
+        
+        // Rimuovi il budget dalla lista dell'account
+        account.getBudgets().remove(budget);
+        
+        // Elimina il budget (non modificare il saldo dell'account)
+        budgetRepository.delete(budget);
+    }
 }
