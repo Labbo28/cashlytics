@@ -139,6 +139,19 @@
                         </div>
                     </div>
 
+                    <!-- Dropdown for ordering -->
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-sort-amount-down-alt"></i> Ordina per
+                        </label>
+                        <select name="orderBy" style="width: 100%; padding: 1rem; border: 1px solid var(--neutral-mid); border-radius: var(--radius-md); font-size: 1rem;">
+                            <option value="MOST_RECENT" th:selected="${param.orderBy == null or param.orderBy == 'MOST_RECENT'}">Più recenti</option>
+                            <option value="OLDEST" th:selected="${param.orderBy == 'OLDEST'}">Più vecchie</option>
+                            <option value="HIGHEST" th:selected="${param.orderBy == 'HIGHEST'}">Importo più alto</option>
+                            <option value="LOWEST" th:selected="${param.orderBy == 'LOWEST'}">Importo più basso</option>
+                        </select>
+                    </div>
+
                     <!-- Pulsanti di Azione -->
                     <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center; flex-wrap: wrap;">
                         <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">

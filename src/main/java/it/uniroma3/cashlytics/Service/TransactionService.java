@@ -178,7 +178,8 @@ public class TransactionService {
             String merchantId,
             String description,
             boolean onlyRecurring,
-            Long categoryId) {
+            Long categoryId,
+            String orderBy) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Transaction> cq = cb.createQuery(Transaction.class);
@@ -218,7 +219,19 @@ public class TransactionService {
         }
 
         cq.where(cb.and(predicates.toArray(new Predicate[0])));
-        cq.orderBy(cb.desc(root.get("date"))); // Ordine decrescente per data
+
+        // Order by logic
+        if (orderBy == null || orderBy.equals("MOST_RECENT")) {
+            cq.orderBy(cb.desc(root.get("date")));
+        } else if (orderBy.equals("OLDEST")) {
+            cq.orderBy(cb.asc(root.get("date")));
+        } else if (orderBy.equals("HIGHEST")) {
+            cq.orderBy(cb.desc(root.get("amount")));
+        } else if (orderBy.equals("LOWEST")) {
+            cq.orderBy(cb.asc(root.get("amount")));
+        } else {
+            cq.orderBy(cb.desc(root.get("date"))); // default fallback
+        }
 
         return entityManager.createQuery(cq).getResultList();
     }
